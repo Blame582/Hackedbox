@@ -1,0 +1,91 @@
+
+#name: 		frobust
+#author:	miklos
+#date:		Tue, 03.05.02
+#updated: 	(09/2026) for hackedbox-0.8.8 
+
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
+# Background folder for automatic image rotation
+#root.background.folder: ~/.hackedbox/backgrounds
+# Background rotation timer in seconds (0 = disabled)
+#root.background.timer: 0
+
+menu.frame:					Raised Solid
+menu.frame.color:			#4c4c4c
+menu.frame.textColor:		#d7e0ee
+menu.frame.font: 			Hack-12
+menu.frame.justify:			Right
+
+menu.title:					Raised Bevel1 Solid PipeCross
+menu.title.color:			#8d929a
+menu.title.colorTo:			#73787e
+menu.title.textColor:		#000000
+menu.title.font: 			Hack-14
+menu.title.justify:			Center
+
+menu.hilite:				Sunken Solid 
+menu.hilite.color:			#73787e
+menu.hilite.colorTo:		#ffffff
+menu.hilite.textColor:		#d7e0ee
+
+menu.bullet:				Triangle
+menu.bullet.position:		Right
+menu.frame.disableColor:	#ffffff
+
+window.button.focus:	Flat Gradient Vertical
+window.button.focus.color:	#4c4c4c
+window.button.focus.colorTo:	#414141
+window.button.focus.picColor:	#d8e0ee
+
+window.button.unfocus:	Flat Gradient Vertical
+window.button.unfocus.color:	#4c4c4c
+window.button.unfocus.colorTo:	#414141
+window.button.unfocus.picColor:	#686868
+
+window.grip.focus:	Raised Bevel1 Solid Vertical
+window.grip.focus.color:	#aab0b9
+
+window.grip.unfocus:	Raised Bevel1 Solid Horizontal
+window.grip.unfocus.color:	#4c4c4c
+window.grip.unfocus.colorTo:	#ffffff
+
+window.handle.focus:	Raised Bevel1 Solid Vertical
+window.handle.focus.color:	#8a8f96
+
+window.handle.unfocus:	Raised Bevel1 Solid Horizontal
+window.handle.unfocus.color:	#4c4c4c
+window.handle.unfocus.colorTo:	#ffffff
+
+window.label.focus:	Sunken Bevel1 Gradient Vertical
+window.label.focus.color:	#aab0b9
+window.label.focus.colorTo:	#73787e
+window.label.focus.textColor:	#000000
+window.label.focus.justify:	Center
+
+window.justify:	Center
+window.label.unfocus:	Flat Gradient Vertical
+window.label.unfocus.color:	#4c4c4c
+window.label.unfocus.colorTo:	#414141
+window.label.unfocus.textColor:	#686868
+
+window.title.focus:	Raised Bevel1 Gradient Vertical
+window.title.focus.color:	#4c4c4c
+window.title.focus.colorTo:	#414141
+
+window.title.unfocus:	Raised Bevel1 Gradient Vertical
+window.title.unfocus.color:	#4c4c4c
+window.title.unfocus.colorTo:	#414141
+
+window.button.pressed:	Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:	#484848
+window.button.pressed.colorTo:	#73787e
+
+window.frame.focusColor:	#73787e
+window.frame.unfocusColor:	#62666b
+
+handleWidth:	4
+frameWidth:	1
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#000000

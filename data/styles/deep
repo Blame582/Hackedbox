@@ -1,0 +1,77 @@
+# deep - by safari_al
+#tr@rebel.net.au
+#the scent of deep heat is wafting through the air.  inhale.
+#updated: 		(09/2026) for hackedbox-0.8.8 
+
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
+# Background folder for automatic image rotation
+#root.background.folder: ~/.hackedbox/backgrounds
+# Background rotation timer in seconds (0 = disabled)
+#root.background.timer: 0
+
+menu.title.font: 				Hack-14
+menu.title:						flat gradient horizontal 
+menu.title.color:				#223256
+menu.title.colorTo:				#3f5881
+menu.title.textColor:			#d3d3d3
+
+menu.frame.font: 				Hack-12
+menu.frame:						flat gradient horizontal
+menu.frame.color:				#a3a3a3
+menu.frame.colorTo:				#d3d3d3
+menu.frame.textColor:			black
+
+menu.hilite:					flat gradient horizontal
+menu.hilite.color:				#a3a3a3
+menu.hilite.colorTo:			#3f5881
+menu.hilite.textColor:			black
+
+menu.bullet: 					empty
+menu.bullet.position:			left
+
+window.title.focus:				flat gradient vertical
+window.title.focus.color:		#d3d3d3
+window.title.focus.colorTo:		#a3a3a3
+window.title.unfocus:			flat gradient vertical
+window.title.unfocus.color:		#d3d3d3
+window.title.unfocus.colorTo:	#a3a3a3
+
+window.label.focus:				flat gradient horizontal
+window.label.focus.color:		#223256
+window.label.focus.colorTo:		#3f5881
+window.label.focus.textColor:	#d3d3d3
+window.label.unfocus:			flat solid
+window.label.unfocus.color:		#223256
+window.label.unfocus.textColor:	#d3d3d3
+
+window.button.focus:			parentrelative
+window.button.focus.picColor:	black
+window.button.unfocus:			parentrelative
+window.button.unfocus.picColor:	black
+
+window.button.pressed:			flat gradient vertical
+window.button.pressed.color:	#d3d3d3
+window.button.pressed.colorTo:	#3f5881
+
+window.frame.focusColor:		#d3d3d3
+window.frame.unfocusColor:		#a3a3a3
+
+window.handle.focus:			flat solid
+window.handle.focus.color:		#d3d3d3
+window.handle.unfocus:			flat solid
+window.handle.unfocus.color:	#a3a3a3
+
+window.grip.focus:				flat solid
+window.grip.focus.color:		#3f5881
+window.grip.unfocus:			flat solid
+window.grip.unfocus.color:		#223526
+
+borderColor:					black
+
+*justify:						left
+
+borderWidth:					1
+bevelWidth:						1
+frameWidth:						1
+handleWidth:					3

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+HACKEDBOX_HOME="$HOME/.hackedbox"
+IMAGE_FOLDER="$HACKEDBOX_HOME/image"
+SPLASH="$IMAGE_FOLDER/hackedbox.png"
+
+# Show splash
+if [ -f "$SPLASH" ]; then
+    hbsetbg -center "$SPLASH"
+fi
+
+# Run user startup entries
+if [ -d "$HACKEDBOX_HOME/startup" ]; then
+    for startup in "$HACKEDBOX_HOME/startup/"*.run; do
+        [ -f "$startup" ] || continue
+        [ -x "$startup" ] || continue
+        "$startup" &
+    done
+fi
+
+# Keep splash visible briefly
+sleep 5
+
+exec hackedbox

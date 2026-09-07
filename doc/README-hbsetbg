@@ -1,0 +1,74 @@
+hbsetbg
+=======
+
+The Tool that is used to set the XLibre desktop background in Hackedbox.
+It can load an image using several placement modes. It is intended specifically for setting the desktop/root-window background.
+
+Usage:
+    hbsetbg [option] <path to image>
+
+Options
+
+    -center, --center <image>
+        Display the image at its original size, centered on the screen.
+
+    -tile, --tile <image>
+        Tile the image across the entire screen.
+
+    -s2c, --stretch2center <image>
+        Scale the image proportionally so that it fits within the screen,
+        then center it.
+
+    -s2e, --stretch2edge <image>
+        Scale the image proportionally to cover the screen.
+        The image may extend beyond the screen edges.
+        
+
+
+It is built as part of Hackedbox and is used internally by the
+Hackedbox style/background system. Users normally do not need to
+invoke hbsetbg directly.
+
+Backgrounds are configured through the Hackedbox style configuration.
+When a style specifies a root background, Hackedbox invokes hbsetbg
+behind the scenes to apply the requested background.
+
+Style properties include:
+
+    root.background
+    root.background.mode
+    root.background.folder
+    root.background.timer
+
+The style system is responsible for determining when and how hbsetbg
+is used.
+
+Purpose
+-------
+
+hbsetbg provides the actual background-setting functionality while
+keeping background configuration inside the Hackedbox style system.
+
+This separates:
+
+    Style configuration
+        ↓
+    Hackedbox / HbTK style handling
+        ↓
+    hbsetbg
+        ↓
+    X11/XLibre root window
+
+The utility therefore remains a separate executable internally, but
+is not intended to be part of the normal user-facing configuration
+workflow.
+
+Status
+------
+
+hbsetbg was developed from the ground up for Hackedbox and replaces
+the need for users to manually manage the root background through
+external background-setting commands.
+
+Direct invocation may still be possible for development/debugging,
+but normal operation is handled automatically by Hackedbox.

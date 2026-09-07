@@ -1,0 +1,86 @@
+#Title:		cthulhain
+#By:		cthulhain (http://lordzork.com/blackbox/
+#Email:		cthulhain@lordzork.com
+#Comment:	no comment
+
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
+# Background folder for automatic image rotation
+#root.background.folder: ~/.hackedbox/backgrounds
+# Background rotation timer in seconds (0 = disabled)
+#root.background.timer: 0
+
+menu.title.font: Hack-14
+menu.title:						raised gradient crossdiagonal
+menu.title.color:				#151a22
+menu.title.colorTo:				#7a8290
+menu.title.textColor:			#ffffff
+menu.title.justify:				center
+
+menu.frame.font: Hack-12
+menu.frame:						sunken gradient crossdiagonal
+menu.frame.color:				#0f1319
+menu.frame.colorTo:				gray40
+menu.frame.textColor:			#cccccc
+menu.frame.justify:				right
+
+menu.hilite:					sunken gradient crossdiagonal
+menu.hilite.color:				#151a22
+menu.hilite.colorTo:			#7a8290
+menu.hilite.textColor:			#ffffff
+
+menu.bullet:					triangle
+menu.bullet.position:			right
+
+window.title.focus:				raised gradient diagonal
+window.title.focus.color:		gray40
+window.title.focus.colorTo:		#0f1319
+window.title.unfocus:			raised gradient diagonal
+window.title.unfocus.color:		gray40
+window.title.unfocus.colorTo:	#0f1319
+
+window.label.focus:				sunken gradient crossdiagonal
+window.label.focus.color:		#151a22
+window.label.focus.colorTo:		#7a8290
+window.label.focus.textColor:	gray90
+
+window.label.unfocus:			parentrelative
+window.label.unfocus.textColor:	#808080
+
+window.button.focus:			parentrelative
+window.button.focus.picColor:	#cccccc
+
+window.button.pressed:			flat gradient vertical
+window.button.pressed.color:	#0f1319
+window.button.pressed.colorTo:	#7a8290
+window.button.unfocus:			parentrelative
+window.button.unfocus.picColor:	#727272
+
+window.handle.focus:			raised gradient diagonal
+window.handle.focus.color:		gray50
+window.handle.focus.colorTo:	#0f1319
+window.handle.unfocus:			raised gradient diagonal
+window.handle.unfocus.color:	gray50
+window.handle.unfocus.colorTo: 	#0f1319
+
+window.grip.focus:				raised gradient diagonal
+window.grip.focus.color:		#7a8290
+window.grip.focus.colorTo:		#151a22
+window.grip.unfocus:			raised gradient diagonal
+window.grip.unfocus.color:		gray50
+window.grip.unfocus.colorTo:	#0f1319
+
+window.frame.focusColor:		#858585
+window.frame.focus.color:		#858585
+window.frame.unfocusColor:		#5e6166
+window.frame.unfocus.color:		#5e6166
+
+window.justify:					right
+
+borderColor:					#202020
+
+borderWidth:					1
+bevelWidth:						2
+handleWidth:					4
+frameWidth:						0
+

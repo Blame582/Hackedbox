@@ -1,0 +1,91 @@
+#name:	trisb
+#author:	miklos
+#date:	March 25, 2002
+#updated: 		(09/2026) for hackedbox-0.8.8 
+
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
+# Background folder for automatic image rotation
+#root.background.folder: ~/.hackedbox/backgrounds
+# Background rotation timer in seconds (0 = disabled)
+#root.background.timer: 0
+
+menu.frame.font: Hack-12	
+menu.frame:	Flat Gradient CrossDiagonal
+menu.frame.color:	#d5d5d5
+menu.frame.colorTo:	#b4b4b4
+menu.frame.textColor:	#343434
+menu.frame.justify:	Right
+
+menu.title.font: Hack-14
+menu.title:	Flat Gradient Vertical
+menu.title.color:	#8e8e8e
+menu.title.colorTo:	#5f5f5f
+menu.title.textColor:	#c8c8c8
+menu.title.justify:	Center
+
+menu.hilite:	Flat Gradient Vertical
+menu.hilite.color:	#3b90dc
+menu.hilite.colorTo:	#2c5f8c
+menu.hilite.textColor:	#8efdff
+
+menu.bullet:	Triangle
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+window.button.focus:	Flat Gradient Vertical
+window.button.focus.color:	#3b90dc
+window.button.focus.colorTo:	#2c5f8c
+window.button.focus.picColor:	#8efdff
+
+window.button.unfocus:	Flat Gradient Vertical
+window.button.unfocus.color:	#8e8e8e
+window.button.unfocus.colorTo:	#5f5f5f
+window.button.unfocus.picColor:	#aaaaaa
+
+window.grip.focus:	Flat Solid Vertical
+window.grip.focus.color:	#3b90dc
+window.grip.focus.colorto:	#2c5f8c
+
+window.grip.unfocus:	Flat Gradient Vertical
+window.grip.unfocus.color:	#8e8e8e
+window.grip.unfocus.colorTo:	#5f5f5f
+
+window.handle.focus:	Flat Gradient Vertical
+window.handle.focus.color:	#3b90dc
+window.handle.focus.colorTo:	#2c5f8c
+
+window.handle.unfocus:	Flat Gradient Vertical
+window.handle.unfocus.color:	#7a7a7a
+window.handle.unfocus.colorTo:	#555555
+
+window.label.focus:	Flat Gradient Vertical
+window.label.focus.color:	#3b90dc
+window.label.focus.colorTo:	#2c5f8c
+window.label.focus.textColor:	#8efdff
+window.label.focus.justify:	Center
+
+window.justify:	Center
+window.label.unfocus:	Flat Gradient Vertical
+window.label.unfocus.color:	#8e8e8e
+window.label.unfocus.colorTo:	#5f5f5f
+window.label.unfocus.textColor:	#aaaaaa
+
+window.title.focus:	Flat Gradient Vertical
+window.title.focus.color:	#3b90dc
+window.title.focus.colorTo:	#2c5f8c
+
+window.title.unfocus:	Flat Gradient Vertical
+window.title.unfocus.color:	#8e8e8e
+window.title.unfocus.colorTo:	#5f5f5f
+
+window.button.pressed:	Sunken Bevel1 Solid Vertical
+window.button.pressed.color:	#3b90dc
+
+window.frame.focusColor:	#343434
+window.frame.unfocusColor:	#000000
+handleWidth:	3
+frameWidth:	0
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#121212

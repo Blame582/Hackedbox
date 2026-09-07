@@ -1,0 +1,11 @@
+Util.cpp:157 unused variable 'result'
+Screen.cpp deprecated-copy
+Window.cpp suggest parentheses
+Hackedbox.cpp signalHandler defined but not used
+
+Restore automatic menu reload
+Menu changes should be detected/reloaded without manually restarting Hackedbox.
+
+Fix menu stacking/foreground behavior
+Menu should appear above managed application windows when opened.
+Currently it can end up underneath another window.

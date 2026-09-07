@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Hackedbox
+Comment=Hackedbox WM
+Exec=/usr/bin/hackedbox-session
+TryExec=/usr/bin/hackedbox-session
+Type=Application
+DesktopNames=Hackedbox

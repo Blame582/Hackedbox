@@ -1,0 +1,14 @@
+CompileFlags:
+  Add:
+    - -I.
+    - -DHAVE_CONFIG_H
+    - -Wall
+    - -W
+    - -pedantic
+    - -g
+    - -O2
+    - -I/usr/include/freetype2
+    - -I/usr/include/libpng16
+    - -I/usr/include
+    - '-DDEFAULTMENU="~/.hackedbox/menu"'
+    - '-DDEFAULTSTYLE="~/.hackedbox/styles/hackedbox"'

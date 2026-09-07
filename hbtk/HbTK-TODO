@@ -1,0 +1,116 @@
+# HbTK TODO
+
+## Core
+- [ ] Application
+- [ ] EventLoop
+- [ ] Window
+- [ ] Widget
+- [ ] Panel
+- [ ] Layout
+- [ ] Timer
+- [ ] Clipboard
+- [ ] Selection
+- [ ] Focus manager
+- [ ] Keyboard shortcuts
+- [ ] Mouse handling
+- [ ] X11/XLibre window abstraction
+- [ ] Font manager
+- [ ] Image/icon loader
+- [ ] Theme/style system
+- [ ] Scroll model
+- [ ] Drag-and-drop
+- [ ] Cursor management
+
+## Layout
+- [x] HbSplitter
+- [ ] Horizontal layout
+- [ ] Vertical layout
+- [ ] Grid layout
+- [ ] Stack layout
+
+## Menus and Navigation
+- [ ] MenuBar
+- [ ] Menu
+- [ ] ContextMenu
+- [ ] TabBar
+
+## Basic Widgets
+- [ ] Label
+- [ ] Button
+- [ ] CheckBox
+- [ ] RadioButton
+- [ ] ToggleButton
+- [ ] Separator
+- [ ] Image
+
+## Text and Input
+- [ ] LineEdit
+- [ ] TextEdit
+- [ ] TextView
+- [ ] ComboBox
+- [ ] SpinBox
+- [ ] SearchBox
+
+## Scrolling
+- [ ] ScrollBar
+- [ ] ScrollArea
+
+## Selection and Data
+- [ ] ListView
+- [ ] ListBox
+- [ ] TreeView
+- [ ] TableView
+- [ ] FileView
+- [ ] ProgressBar
+
+## Dialogs
+- [ ] Dialog
+- [ ] MessageBox
+- [ ] FileDialog
+- [ ] ColorDialog
+- [ ] FontDialog
+- [ ] InputDialog
+
+## Toolbar and Status
+- [ ] Toolbar
+- [ ] ToolButton
+- [ ] StatusBar
+
+## Terminally-Hacked Requirements
+- [ ] Window
+- [ ] TabBar
+- [ ] ContextMenu
+- [ ] Clipboard
+- [ ] Selection
+- [ ] ScrollBar
+- [ ] Keyboard shortcuts
+- [ ] Mouse handling
+- [ ] Timer
+- [ ] EventLoop
+
+## Fileman Requirements
+- [ ] TreeView
+- [ ] ListView
+- [ ] TableView
+- [ ] HbSplitter
+- [ ] ContextMenu
+- [ ] MenuBar
+- [ ] Toolbar
+- [ ] FileDialog
+
+## Hackedpad Requirements
+- [ ] TextEdit
+- [ ] ScrollBar
+- [ ] MenuBar
+- [ ] Toolbar
+- [ ] ContextMenu
+- [ ] Dialog
+- [ ] SearchBox
+- [ ] TabBar
+
+## Architecture
+- [ ] Keep GUI infrastructure in HbTK
+- [ ] Keep terminal-specific PTY/parser/screen logic in Terminally-Hacked
+- [ ] Make widgets reusable across Terminally-Hacked, Fileman, Hackedpad, and other HbTK applications
+- [ ] Avoid Qt/GTK dependencies
+- [ ] Use native XLibre/X11 infrastructure

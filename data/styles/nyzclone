@@ -1,0 +1,82 @@
+
+#name:		nyzclone
+#author:	miklos
+#date:		March 3, 2002
+#updated: 		(09/2026) for hackedbox-0.8.8 
+
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
+# Background folder for automatic image rotation
+#root.background.folder: ~/.hackedbox/backgrounds
+# Background rotation timer in seconds (0 = disabled)
+#root.background.timer: 0
+
+menu.title.font: 				Hack-14
+menu.title:						Raised Bevel1 Solid
+menu.title.color:				#506c90
+menu.title.textColor:			#ffffff
+menu.title.justify:				Center
+
+menu.frame.font: 				Hack-12
+menu.frame:						Raised Bevel1 Solid
+menu.frame.color:				#c8c8c8
+menu.frame.textColor:			#000000
+menu.frame.justify:				Center
+menu.frame.disableColor:		#ffffff
+
+menu.hilite:					Flat Solid
+menu.hilite.color:				#506890
+menu.hilite.textColor:			#ffffff
+
+menu.bullet:					Empty
+menu.bullet.position:			Right
+
+window.button.focus:			Flat Solid
+window.button.focus.color:		#506c90
+window.button.focus.picColor:	#ffffff
+
+window.button.unfocus:			Flat Solid
+window.button.unfocus.color:	#c8c8c8
+window.button.unfocus.picColor:	#787c78
+
+window.grip.focus:				Raised Bevel1 Solid
+window.grip.focus.color:		#506890
+
+window.grip.unfocus:			Raised Bevel1 Solid
+window.grip.unfocus.color:		#c8c8c8
+
+window.handle.focus:			Raised Bevel1 Solid
+window.handle.focus.color:		#506890
+
+window.handle.unfocus:			Raised Bevel1 Solid
+window.handle.unfocus.color:	#c8c8c8
+
+window.label.focus:				Flat Solid
+window.label.focus.color:		#506890
+window.label.focus.textColor:	#ffffff
+window.label.focus.justify:		Center
+
+window.justify:					Center
+window.label.unfocus:			Flat Solid
+window.label.unfocus.color:		#c8c8c8
+window.label.unfocus.textColor:	#787c78
+
+window.title.focus:				Raised Bevel1 Solid
+window.title.focus.color:		#506890
+
+window.title.unfocus:			Raised Bevel1 Solid
+window.title.unfocus.color:		#c8c8c8
+
+window.button.pressed:			Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:	#506890
+window.button.pressed.colorTo:	#a0a0a0
+
+window.frame.focusColor:		#ffffff
+window.frame.unfocusColor:		#202428
+
+handleWidth:					5	
+frameWidth:						0
+bevelWidth:						1
+borderWidth:					1
+borderColor:					#000000
+

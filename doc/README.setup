@@ -1,0 +1,345 @@
+README.setup
+
+# Hackedbox Setup Guide
+
+This document describes the complete process of setting up Hackedbox from the source code to a working desktop session.
+
+The process is divided into the following stages:
+
+1. Downloading Hackedbox
+2. Extracting the Source
+3. Preparing the Build
+4. Compiling Hackedbox
+5. Installing Hackedbox
+6. System Setup
+   - XLibre
+   - session files
+   - display manager integration
+   - OpenRC considerations
+   - other required desktop components
+7. User Setup
+   - ~/.hackedbox
+   - configuration
+   - styles
+   - backgrounds
+   - user session setup
+8. Launching Hackedbox
+   - SDDM
+   - XDM
+   - startx
+   - direct session launch
+9. First Run
+10. Troubleshooting
+
+The goal is to take a system with the required dependencies installed and bring it to a fully working Hackedbox desktop session.
+
+## 1. Downloading Hackedbox
+
+Obtain the Hackedbox source archive from the project's distribution location.
+
+The source archive should contain the complete Hackedbox source tree, including the build system, source code, headers, configuration files, documentation, styles, and other resources required to build and install Hackedbox.
+
+After downloading the archive, verify that the file was downloaded successfully before continuing.
+
+## 2. Extracting the Source
+
+Create or select a directory in which to build Hackedbox.
+
+Extract the source archive:
+
+tar -xf hackedbox-<version>.tar.xz
+
+Enter the extracted source directory:
+
+cd hackedbox-<version>
+
+The source directory should contain the Hackedbox build files and directories, including `src`, `include`, `docs`, and the project Makefiles.
+
+## 3. Preparing the Build
+
+Before compiling Hackedbox, make sure the required build tools and libraries are installed.
+
+Hackedbox requires the following:
+
+Required:
+
+    C++ compiler (g++)
+
+    GNU Make
+
+    Autoconf
+
+    Automake
+
+    pkg-config
+
+X11/XLibre:
+
+    libX11
+
+    libXext
+
+    libXrender
+
+    libXft
+
+Graphics:
+
+    Imlib2
+
+Font support:
+
+    Fontconfig
+
+    FreeType
+
+These dependencies must be installed before continuing with the build.
+
+The exact build dependencies are documented separately from this setup procedure so that the dependency list can be maintained independently of the installation instructions.
+
+Check the source tree before beginning the build:
+
+ls
+
+Initialize the build system:
+
+./bootstrap
+
+Configure Hackedbox with /usr as the installation prefix:
+
+./configure --prefix=/usr
+
+## 4. Compiling Hackedbox
+
+Compile the source from the Hackedbox source directory:
+
+make
+
+The build should produce the Hackedbox executable and the required object files.
+
+If the compilation fails, correct the reported dependency or source problem before proceeding. Do not continue with installation using an incomplete build.
+
+After a successful build, verify that the Hackedbox executable was produced.
+
+## 5. Installing Hackedbox
+
+Install the compiled Hackedbox files into the system:
+
+
+sudo make install
+
+
+The installation should place the Hackedbox executable, session files, resources, and documentation in their appropriate system locations.
+
+The installation layout is intended to keep system-wide Hackedbox files separate from user-specific configuration.
+
+The Hackedbox installation must provide the components required to start a Hackedbox session, including the session launcher and display-manager session definition where applicable.
+
+## 6. System Setup
+
+Hackedbox runs as an X session and therefore requires a functioning XLibre installation.
+
+The following system components may be involved in a complete desktop installation:
+
+* XLibre
+* X authentication
+* input devices
+* fonts
+* cursor themes
+* DBus, where required by applications
+* audio services, where required
+* network services, where required
+* an optional display manager
+* OpenRC services, where required by the system
+
+These components are system-level services and are not all provided by Hackedbox itself.
+
+Hackedbox should not assume that a particular init system, display manager, audio system, or network manager is being used.
+
+### Display Manager Integration
+
+For SDDM, Hackedbox provides an X session definition:
+
+/usr/share/xsessions/hackedbox.desktop
+
+
+The session definition starts:
+
+hackedbox-session
+
+The Hackedbox session launcher is installed system-wide and is responsible for starting the Hackedbox session.
+
+Other display managers may use different mechanisms for selecting and launching an X session.
+
+### OpenRC
+
+Hackedbox is designed to operate on systems using OpenRC.
+
+System services required by the desktop environment should be enabled through the system's normal OpenRC configuration.
+
+Hackedbox itself Does not provide any OpenRC services nor should it.
+
+## 7. User Setup
+
+After the system-wide installation is complete, configure the Hackedbox environment for the user who will run it.
+
+User-specific Hackedbox configuration is stored in the user's home directory.
+
+The Hackedbox configuration directory is:
+
+~/.hackedbox/
+
+User configuration may include:
+
+
+~/.hackedbox/
+	backgrounds/
+	styles/
+
+
+Copy or create the required configuration files in the user's `~/.hackedbox/` directory.
+
+System-wide files installed by Hackedbox should not be modified simply to change one user's desktop configuration.
+
+## 8. Hackedbox Session
+
+The Hackedbox session launcher is installed system-wide at:
+
+/usr/bin/hackedbox-session
+
+
+The launcher establishes the environment required for the desktop session and starts Hackedbox.
+
+The launcher must be executable:
+
+chmod +x /usr/bin/hackedbox-session
+
+
+All users use the same system-wide session launcher.
+
+## 9. Launching Hackedbox
+
+There are several ways to start Hackedbox.
+
+### SDDM
+
+Install the Hackedbox X session definition at:
+
+/usr/share/xsessions/hackedbox.desktop
+
+
+The desktop entry should contain:
+
+
+[Desktop Entry]
+Name=Hackedbox
+Comment=Hackedbox WM
+Exec=/usr/bin/hackedbox-session
+TryExec=/usr/bin/hackedbox-session
+Type=Application
+DesktopNames=Hackedbox
+
+
+Select **Hackedbox** from the available X sessions in SDDM and log in.
+
+### XDM
+
+Configure XDM to start the system-wide session launcher:
+
+/usr/bin/hackedbox-session
+
+
+### startx
+
+Configure the user's X startup environment to execute:
+
+/usr/bin/hackedbox-session
+
+
+Then start X normally:
+
+
+startx
+
+
+### Direct Session Launch
+
+A Hackedbox session can also be started directly from an existing X environment:
+
+/usr/bin/hackedbox-session
+
+This requires an X server and the required session environment to already be available.
+
+## Installation Layout
+
+The Hackedbox installation separates system files from user configuration.
+
+### System Files
+
+/usr/bin/hackedbox
+/usr/bin/hackedbox-session
+/usr/share/hackedbox/
+
+### Display Manager Integration
+
+/usr/share/xsessions/hackedbox.desktop
+
+### User Configuration
+
+~/.hackedbox/
+
+The Hackedbox build installs the global Hackedbox executable and hbsetbg executable. The user's `~/.hackedbox/` directory contains only user-specific configuration and resources.
+
+## 10. First Run
+
+After Hackedbox starts, verify the basic desktop components:
+
+* the root window is displayed correctly
+* the mouse and keyboard work
+* menus open correctly
+* applications can be launched
+* the configured style loads
+* backgrounds load correctly
+* the clock works when enabled
+* terminal applications start correctly
+* the file manager starts correctly
+* the session can exit cleanly
+
+If any of these components fail, determine whether the problem belongs to Hackedbox itself or to an external system component before changing the Hackedbox configuration.
+
+## 11. Troubleshooting
+
+When troubleshooting a Hackedbox session, check the problem in this order:
+
+1. XLibre
+2. X authentication
+3. input devices
+4. session launcher
+5. Hackedbox executable
+6. Hackedbox configuration
+7. external desktop services
+8. individual applications
+
+A failure in an external service should not automatically be treated as a Hackedbox failure.
+
+For problems specific to Hackedbox, run the session from a terminal where possible so that startup errors can be observed directly.
+
+---
+
+## Installation Layout
+
+The intended installation separates system files from user configuration.
+
+System files:
+
+/usr/bin/hackedbox
+/usr/bin/hackedbox-session
+/usr/share/xsessions/hackedbox.desktop
+/usr/share/hackedbox/
+
+User files:
+
+~/.hackedbox/
+~/.local/bin/
+
+The exact installation paths are determined by the Hackedbox build and installation configuration and should be kept consistent with this document.

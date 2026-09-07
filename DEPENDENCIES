@@ -1,0 +1,24 @@
+Hackedbox Build Dependencies
+============================
+
+Required:
+- C++ compiler (g++)
+- GNU Make
+
+X11/XLibre:
+- libX11
+- libXext
+- libXrender
+- libXft
+
+Graphics:
+- Imlib2
+
+Font support:
+- Fontconfig
+- FreeType
+
+Build tools:
+- autoconf
+- automake
+- pkg-config

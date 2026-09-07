@@ -1,0 +1,391 @@
+README.style
+------------
+
+Hackedbox Styles
+================
+
+A Hackedbox style is an X resource file containing the visual configuration
+used by the window manager. Styles control the appearance of menus, window
+decorations, fonts, colors, textures, borders, and the root background.
+
+Styles are plain text files and can be created or modified with any text
+editor.
+
+
+Style Locations
+===============
+
+System-installed styles are located in:
+
+    /usr/share/hackedbox/styles/
+
+User styles may be placed in:
+
+    ~/.hackedbox/styles/
+
+A style may also be stored elsewhere on the filesystem. Hackedbox only
+requires read access to the file.
+
+
+Loading a Style
+===============
+
+The current style is selected through the Hackedbox menu or configuration.
+
+When a style is loaded, Hackedbox reads the X resources contained in the
+style file and applies the settings to the window manager.
+
+Styles can be changed without rebuilding Hackedbox.
+
+
+Style File Structure
+====================
+
+A style consists of resource keys and values:
+
+    resource.key: value
+
+Resource names are separated by periods. X resource wildcards may also be
+used where supported.
+
+Comments begin with:
+
+    !
+
+For example:
+
+    ! Menu title
+    menu.title.font: Hack-14
+    menu.title.textColor: white
+
+
+Fonts
+=====
+
+Fonts are assigned to individual style components.
+
+Examples:
+
+    menu.title.font: Hack-14
+    menu.frame.font: Hack-10
+
+Use a font name or alias supported by the X11/Xft font system used by the
+current Hackedbox build.
+
+Fonts do not have to be identical throughout the style. Different
+components may use different families and sizes.
+
+
+Menus
+=====
+
+The menu system is divided into the title, frame, and highlighted item.
+
+Typical resources include:
+
+    menu.title.font
+    menu.title
+    menu.title.color
+    menu.title.colorTo
+    menu.title.textColor
+    menu.title.justify
+
+    menu.frame.font
+    menu.frame
+    menu.frame.color
+    menu.frame.colorTo
+    menu.frame.textColor
+    menu.frame.justify
+
+    menu.hilite
+    menu.hilite.color
+    menu.hilite.colorTo
+    menu.hilite.textColor
+
+Menu bullets can be configured with:
+
+    menu.bullet
+    menu.bullet.position
+
+
+Textures
+========
+
+Textures determine how a component is drawn.
+
+The texture description can specify:
+
+    raised
+    sunken
+    flat
+
+along with:
+
+    solid
+    gradient
+
+and gradient direction where supported.
+
+Bevel settings determine how the edge shading is rendered.
+
+Bevel1 places the shading at the edge of the component.
+
+Bevel2 places the shading one pixel inward from the edge.
+
+Texture keywords are not required to use uppercase characters.
+
+
+Colors
+======
+
+Colors may be specified using standard X color names or X color
+specifications.
+
+Examples:
+
+    white
+    black
+    green
+    rgb:90/94/98
+    #08FF52
+
+Gradient textures use both:
+
+    color
+    colorTo
+
+Solid textures only require the primary color.
+
+
+Window Decorations
+==================
+
+Window decorations have separate focused and unfocused states.
+
+The title, label, buttons, frame, handle, and grip can each have their own
+appearance and colors.
+
+The relevant resources are grouped under the window namespace, for example:
+
+    window.title.focus
+    window.title.focus.color
+    window.title.focus.colorTo
+
+    window.title.unfocus
+    window.title.unfocus.color
+    window.title.unfocus.colorTo
+
+    window.label.focus
+    window.label.unfocus
+
+    window.button.focus
+    window.button.unfocus
+    window.button.pressed
+
+    window.frame.focusColor
+    window.frame.unfocusColor
+
+    window.handle.focus
+    window.handle.unfocus
+
+    window.grip.focus
+    window.grip.unfocus
+
+Text and button colors are configured through the corresponding resources.
+
+
+Borders and Geometry
+====================
+
+The following resources control the physical dimensions of decorations:
+
+    borderWidth
+    bevelWidth
+    handleWidth
+
+The border color is controlled by:
+
+    borderColor
+
+For example:
+
+    borderColor: green
+    borderWidth: 1
+    bevelWidth: 2
+    handleWidth: 5
+
+
+Window Layout and Justification
+===============================
+
+Text justification can be configured with:
+
+    window.justify
+
+Menu and title components may also provide their own justification
+resources.
+
+Supported values depend on the component and current style parser.
+
+
+Backgrounds
+==========
+
+Hackedbox uses hbsetbg for root background handling.
+
+New styles should use:
+
+    root.background: /path/to/image.jpg
+    root.background.mode: center
+
+For example:
+
+    root.background: /usr/share/hackedbox/backgrounds/default.jpg
+    root.background.mode: center
+
+User backgrounds may also be stored under:
+
+    ~/.hackedbox/backgrounds/
+
+The optional background rotation resources are:
+
+    root.background.folder
+    root.background.timer
+
+A timer value of 0 disables rotation.
+
+The older:
+
+    rootCommand:
+
+resource is retained for compatibility with older styles but is not used by
+the current root background system. New styles should use the
+root.background resources instead.
+
+
+Pointers and Cursors
+====================
+
+Mouse pointer handling is provided by X11/XLibre rather than by the Hackedbox
+style texture system.
+
+Cursor themes and sizes can therefore be configured through the X cursor
+resources, for example:
+
+    Xcursor.theme: breeze_cursors
+    Xcursor.size: 26
+
+These settings normally belong in the user's X resource configuration
+rather than in the Hackedbox style.
+
+
+Creating a Style From Scratch
+=============================
+
+The simplest way to create a new style is to start with an empty file and
+add only the resources that need to be changed.
+
+For example:
+
+    ! My Hackedbox style
+
+    root.background: /usr/share/hackedbox/backgrounds/default.jpg
+    root.background.mode: center
+
+    menu.title.font: Hack-14
+    menu.frame.font: Hack-10
+
+    menu.title: raised gradient diagonal
+    menu.title.color: rgb:90/94/98
+    menu.title.colorTo: rgb:20/24/28
+    menu.title.textColor: white
+
+    menu.frame: sunken gradient diagonal
+    menu.frame.color: rgb:10/20/30
+    menu.frame.colorTo: rgb:70/80/90
+    menu.frame.textColor: rgb:90/a0/b0
+
+    menu.hilite: raised gradient diagonal
+    menu.hilite.color: rgb:90/94/98
+    menu.hilite.colorTo: rgb:20/24/28
+    menu.hilite.textColor: green
+
+    borderColor: green
+    bevelWidth: 2
+    borderWidth: 1
+    handleWidth: 5
+
+Resources that are not specified retain their default values.
+
+This makes it possible to build a style incrementally instead of copying
+an existing style and modifying every setting.
+
+
+Installing a User Style
+=======================
+
+Save the style in:
+
+    ~/.hackedbox/styles/
+
+For example:
+
+    ~/.hackedbox/styles/MyStyle
+
+The style can then be selected through the Hackedbox menu.
+
+System-wide styles installed by Hackedbox are normally located in:
+
+    /usr/share/hackedbox/styles/
+
+
+Reconfiguring
+=============
+
+After modifying a style, reload or reconfigure Hackedbox so that the new
+resources are read.
+
+If a resource appears to have no effect, verify the resource name and value
+against the currently supported style resources. Hackedbox ignores resources
+that are not used by the component being configured.
+
+
+Complete Example
+================
+
+The following is a compact example containing the major components of a
+style:
+
+    ! Example Hackedbox style
+
+    root.background: /usr/share/hackedbox/backgrounds/default.jpg
+    root.background.mode: center
+
+    menu.title.font: Hack-14
+    menu.frame.font: Hack-10
+
+    menu.title: raised gradient diagonal
+    menu.title.color: rgb:90/94/98
+    menu.title.colorTo: rgb:20/24/28
+    menu.title.textColor: white
+
+    menu.frame: sunken gradient diagonal
+    menu.frame.color: rgb:10/20/30
+    menu.frame.colorTo: rgb:70/80/90
+    menu.frame.textColor: rgb:90/a0/b0
+
+    menu.hilite: raised gradient diagonal
+    menu.hilite.color: rgb:90/94/98
+    menu.hilite.colorTo: rgb:20/24/28
+    menu.hilite.textColor: green
+
+    window.justify: center
+
+    borderColor: green
+    bevelWidth: 2
+    borderWidth: 1
+    handleWidth: 5
+
+This example is intentionally minimal. A complete style can add focused
+and unfocused window textures, labels, buttons, handles, grips, and other
+component-specific resources as required.

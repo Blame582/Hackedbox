@@ -1,0 +1,75 @@
+Hackedbox Startup Directory
+
+Hackedbox provides a simple startup directory for programs that should be started when the Hackedbox session begins.
+
+The startup system is intentionally simple. There is no special configuration language and no numbered startup files. Everything in the startup directory is a normal shell script.
+
+How It Works:
+When Hackedbox starts, hackedbox-session checks:
+~/.hackedbox/startup/
+Every executable file in that directory is run.
+Startup files are ordinary shell scripts.
+
+For example:
+    #!/bin/sh
+
+    volumeicon &
+
+Save this as:
+~/.hackedbox/startup/sound
+
+Then make it executable:
+chmod +x ~/.hackedbox/startup/sound
+
+this will send the volume icon to the icon menu (middle click)
+
+User Programs
+The startup directory is also a convenient place to start programs automatically when Hackedbox starts.
+
+For example:
+    #!/bin/sh
+
+    conky &
+    xclock &
+    my-program &
+
+Save it as:
+~/.hackedbox/startup/programs
+
+and make it executable:
+chmod +x ~/.hackedbox/startup/programs
+
+Anything that can normally be started from a terminal can be placed in a startup script.
+
+Startup Programs and System Services:
+The Hackedbox startup directory is not a replacement for the system init system.
+OpenRC, runit, dinit, s6, systemd, or another init system should continue to handle system services. The Hackedbox startup directory is intended for graphical-session programs and user-specific startup tasks.
+
+For example:
+    volume/tray applications
+    network tray applications
+    desktop utilities
+    notification programs
+    user applications
+    graphical configuration programs
+    scripts needed by the user's desktop session
+
+This allows Hackedbox to work with different init systems without requiring Hackedbox to manage those services itself.
+
+Keep It Simple:
+The startup system follows one rule:
+If it is an executable shell script in ~/.hackedbox/startup/, Hackedbox will run it when the session starts. There are no startup numbers, no complicated dependency system, and no Hackedbox-specific scripting language. Just normal shell scripts in one directory.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
