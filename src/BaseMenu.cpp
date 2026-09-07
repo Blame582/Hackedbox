@@ -456,7 +456,7 @@ void HbBasemenu::update(void) {
   /*
    * Menu clock:
    *
-   * The clock occupies the title area as:
+   * The clock occupies the title area of the menu as:
    *
    *     Hackedbox Menu
    *     09/07/2026
@@ -470,6 +470,16 @@ void HbBasemenu::update(void) {
     hackedbox->getClockEnabled() &&
     (hackedbox->getClockTarget() == "menu" ||
      hackedbox->getClockTarget() == "both");
+
+    FILE *log = fopen("/home/blame/.hackedbox/hackedbox.log", "a");
+    if (log) {
+      fprintf(log,
+              "HBTRACE: menu_clock=%d enabled=%d target='%s'\n",
+              menu_clock,
+              hackedbox->getClockEnabled(),
+              hackedbox->getClockTarget().c_str());
+      fclose(log);
+    }
 
   if (menu_clock)
     hackedbox->getClock()->update();

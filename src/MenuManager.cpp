@@ -230,6 +230,16 @@ bool MenuManager::parseFile(FILE *file,
 
       break;
 
+    /*
+     * [begin]
+     */
+    case 517:
+
+        if (*label)
+         menu->setLabel(label);
+
+        break;
+
 
     /*
      * [style]

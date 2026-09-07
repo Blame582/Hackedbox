@@ -147,11 +147,28 @@ bool resourceIsTrue(const XrmValue& value) {
   if (!value.addr)
     return false;
 
-  const std::string_view text(value.addr, value.size);
+  std::string_view text(value.addr, value.size);
 
-  return text == "true" ||
-         text == "True" ||
-         text == "TRUE";
+  if (!text.empty() && text.back() == '\0')
+    text.remove_suffix(1);
+
+  const bool result =
+    text == "true" ||
+    text == "True" ||
+    text == "TRUE";
+
+  FILE *log = fopen("/home/blame/.hackedbox/hackedbox.log", "a");
+  if (log) {
+    fprintf(log,
+            "HBTRACE: resourceIsTrue text='%.*s' size=%u result=%d\n",
+            static_cast<int>(value.size),
+            value.addr,
+            value.size,
+            result);
+    fclose(log);
+  }
+
+  return result;
 }
 
 bool resourceIsFalse(const XrmValue& value) {
@@ -1536,6 +1553,17 @@ void Hackedbox::load_rc() {
         "Session.Clock.Enabled",
         &valueType,
         &value)) {
+        
+        FILE *log = fopen("/home/blame/.hackedbox/hackedbox.log", "a");
+          if (log) {
+            fprintf(log,
+                    "HBTRACE: clock resource value='%.*s' size=%u type='%s'\n",
+                    static_cast<int>(value.size),
+                    value.addr ? value.addr : "",
+                    value.size,
+                    valueType ? valueType : "");
+            fclose(log);
+          }
 
     resource.clock_enabled = resourceIsTrue(value);
   }
