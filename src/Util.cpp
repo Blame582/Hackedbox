@@ -1,5 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-// Util.cpp for Hackedbox - an XLibre Window Manager
+// Util.cpp for Hackedbox - an X Window Manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 // Look in the Authors file for credits and copyrights.
 //

@@ -1,4 +1,4 @@
-// Runbox.cpp for Hackedbox - an XLibre Window Manager
+// Runbox.cpp for Hackedbox - an X Window Manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 // See AUTHORS for additional contributors and historical copyright holders.
 //

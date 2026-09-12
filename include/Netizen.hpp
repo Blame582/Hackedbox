@@ -1,4 +1,4 @@
-// Netizen.hpp for Hackedbox - An XLibre Window Manager
+// Netizen.hpp for Hackedbox - An X Window Manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 // See AUTHORS for additional contributors and historical copyright holders.
 //

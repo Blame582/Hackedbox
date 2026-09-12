@@ -1,5 +1,5 @@
-// HbSetBg.cpp for Hackedbox - an XLibre window manager
-// Copyright (c) 2026 Kevin Day
+// HbSetBg.cpp for Hackedbox - an X window manager
+// Copyright (c) 2026 Kevin Day  (blame582@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),

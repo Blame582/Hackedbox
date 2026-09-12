@@ -1,4 +1,4 @@
-// Texture.cpp for Hackedbox - an XLibre Window Manager
+// Texture.cpp for Hackedbox - an X Window Manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

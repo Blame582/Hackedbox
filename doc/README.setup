@@ -12,7 +12,7 @@ The process is divided into the following stages:
 4. Compiling Hackedbox
 5. Installing Hackedbox
 6. System Setup
-   - XLibre
+   - X
    - session files
    - display manager integration
    - OpenRC considerations
@@ -73,7 +73,7 @@ Required:
 
     pkg-config
 
-X11/XLibre:
+X11:
 
     libX11
 
@@ -137,11 +137,11 @@ The Hackedbox installation must provide the components required to start a Hacke
 
 ## 6. System Setup
 
-Hackedbox runs as an X session and therefore requires a functioning XLibre installation.
+Hackedbox runs as an X session and therefore requires a functioning Xorg installation.
 
 The following system components may be involved in a complete desktop installation:
 
-* XLibre
+* Xorg
 * X authentication
 * input devices
 * fonts
@@ -311,7 +311,7 @@ If any of these components fail, determine whether the problem belongs to Hacked
 
 When troubleshooting a Hackedbox session, check the problem in this order:
 
-1. XLibre
+1. Xorg
 2. X authentication
 3. input devices
 4. session launcher

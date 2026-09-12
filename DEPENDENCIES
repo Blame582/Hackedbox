@@ -5,7 +5,7 @@ Required:
 - C++ compiler (g++)
 - GNU Make
 
-X11/XLibre:
+X11:
 - libX11
 - libXext
 - libXrender

@@ -1,4 +1,4 @@
-// Font.cpp for Hackedbox - an XLibre Window manager
+// Font.cpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day (blame582@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

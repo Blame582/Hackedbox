@@ -266,7 +266,7 @@ root.background resources instead.
 Pointers and Cursors
 ====================
 
-Mouse pointer handling is provided by X11/XLibre rather than by the Hackedbox
+Mouse pointer handling is provided by X11 rather than by the Hackedbox
 style texture system.
 
 Cursor themes and sizes can therefore be configured through the X cursor

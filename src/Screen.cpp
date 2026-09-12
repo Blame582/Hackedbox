@@ -1,4 +1,4 @@
-// Screen.cpp for Hackedbox - an XLibre Window manager
+// Screen.cpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 // Look in the Authors file for credits and copyrights.
 //
@@ -137,6 +137,49 @@ HbScreen::HbScreen(Hackedbox *hb, unsigned int scrn)
                   reinterpret_cast<unsigned char *>(&bpid),
                   1);
 #endif
+
+  Window wm_window = XCreateSimpleWindow(
+    hackedbox->getXDisplay(),
+    getRootWindow(),
+    0, 0, 1, 1, 0, 0, 0);
+
+  XChangeProperty(
+    hackedbox->getXDisplay(),
+    getRootWindow(),
+    hackedbox->getNETSupportingWMCheckAtom(),
+    XA_WINDOW,
+    32,
+    PropModeReplace,
+    reinterpret_cast<unsigned char *>(&wm_window),
+    1);
+
+  XChangeProperty(
+    hackedbox->getXDisplay(),
+    wm_window,
+    hackedbox->getNETSupportingWMCheckAtom(),
+    XA_WINDOW,
+    32,
+    PropModeReplace,
+    reinterpret_cast<unsigned char *>(&wm_window),
+    1);
+
+  XStoreName(
+    hackedbox->getXDisplay(),
+    wm_window,
+    "Hackedbox");
+
+  Atom utf8_string =
+    XInternAtom(hackedbox->getXDisplay(), "UTF8_STRING", False);
+
+  XChangeProperty(
+    hackedbox->getXDisplay(),
+    wm_window,
+    hackedbox->getNETWMNameAtom(),
+    utf8_string,
+    8,
+    PropModeReplace,
+    reinterpret_cast<unsigned char *>("Hackedbox"),
+    9);
 
   XDefineCursor(hackedbox->getXDisplay(),
                 getRootWindow(),

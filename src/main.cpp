@@ -1,4 +1,4 @@
-// main.cpp for Hackedbox - an XLibre Window manager
+// main.cpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 // See the AUTHORS file for original Blackbox contributors.
 //

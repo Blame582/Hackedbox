@@ -1,12 +1,12 @@
 -- README for HackedBox 0.8.x --
 
-HackedBox is a lightweight XLibre window manager derived from the
+HackedBox is a lightweight X window manager derived from the
 original Blackbox window manager. The 0.8.x series modernizes the original
 codebase while retaining its lightweight design, traditional resource-based
 configuration, and minimal desktop dependencies.
 
 HackedBox is developed for Unix-like systems using the X11 protocol and is
-currently developed and tested with XLibre on Linux.
+currently developed and tested with Xorg on Linux.
 
 
 Source Tree:
@@ -19,12 +19,12 @@ The HackedBox source tree is organized into the following directories:
 
     doc/        - Documentation and manual pages.
 
-	hbSettings  - Start of a built in settings handler.
+    hbSettings  - Start of a built in settings handler.
 
     hbtk/       - The HackedBox Toolkit (HbTK), the native GUI toolkit being
                   developed for HackedBox and related applications.
 
-	include/    - The Hackedbox window manager header files.
+    include/    - The Hackedbox window manager header files.
 
     src/        - The HackedBox window manager source code.
 
@@ -197,12 +197,7 @@ Compatibility:
 
 HackedBox is currently developed and tested on:
 
-    Linux x86_64
-    XLibre
-
-Additional platforms being tested:
-
-    FreeBSD x86_64
+    Linux x86_64 Xorg
     
 The 0.8.x codebase is derived from an older Blackbox codebase that supported
 a number of additional platforms. Those historical platforms are not
@@ -242,6 +237,8 @@ Reporting Problems:
 When reporting a build or runtime problem, include the HackedBox version,
 operating system, architecture, configure options, and any relevant error
 messages or build output.
+
+Kevin Day <blame582@gmail.com>
 
 
 License:

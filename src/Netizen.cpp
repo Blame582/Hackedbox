@@ -1,4 +1,4 @@
-// Nerizen.cpp for Hackedbox - An Xlibre Window manager 
+// Nerizen.cpp for Hackedbox - An X Window manager 
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 // See AUTHORS for additional contributors and historical copyright holders.
 //

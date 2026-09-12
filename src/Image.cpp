@@ -1,4 +1,4 @@
-// Image.cpp for Hackedbox - an XLibre Window Manager
+// Image.cpp for Hackedbox - an X Window Manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 //
 // See the AUTHORS file for the complete list of contributors.

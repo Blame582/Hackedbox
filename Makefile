@@ -14,7 +14,7 @@
 
 
 
-# Makefile.am for Hackedbox - an XLibre Window Manager
+# Makefile.am for Hackedbox - an X Window Manager
 # Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -272,12 +272,12 @@ am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
 distcleancheck_listfiles = \
   find . \( -type f -a \! \
             \( -name .nfs* -o -name .smb* -o -name .__afs* \) \) -print
-ACLOCAL = ${SHELL} '/home/blame/Projects/hackedbox/missing' aclocal-1.18
+ACLOCAL = ${SHELL} '/home/blame/projects/hackedbox/missing' aclocal-1.18
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} '/home/blame/Projects/hackedbox/missing' autoconf
-AUTOHEADER = ${SHELL} '/home/blame/Projects/hackedbox/missing' autoheader
-AUTOMAKE = ${SHELL} '/home/blame/Projects/hackedbox/missing' automake-1.18
+AUTOCONF = ${SHELL} '/home/blame/projects/hackedbox/missing' autoconf
+AUTOHEADER = ${SHELL} '/home/blame/projects/hackedbox/missing' autoheader
+AUTOMAKE = ${SHELL} '/home/blame/projects/hackedbox/missing' automake-1.18
 AWK = gawk
 CC = gcc -std=gnu23
 CCDEPMODE = depmode=none
@@ -308,7 +308,7 @@ LIBOBJS =
 LIBS =   -lX11 -lXft  -lXext
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = ${SHELL} '/home/blame/Projects/hackedbox/missing' makeinfo
+MAKEINFO = ${SHELL} '/home/blame/projects/hackedbox/missing' makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 ORDEREDPSEUDO = 
@@ -332,10 +332,10 @@ X_CFLAGS =
 X_EXTRA_LIBS = 
 X_LIBS = 
 X_PRE_LIBS =  -lSM -lICE
-abs_builddir = /home/blame/Projects/hackedbox
-abs_srcdir = /home/blame/Projects/hackedbox
-abs_top_builddir = /home/blame/Projects/hackedbox
-abs_top_srcdir = /home/blame/Projects/hackedbox
+abs_builddir = /home/blame/projects/hackedbox
+abs_srcdir = /home/blame/projects/hackedbox
+abs_top_builddir = /home/blame/projects/hackedbox
+abs_top_srcdir = /home/blame/projects/hackedbox
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -357,7 +357,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/blame/Projects/hackedbox/install-sh
+install_sh = ${SHELL} /home/blame/projects/hackedbox/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale

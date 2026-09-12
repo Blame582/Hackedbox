@@ -1,4 +1,4 @@
-// ImageControl.hpp for Hackedbox - an XLibre Window manager
+// ImageControl.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 //
 // Additional historical authors and contributors are credited in the
