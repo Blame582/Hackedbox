@@ -7,3 +7,9 @@
 .libs/
 *.o
 autom4te.cache/
+.dirstamp
+config.log
+config.status
+config.h
+Makefile
+*~
