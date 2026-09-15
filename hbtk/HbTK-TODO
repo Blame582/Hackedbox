@@ -1,116 +1,497 @@
 # HbTK TODO
 
-## Core
-- [ ] Application
-- [ ] EventLoop
-- [ ] Window
-- [ ] Widget
-- [ ] Panel
-- [ ] Layout
-- [ ] Timer
-- [ ] Clipboard
-- [ ] Selection
-- [ ] Focus manager
-- [ ] Keyboard shortcuts
-- [ ] Mouse handling
-- [ ] X11/XLibre window abstraction
-- [ ] Font manager
-- [ ] Image/icon loader
-- [ ] Theme/style system
-- [ ] Scroll model
-- [ ] Drag-and-drop
-- [ ] Cursor management
+## Purpose
 
-## Layout
-- [x] HbSplitter
-- [ ] Horizontal layout
-- [ ] Vertical layout
-- [ ] Grid layout
-- [ ] Stack layout
+HbTK is the complete visual toolkit for Hackedbox.
 
-## Menus and Navigation
-- [ ] MenuBar
-- [ ] Menu
-- [ ] ContextMenu
-- [ ] TabBar
+It is not intended to be merely a collection of widgets. HbTK provides the rendering, widgets, visual styling, theming, and eventually the user-facing tools used to create and manage Hackedbox styles.
 
-## Basic Widgets
-- [ ] Label
-- [ ] Button
-- [ ] CheckBox
-- [ ] RadioButton
-- [ ] ToggleButton
-- [ ] Separator
-- [ ] Image
+The existing Blackbox/Hackedbox visual system is the foundation and compatibility baseline. HbTK expands that system beyond the traditional limitations of Blackbox themes.
 
-## Text and Input
-- [ ] LineEdit
-- [ ] TextEdit
-- [ ] TextView
-- [ ] ComboBox
-- [ ] SpinBox
-- [ ] SearchBox
+The goal is to allow users to retain the classic Hackedbox character while having the freedom to create substantially more modern visual designs.
 
-## Scrolling
-- [ ] ScrollBar
-- [ ] ScrollArea
+---
 
-## Selection and Data
-- [ ] ListView
-- [ ] ListBox
-- [ ] TreeView
-- [ ] TableView
-- [ ] FileView
-- [ ] ProgressBar
+# Version 1 Requirements
 
-## Dialogs
-- [ ] Dialog
-- [ ] MessageBox
-- [ ] FileDialog
-- [ ] ColorDialog
-- [ ] FontDialog
-- [ ] InputDialog
+## 1. Style Engine
 
-## Toolbar and Status
-- [ ] Toolbar
-- [ ] ToolButton
-- [ ] StatusBar
+Build a centralized HbTK StyleEngine responsible for the visual appearance of HbTK components.
 
-## Terminally-Hacked Requirements
-- [ ] Window
-- [ ] TabBar
-- [ ] ContextMenu
-- [ ] Clipboard
-- [ ] Selection
-- [ ] ScrollBar
-- [ ] Keyboard shortcuts
-- [ ] Mouse handling
-- [ ] Timer
-- [ ] EventLoop
+The StyleEngine should provide a common styling system for:
 
-## Fileman Requirements
-- [ ] TreeView
-- [ ] ListView
-- [ ] TableView
-- [ ] HbSplitter
-- [ ] ContextMenu
-- [ ] MenuBar
-- [ ] Toolbar
-- [ ] FileDialog
+* Windows
+* Dialogs
+* Menus
+* Buttons
+* Entries
+* Containers
+* Future widgets
+* Hackedbox visual components that migrate into HbTK
 
-## Hackedpad Requirements
-- [ ] TextEdit
-- [ ] ScrollBar
-- [ ] MenuBar
-- [ ] Toolbar
-- [ ] ContextMenu
-- [ ] Dialog
-- [ ] SearchBox
-- [ ] TabBar
+Styling should not be hard-coded independently inside individual widgets.
 
-## Architecture
-- [ ] Keep GUI infrastructure in HbTK
-- [ ] Keep terminal-specific PTY/parser/screen logic in Terminally-Hacked
-- [ ] Make widgets reusable across Terminally-Hacked, Fileman, Hackedpad, and other HbTK applications
-- [ ] Avoid Qt/GTK dependencies
-- [ ] Use native XLibre/X11 infrastructure
+### Style properties
+
+The StyleEngine should eventually support:
+
+* Colors
+* Fonts
+* Font sizes
+* Text rendering
+* Borders
+* Border widths
+* Corner radius
+* Backgrounds
+* Transparency
+* Opacity
+* Gradients
+* Shadows
+* Padding
+* Margins
+* Widget dimensions
+* Spacing
+* Titlebar appearance
+* Menu appearance
+* Widget states
+* Icons
+* Visual effects
+
+---
+
+# 2. Modern Rendering Capabilities
+
+HbTK must extend beyond the traditional Blackbox rendering model.
+
+The engine should support visual features such as:
+
+* Rounded corners
+* Curved UI elements
+* Transparent elements
+* Semi-transparent elements
+* Layered backgrounds
+* Gradients
+* Shadows
+* Custom borders
+* Custom titlebar shapes
+* Per-widget visual effects
+* Modern typography
+* Icon-based controls
+
+These features should be available to the StyleEngine rather than implemented as one-off features in individual applications.
+
+---
+
+# 3. Classic Hackedbox Compatibility
+
+The new system must not discard the existing Hackedbox visual identity.
+
+The default HbTK style should be capable of reproducing the traditional Hackedbox/Blackbox appearance.
+
+Classic styling therefore becomes one style among many rather than the maximum capability of the system.
+
+Conceptually:
+
+```
+Classic Hackedbox style
+         +
+   HbTK rendering
+         +
+   StyleEngine
+         =
+Extended Hackedbox styling
+```
+
+---
+
+# 4. Widget Styling
+
+All HbTK widgets should obtain their appearance through the StyleEngine.
+
+Initial widgets include:
+
+* Window
+* Dialog
+* Widget
+* WidgetContainer
+* Entry
+* Button
+
+Each widget should support appropriate visual states.
+
+### Example: Entry
+
+* Normal
+* Focused
+* Disabled
+* Read-only
+* Placeholder text
+* Cursor
+* Selection
+
+### Example: Button
+
+* Normal
+* Hover
+* Pressed
+* Disabled
+* Focused
+
+The widget should provide behavior and geometry while the StyleEngine determines how that state is rendered.
+
+---
+
+# 5. Painter / Rendering Layer
+
+Expand the existing `Painter` into the rendering foundation used by HbTK.
+
+Current responsibilities include:
+
+* Filling rectangles
+* Drawing borders
+* Drawing text
+* Allocating colors
+
+Future responsibilities may include:
+
+* Rounded rectangles
+* Alpha compositing
+* Transparency
+* Gradients
+* Shadows
+* Clipping
+* Images
+* Icons
+* Better font handling
+* Coordinate translation
+* Layered rendering
+
+The rendering layer should remain lightweight and appropriate for Hackedbox.
+
+---
+
+# 6. Widget Geometry and Layout
+
+Complete the HbTK coordinate and layout model.
+
+The current widget hierarchy establishes parents but does not yet provide a complete coordinate transformation system.
+
+The toolkit needs consistent handling of:
+
+* Parent-relative coordinates
+* Child coordinates
+* Window coordinates
+* Nested containers
+* Resizing
+* Minimum/maximum sizes
+* Padding
+* Margins
+* Spacing
+* Basic layout management
+
+Widgets should render at their assigned geometry without requiring individual widgets to know about the top-level X window.
+
+---
+
+# 7. Input and Interaction
+
+Complete the HbTK event system.
+
+Required areas include:
+
+* Mouse press
+* Mouse release
+* Mouse movement
+* Keyboard press
+* Keyboard release
+* Focus handling
+* Widget activation
+* Keyboard navigation
+* Enter/Return activation
+* Escape/cancel behavior
+* Tab navigation
+* Modifier handling
+
+Buttons need an actual activation/callback mechanism.
+
+Entries need real text input and cursor editing.
+
+---
+
+# 8. Runbox
+
+Use Runbox as one of the first complete HbTK applications.
+
+Runbox should demonstrate the StyleEngine rather than contain its own permanent visual styling.
+
+Planned Runbox functionality:
+
+* Command entry
+* Command history
+* History/dropdown control
+* Run
+* Cancel
+* Keyboard operation
+* Enter to execute
+* Escape to cancel
+* Focus handling
+
+The visual design should demonstrate that classic Hackedbox styling and newer HbTK styling can coexist.
+
+Runbox should not become a collection of hard-coded colors and drawing operations.
+
+---
+
+# 9. Style Definition / Theme Format
+
+Create a dedicated format for HbTK styles.
+
+The format should describe appearance rather than executable behavior.
+
+It should eventually support:
+
+* Global style properties
+* Window properties
+* Menu properties
+* Widget properties
+* State-specific properties
+* Fonts
+* Colors
+* Transparency
+* Geometry
+* Borders
+* Radius
+* Gradients
+* Icons
+* Effects
+
+The format should be designed so styles can be created and edited without recompiling Hackedbox.
+
+---
+
+# 10. Style Manager
+
+Create the HbTK component responsible for:
+
+* Loading styles
+* Validating styles
+* Applying styles
+* Switching styles
+* Reloading styles
+* Saving style information
+* Managing the active style
+
+Style changes should be capable of propagating to visible HbTK components.
+
+---
+
+# 11. Style Builder / Front End
+
+Create a user-facing frontend for building HbTK styles.
+
+The long-term goal is that users can spend their time **designing styles rather than manually editing theme files**.
+
+The style builder should eventually provide visual controls for:
+
+* Colors
+* Fonts
+* Borders
+* Corner radius
+* Transparency
+* Opacity
+* Gradients
+* Shadows
+* Widget dimensions
+* Spacing
+* Titlebars
+* Menus
+* Buttons
+* Entries
+* Other HbTK widgets
+
+It should provide a live preview where practical.
+
+The user should be able to:
+
+1. Create a style.
+2. Modify visual properties.
+3. Preview the result.
+4. Save the style.
+5. Load it into Hackedbox.
+6. Continue editing later.
+
+The frontend is part of the overall HbTK vision, not an unrelated desktop configuration utility.
+
+---
+
+# 12. Icons and Visual Assets
+
+Provide a common HbTK mechanism for:
+
+* Icons
+* Images
+* Background assets
+* Widget icons
+* Menu icons
+* Dropdown indicators
+* Other visual assets
+
+Styles should be able to reference these assets without requiring application-specific implementations.
+
+---
+
+# 13. Hackedbox Integration
+
+Gradually move Hackedbox visual functionality onto HbTK.
+
+The long-term boundary should be:
+
+```
+Hackedbox
+    = window manager / desktop behavior
+
+HbTK
+    = visual system / UI toolkit / theming
+```
+
+Hackedbox should request visual components from HbTK rather than independently implementing duplicate visual systems.
+
+Areas for eventual migration include:
+
+* Menus
+* Configuration UI
+* Runbox
+* Dialogs
+* Future desktop utilities
+* Other user-facing visual components
+
+---
+
+# 14. Architecture Goals
+
+HbTK should remain:
+
+* Lightweight
+* X-based
+* Independent of GTK
+* Independent of Qt
+* Independent of a full desktop environment
+* Suitable for Hackedbox
+* Reusable by other Hackedbox utilities
+* Extensible without rewriting existing widgets
+
+The toolkit should separate:
+
+```
+Behavior
+    ↓
+Widget
+    ↓
+Style
+    ↓
+Rendering
+```
+
+A widget should describe what it is and what state it is in.
+
+The StyleEngine should determine how that state looks.
+
+The Painter/rendering layer should determine how that appearance is drawn.
+
+---
+
+# 15. Development Order
+
+### Phase 1 — Foundation
+
+* [ ] Establish HbTK architecture
+* [ ] Complete Painter foundation
+* [ ] Fix widget coordinate handling
+* [ ] Establish parent/child rendering
+* [ ] Establish focus/event model
+* [ ] Establish widget state model
+
+### Phase 2 — StyleEngine
+
+* [ ] Design StyleEngine API
+* [ ] Move widget appearance into StyleEngine
+* [ ] Define colors
+* [ ] Define fonts
+* [ ] Define borders
+* [ ] Define geometry/metrics
+* [ ] Add widget states
+* [ ] Add titlebar styling
+* [ ] Add menu styling
+
+### Phase 3 — Advanced Rendering
+
+* [ ] Rounded corners
+* [ ] Transparency
+* [ ] Opacity
+* [ ] Gradients
+* [ ] Shadows
+* [ ] Advanced borders
+* [ ] Icons
+* [ ] Image assets
+* [ ] Clipping/layering
+
+### Phase 4 — Style System
+
+* [ ] Define style file format
+* [ ] Implement style loading
+* [ ] Implement style validation
+* [ ] Implement style switching
+* [ ] Implement style reload
+* [ ] Implement style management
+
+### Phase 5 — HbTK Applications
+
+* [ ] Finish Runbox
+* [ ] Command history
+* [ ] Dropdown/history control
+* [ ] Keyboard interaction
+* [ ] Apply StyleEngine to Runbox
+* [ ] Build additional HbTK demonstration widgets
+
+### Phase 6 — Style Builder
+
+* [ ] Design style-builder frontend
+* [ ] Add live preview
+* [ ] Add visual property editors
+* [ ] Add widget previews
+* [ ] Add style save/load
+* [ ] Add style management
+* [ ] Add Hackedbox integration
+
+### Phase 7 — Hackedbox Migration
+
+* [ ] Move remaining visual components into HbTK
+* [ ] Remove duplicated styling logic
+* [ ] Make HbTK the authoritative visual layer
+* [ ] Verify classic Hackedbox style
+* [ ] Verify modern HbTK styles
+* [ ] Document HbTK developer API
+
+---
+
+# Version 1 Definition
+
+HbTK Version 1 is complete when Hackedbox has a functioning visual toolkit and StyleEngine capable of supporting both:
+
+```
+Classic Hackedbox / Blackbox appearance
+```
+
+and:
+
+```
+New HbTK-designed styles
+```
+
+without requiring application source-code changes for ordinary visual customization.
+
+The ultimate objective is not simply to make Hackedbox look newer.
+
+The objective is to give Hackedbox a **real, extensible theming system** in which the user can design the appearance of the desktop and its visual components through HbTK.
+
+1.0 should therefore represent a mature visual toolkit and styling foundation, not merely the next numerical release.

@@ -301,6 +301,32 @@ Hackedbox::Hackedbox(char **m_argv,
   active_screen = screenList.front();
   setFocusedWindow(nullptr);
 
+  /*
+   * Emergency reconfigure key:
+   * Ctrl + Shift + Alt + F12
+   */
+  const KeyCode reconfigure_key =
+      XKeysymToKeycode(display, XK_F12);
+
+  const unsigned int lock_masks[] = {
+      0,
+      LockMask,
+      Mod2Mask,
+      Mod2Mask | LockMask
+  };
+
+  for (const unsigned int lock_mask : lock_masks) {
+      XGrabKey(
+          display,
+          reconfigure_key,
+          ControlMask | ShiftMask | Mod1Mask | lock_mask,
+          DefaultRootWindow(display),
+          False,
+          GrabModeAsync,
+          GrabModeAsync
+          );
+  }
+
   XSynchronize(display, False);
   XSync(display, False);
 
@@ -655,11 +681,18 @@ void Hackedbox::process_event(XEvent *event) {
     break;
   }
 
+  case KeyPress: {
+      const KeySym key = XLookupKeysym(&event->xkey, 0);
 
-  case KeyPress:
-    // Keybindings are handled directly by Hackedbox.
-    break;
+      if (key == XK_Home &&
+          (event->xkey.state & ControlMask) &&
+          (event->xkey.state & ShiftMask) &&
+          (event->xkey.state & Mod1Mask)) {
+          reconfigure();
+      }
 
+      break;
+  }
 
   case ColormapNotify: {
     if (auto *screen =
@@ -930,6 +963,12 @@ void Hackedbox::init_icccm() {
   hackedbox_cycle_window_focus =
     XInternAtom(display, "_HACKEDBOX_CYCLE_WINDOW_FOCUS", False);
 
+  net_supporting_wm_check =
+      XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", False);
+
+  net_wm_name =
+      XInternAtom(display, "_NET_WM_NAME", False);
+
 #ifdef NEWWMSPEC
   net_supported =
     XInternAtom(display, "_NET_SUPPORTED", False);
@@ -961,9 +1000,6 @@ void Hackedbox::init_icccm() {
   net_workarea =
     XInternAtom(display, "_NET_WORKAREA", False);
 
-  net_supporting_wm_check =
-    XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", False);
-
   net_virtual_roots =
     XInternAtom(display, "_NET_VIRTUAL_ROOTS", False);
 
@@ -975,9 +1011,6 @@ void Hackedbox::init_icccm() {
 
   net_properties =
     XInternAtom(display, "_NET_PROPERTIES", False);
-
-  net_wm_name =
-    XInternAtom(display, "_NET_WM_NAME", False);
 
   net_wm_desktop =
     XInternAtom(display, "_NET_WM_DESKTOP", False);

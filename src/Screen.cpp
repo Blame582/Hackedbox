@@ -178,7 +178,8 @@ HbScreen::HbScreen(Hackedbox *hb, unsigned int scrn)
     utf8_string,
     8,
     PropModeReplace,
-    reinterpret_cast<unsigned char *>("Hackedbox"),
+    reinterpret_cast<unsigned char *>(
+      const_cast<char *>("Hackedbox")),
     9);
 
   XDefineCursor(hackedbox->getXDisplay(),

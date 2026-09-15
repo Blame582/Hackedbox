@@ -184,6 +184,9 @@ private:
   Atom hackedbox_change_window_focus;
   Atom hackedbox_cycle_window_focus;
 
+  Atom net_supporting_wm_check;
+  Atom net_wm_name;
+
 #ifdef NEWWMSPEC
   Atom net_supported;
   Atom net_client_list;
@@ -195,14 +198,10 @@ private:
   Atom net_desktop_names;
   Atom net_active_window;
   Atom net_workarea;
-  Atom net_supporting_wm_check;
   Atom net_virtual_roots;
-
   Atom net_close_window;
   Atom net_wm_moveresize;
-
   Atom net_properties;
-  Atom net_wm_name;
   Atom net_wm_desktop;
   Atom net_wm_window_type;
   Atom net_wm_state;
@@ -453,6 +452,14 @@ public:
     return hackedbox_cycle_window_focus;
   }
 
+  Atom getNETSupportingWMCheckAtom() const {
+    return net_supporting_wm_check;
+  }
+  
+  Atom getNETWMNameAtom() const {
+    return net_wm_name;
+  }
+
 #ifdef NEWWMSPEC
   Atom getNETSupportedAtom() const {
     return net_supported;
@@ -490,10 +497,6 @@ public:
     return net_workarea;
   }
 
-  Atom getNETSupportingWMCheckAtom() const {
-    return net_supporting_wm_check;
-  }
-
   Atom getNETVirtualRootsAtom() const {
     return net_virtual_roots;
   }
@@ -508,10 +511,6 @@ public:
 
   Atom getNETPropertiesAtom() const {
     return net_properties;
-  }
-
-  Atom getNETWMNameAtom() const {
-    return net_wm_name;
   }
 
   Atom getNETWMDesktopAtom() const {
