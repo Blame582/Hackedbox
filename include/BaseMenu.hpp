@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -62,6 +62,8 @@ private:
   int which_press;
   int which_sbl;
   int alignment;
+  int clock_item;
+  int date_item;
 
   struct _menu {
     Pixmap frame_pixmap;
@@ -156,6 +158,12 @@ public:
              int pos = -1);
 
   int insert(const std::string& label,
+             int function,
+             const std::string& exec,
+             const std::string& icon,
+             int pos = -1);
+
+  int insert(const std::string& label,
              HbBasemenu *submenu,
              int pos = -1);
 
@@ -215,6 +223,8 @@ public:
   void reconfigure(void);
 
   void redrawClock();
+  void setClockItem(int index);
+  void setDateItem(int index);
 
   void setLabel(const std::string& label);
   void move(int x, int y);
@@ -253,6 +263,7 @@ private:
 
   std::string l;
   std::string e;
+  std::string i;
 
   int f;
   int enabled;
@@ -261,10 +272,12 @@ private:
 public:
   HbBasemenuItem(const std::string& lp,
                  int fp = 0,
-                 const std::string& ep = ""):
+                 const std::string& ep = "",
+                 const std::string& ip = ""):
     sub(0),
     l(lp),
     e(ep),
+    i(ip),
     f(fp),
     enabled(1),
     selected(0) {}
@@ -282,6 +295,9 @@ public:
 
   inline const char *label(void) const
     { return l.c_str(); }
+
+  inline const char *icon(void) const
+    { return i.c_str(); }
 
   inline int function(void) const
     { return f; }

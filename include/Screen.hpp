@@ -1,5 +1,6 @@
 // Screen.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
+// Look in the Authors file for credits and copyrights.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -13,128 +14,94 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef __Screen_hpp
-#define __Screen_hpp
+#ifndef   __Screen_hpp
+#define   __Screen_hpp
+
 
 #include <X11/Xresource.h>
 
 #include <sys/time.h>
 
-#include <cstdio>
 #include <list>
-#include <string>
 #include <vector>
+
 
 #include "Color.hpp"
 #include "ConfigMenu.hpp"
 #include "Texture.hpp"
 #include "IconMenu.hpp"
 #include "Netizen.hpp"
-#include "RootMenu.hpp"
+#include "MenuManager.hpp"
 #include "Workspace.hpp"
 #include "WorkspaceMenu.hpp"
 #include "Hackedbox.hpp"
 #include "Font.hpp"
 
-class Slit;
-class MenuManager;
+class Slit; // forward reference
 
-// Text alignment
-enum TextJustify {
-  LeftJustify = 1,
-  RightJustify,
-  CenterJustify
-};
-
+enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
 struct WindowStyle {
-  HbColor l_text_focus;
-  HbColor l_text_unfocus;
-  HbColor b_pic_focus;
-  HbColor b_pic_unfocus;
+  HbColor l_text_focus, l_text_unfocus, b_pic_focus,
+    b_pic_unfocus;
 
-  HbTexture f_focus;
-  HbTexture f_unfocus;
-  HbTexture t_focus;
-  HbTexture t_unfocus;
-  HbTexture l_focus;
-  HbTexture l_unfocus;
-  HbTexture h_focus;
-  HbTexture h_unfocus;
-  HbTexture b_focus;
-  HbTexture b_unfocus;
-  HbTexture b_pressed;
-  HbTexture g_focus;
-  HbTexture g_unfocus;
+  HbTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
+    h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
 
   XFontSet fontset;
   XFontSetExtents *fontset_extents;
   HbFont *font;
 
-  TextJustify justify;
+  TextJustify justify; 
 
-  int doJustify(const char *text,
-                int &start_pos,
-                unsigned int max_length,
-                unsigned int modifier,
-                bool multibyte) const;
+  int doJustify(const char *text, int &start_pos, unsigned int max_length,
+                unsigned int modifier, bool multibyte) const;
 };
 
 
 struct MenuStyle {
-  HbColor t_text;
-  HbColor f_text;
-  HbColor h_text;
-  HbColor d_text;
+  HbColor t_text, f_text, h_text, d_text;
+  HbColor clock_text, date_text;
+  
+  HbTexture title, frame, hilite, sel;
 
-  HbTexture title;
-  HbTexture frame;
-  HbTexture hilite;
-  HbTexture sel;
+  XFontSet t_fontset, f_fontset;
+  XFontSet clock_fontset, date_fontset;
+  
+  XFontSetExtents *t_fontset_extents, *f_fontset_extents;
+  XFontSetExtents *clock_fontset_extents, *date_fontset_extents;
+  
+  HbFont *t_font, *f_font;
+  HbFont *clock_font, *date_font;
 
-  XFontSet t_fontset;
-  XFontSet f_fontset;
+  TextJustify t_justify, f_justify;
+  TextJustify clock_justify, date_justify;
+  
+  std::string clock_format, date_format;
+  
+  int bullet, bullet_pos;
 
-  XFontSetExtents *t_fontset_extents;
-  XFontSetExtents *f_fontset_extents;
-
-  HbFont *t_font;
-  HbFont *f_font;
-
-  TextJustify t_justify;
-  TextJustify f_justify;
-
-  int bullet;
-  int bullet_pos;
+  bool icon;
+  int icon_pos;
 };
 
 
 struct Strut {
-  unsigned int top;
-  unsigned int bottom;
-  unsigned int left;
-  unsigned int right;
+  unsigned int top, bottom, left, right;
 
-  Strut(void)
-    : top(0),
-      bottom(0),
-      left(0),
-      right(0) {}
+  Strut(void): top(0), bottom(0), left(0), right(0) {}
 };
 
 
 class HbScreen : public ScreenInfo {
 private:
-  bool root_colormap_installed;
-  bool managed;
-  bool geom_visible;
-
+  bool root_colormap_installed, managed, geom_visible;
   GC opGC;
   Pixmap geom_pixmap;
   Window geom_window;
@@ -143,22 +110,20 @@ private:
   HbImageControl *image_control;
   Configmenu *configmenu;
   Iconmenu *iconmenu;
-  Rootmenu *rootmenu;
+  MenuManager *rootmenu;
 
-  typedef std::list<Rootmenu*> RootmenuList;
+  typedef std::list<MenuManager*> RootmenuList;
   RootmenuList rootmenuList;
 
   typedef std::list<Netizen*> NetizenList;
   NetizenList netizenList;
 
-  HackedboxWindowList iconList;
-  HackedboxWindowList windowList;
+  HackedboxWindowList iconList, windowList;
 
   Workspace *current_workspace;
   Workspacemenu *workspacemenu;
 
-  unsigned int geom_w;
-  unsigned int geom_h;
+  unsigned int geom_w, geom_h;
   unsigned long event_mask;
 
   Rect usableArea;
@@ -176,55 +141,42 @@ private:
     WindowStyle wstyle;
     MenuStyle mstyle;
 
-    bool sloppy_focus;
-    bool auto_raise;
-    bool auto_edge_balance;
-    bool image_dither;
-    bool ordered_dither;
-    bool opaque_move;
-    bool full_max;
-    bool focus_new;
-    bool focus_last;
-    bool click_raise;
-    bool allow_scroll_lock;
+    bool sloppy_focus, auto_raise, auto_edge_balance, image_dither,
+         ordered_dither, opaque_move, full_max, focus_new, focus_last,
+         click_raise, allow_scroll_lock;
 
     HbColor border_color;
     XrmDatabase stylerc;
 
+	std::string backgroundFolder;
+	int backgroundTimer;
+
     unsigned int workspaces;
+    int placement_policy, edge_snap_threshold, row_direction, col_direction;
 
-    int placement_policy;
-    int edge_snap_threshold;
-    int row_direction;
-    int col_direction;
+    unsigned int handle_width, bevel_width, frame_width, border_width;
 
-    unsigned int handle_width;
-    unsigned int bevel_width;
-    unsigned int frame_width;
-    unsigned int border_width;
-
-    std::string backgroundFolder;
-    int backgroundTimer;
-
-#ifdef HAVE_STRFTIME
+#ifdef    HAVE_STRFTIME
     std::string strftime_format;
-#else
+#else // !HAVE_STRFTIME
     bool clock24hour;
     int date_format;
-#endif
+#endif // HAVE_STRFTIME
 
   } resource;
 
   HbScreen(const HbScreen&);
   HbScreen& operator=(const HbScreen&);
 
+  bool parseMenuFile(FILE *file, MenuManager *menu);
+
   HbTexture readDatabaseTexture(const std::string &rname,
-                                const std::string &rclass,
-                                const std::string &default_color);
+                               const std::string &rclass,
+                               const std::string &default_color);
 
   HbColor readDatabaseColor(const std::string &rname,
-                            const std::string &rclass,
-                            const std::string &default_color);
+                           const std::string &rclass,
+                           const std::string &default_color);
 
   XFontSet readDatabaseFontSet(const std::string &rname,
                                const std::string &rclass);
@@ -262,7 +214,6 @@ public:
     Exit,
     Shutdown,
     Execute,
-    Runbox,
     Reconfigure,
     WindowShade,
     WindowIconify,
@@ -284,261 +235,156 @@ public:
   ~HbScreen(void);
 
   inline bool isSloppyFocus(void) const
-  {
-    return resource.sloppy_focus;
-  }
+  { return resource.sloppy_focus; }
 
   inline bool isRootColormapInstalled(void) const
-  {
-    return root_colormap_installed;
-  }
+  { return root_colormap_installed; }
 
   inline bool doAutoRaise(void) const
-  {
-    return resource.auto_raise;
-  }
+  { return resource.auto_raise; }
 
   inline bool doClickRaise(void) const
-  {
-    return resource.click_raise;
-  }
+  { return resource.click_raise; }
 
   inline bool isScreenManaged(void) const
-  {
-    return managed;
-  }
+  { return managed; }
 
   inline bool doImageDither(void) const
-  {
-    return resource.image_dither;
-  }
+  { return resource.image_dither; }
 
   inline bool doOrderedDither(void) const
-  {
-    return resource.ordered_dither;
-  }
+  { return resource.ordered_dither; }
 
   inline bool doOpaqueMove(void) const
-  {
-    return resource.opaque_move;
-  }
+  { return resource.opaque_move; }
 
   inline bool doFullMax(void) const
-  {
-    return resource.full_max;
-  }
+  { return resource.full_max; }
 
   inline bool doFocusNew(void) const
-  {
-    return resource.focus_new;
-  }
+  { return resource.focus_new; }
 
   inline bool doFocusLast(void) const
-  {
-    return resource.focus_last;
-  }
+  { return resource.focus_last; }
 
   inline bool allowScrollLock(void) const
-  {
-    return resource.allow_scroll_lock;
-  }
+  { return resource.allow_scroll_lock; }
 
   inline const GC &getOpGC(void) const
-  {
-    return opGC;
-  }
+  { return opGC; }
 
   inline Hackedbox *getHackedbox(void)
-  {
-    return hackedbox;
-  }
+  { return hackedbox; }
 
   inline HbColor *getBorderColor(void)
-  {
-    return &resource.border_color;
-  }
+  { return &resource.border_color; }
 
   inline HbImageControl *getImageControl(void)
-  {
-    return image_control;
-  }
+  { return image_control; }
 
-  inline Rootmenu *getRootmenu(void)
-  {
-    return rootmenu;
-  }
-
-  inline Configmenu *getConfigmenu(void)
-  {
-    return configmenu;
-  }
-
-  inline void addRootmenu(Rootmenu *menu)
-  {
-    if (menu)
-      rootmenuList.push_back(menu);
-  }
+  inline MenuManager *getRootmenu(void)
+  { return rootmenu; }
 
   Workspace *getWorkspace(unsigned int index);
 
   inline Workspace *getCurrentWorkspace(void)
-  {
-    return current_workspace;
-  }
+  { return current_workspace; }
 
   inline Workspacemenu *getWorkspacemenu(void)
-  {
-    return workspacemenu;
-  }
+  { return workspacemenu; }
 
   inline unsigned int getHandleWidth(void) const
-  {
-    return resource.handle_width;
-  }
+  { return resource.handle_width; }
 
   inline unsigned int getBevelWidth(void) const
-  {
-    return resource.bevel_width;
-  }
+  { return resource.bevel_width; }
 
   inline unsigned int getFrameWidth(void) const
-  {
-    return resource.frame_width;
-  }
+  { return resource.frame_width; }
 
   inline unsigned int getBorderWidth(void) const
-  {
-    return resource.border_width;
-  }
+  { return resource.border_width; }
 
   inline unsigned int getCurrentWorkspaceID(void) const
-  {
-    return current_workspace->getID();
-  }
+  { return current_workspace->getID(); }
 
   inline unsigned int getWorkspaceCount(void) const
-  {
-    return workspacesList.size();
-  }
+  { return workspacesList.size(); }
 
   inline unsigned int getIconCount(void) const
-  {
-    return iconList.size();
-  }
+  { return iconList.size(); }
 
   inline unsigned int getNumberOfWorkspaces(void) const
-  {
-    return resource.workspaces;
-  }
+  { return resource.workspaces; }
 
   inline int getPlacementPolicy(void) const
-  {
-    return resource.placement_policy;
-  }
+  { return resource.placement_policy; }
 
   inline int getEdgeSnapThreshold(void) const
-  {
-    return resource.edge_snap_threshold;
-  }
+  { return resource.edge_snap_threshold; }
 
   inline int getRowPlacementDirection(void) const
-  {
-    return resource.row_direction;
-  }
+  { return resource.row_direction; }
 
   inline int getColPlacementDirection(void) const
-  {
-    return resource.col_direction;
-  }
+  { return resource.col_direction; }
 
   inline void setRootColormapInstalled(bool r)
-  {
-    root_colormap_installed = r;
-  }
+  { root_colormap_installed = r; }
 
   inline void saveSloppyFocus(bool s)
-  {
-    resource.sloppy_focus = s;
-  }
+  { resource.sloppy_focus = s; }
 
   inline void saveAutoRaise(bool a)
-  {
-    resource.auto_raise = a;
-  }
+  { resource.auto_raise = a; }
 
   inline void saveClickRaise(bool c)
-  {
-    resource.click_raise = c;
-  }
+  { resource.click_raise = c; }
 
   inline void saveWorkspaces(unsigned int w)
-  {
-    resource.workspaces = w;
-  }
+  { resource.workspaces = w; }
 
   inline void savePlacementPolicy(int p)
-  {
-    resource.placement_policy = p;
-  }
+  { resource.placement_policy = p; }
 
   inline void saveRowPlacementDirection(int d)
-  {
-    resource.row_direction = d;
-  }
+  { resource.row_direction = d; }
 
   inline void saveColPlacementDirection(int d)
-  {
-    resource.col_direction = d;
-  }
+  { resource.col_direction = d; }
 
   inline void saveEdgeSnapThreshold(int t)
-  {
-    resource.edge_snap_threshold = t;
-  }
+  { resource.edge_snap_threshold = t; }
 
   inline void saveImageDither(bool d)
-  {
-    resource.image_dither = d;
-  }
+  { resource.image_dither = d; }
 
   inline void saveOpaqueMove(bool o)
-  {
-    resource.opaque_move = o;
-  }
+  { resource.opaque_move = o; }
 
   inline void saveFullMax(bool f)
-  {
-    resource.full_max = f;
-  }
+  { resource.full_max = f; }
 
   inline void saveFocusNew(bool f)
-  {
-    resource.focus_new = f;
-  }
+  { resource.focus_new = f; }
 
   inline void saveFocusLast(bool f)
-  {
-    resource.focus_last = f;
-  }
+  { resource.focus_last = f; }
 
   inline void saveAllowScrollLock(bool a)
-  {
-    resource.allow_scroll_lock = a;
-  }
+  { resource.allow_scroll_lock = a; }
 
   inline void iconUpdate(void)
-  {
-    iconmenu->update();
-  }
+  { iconmenu->update(); }
 
   /*
-#ifdef HAVE_STRFTIME
+#ifdef    HAVE_STRFTIME
   inline const char *getStrftimeFormat(void)
   { return resource.strftime_format.c_str(); }
 
   void saveStrftimeFormat(const std::string& format);
 
-#else
+#else // !HAVE_STRFTIME
   inline int getDateFormat(void)
   { return resource.date_format; }
 
@@ -551,18 +397,14 @@ public:
   inline void saveClock24Hour(bool c)
   { resource.clock24hour = c; }
 
-#endif
+#endif // HAVE_STRFTIME
   */
 
   inline WindowStyle *getWindowStyle(void)
-  {
-    return &resource.wstyle;
-  }
+  { return &resource.wstyle; }
 
   inline MenuStyle *getMenuStyle(void)
-  {
-    return &resource.mstyle;
-  }
+  { return &resource.mstyle; }
 
   HackedboxWindow *getIcon(unsigned int index);
 
@@ -623,5 +465,6 @@ public:
   void updateNetizenWindowRaise(Window w);
   void updateNetizenWindowLower(Window w);
 };
+
 
 #endif // __Screen_hpp

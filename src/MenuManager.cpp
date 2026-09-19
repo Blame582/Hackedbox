@@ -14,17 +14,21 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#ifdef HAVE_CONFIG_H
+#  include "../config.h"
+#endif // HAVE_CONFIG_H
+
 #include "MenuManager.hpp"
 
 #include "Hackedbox.hpp"
 #include "Screen.hpp"
-#include "RootMenu.hpp"
+#include "Util.hpp"
 #include "ConfigMenu.hpp"
 
 #include <algorithm>
@@ -33,9 +37,9 @@
 #include <cstring>
 #include <dirent.h>
 #include <string>
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <vector>
-
 
 static size_t stringWithin(char begin,
                            char end,
@@ -74,14 +78,89 @@ static size_t stringWithin(char begin,
   return i;
 }
 
-
 MenuManager::MenuManager(HbScreen *screen)
-  : m_screen(screen) {
+  : HbBasemenu(screen),
+    m_screen(screen)
+{
 }
 
+MenuManager::~MenuManager()
+{
+}
+
+void MenuManager::itemSelected(int button,
+                               unsigned int index)
+{
+  if (button != 1)
+    return;
+
+  HbBasemenuItem *item = find(index);
+
+  if (!item->function())
+    return;
+
+  if (!(getScreen()->getRootmenu()->isTorn() || isTorn()) &&
+      item->function() != HbScreen::Reconfigure &&
+      item->function() != HbScreen::SetStyle)
+    hide();
+
+  switch (item->function()) {
+
+  case HbScreen::Execute:
+    if (item->exec()) {
+      std::string command = item->exec();
+
+      const char *menuFile =
+        getScreen()->getHackedbox()->getMenuFilename();
+
+      const char *styleFile =
+        getScreen()->getHackedbox()->getStyleFilename();
+
+      std::string::size_type pos;
+
+      pos = command.find("$menu");
+      if (pos != std::string::npos)
+        command.replace(pos, 5, menuFile);
+
+      pos = command.find("$style");
+      if (pos != std::string::npos)
+        command.replace(pos, 6, styleFile);
+
+      hbexec(command, getScreen()->displayString());
+    }
+    break;
+
+  case HbScreen::Restart:
+    getScreen()->getHackedbox()->restart();
+    break;
+
+  case HbScreen::RestartOther:
+    if (item->exec())
+      getScreen()->getHackedbox()->restart(item->exec());
+    break;
+
+  case HbScreen::Exit:
+    getScreen()->getHackedbox()->shutdown();
+    break;
+
+  case HbScreen::SetStyle:
+    if (item->exec())
+      getScreen()->getHackedbox()->saveStyleFilename(item->exec());
+    [[fallthrough]];
+
+  case HbScreen::Reconfigure:
+    getScreen()->getHackedbox()->reconfigure();
+    return;
+  }
+
+  if (!(getScreen()->getRootmenu()->isTorn() || isTorn()) &&
+      item->function() != HbScreen::Reconfigure &&
+      item->function() != HbScreen::SetStyle)
+    hide();
+}
 
 bool MenuManager::parseFile(FILE *file,
-                            Rootmenu *menu) {
+                            MenuManager *menu) {
   if (!file || !menu || !m_screen)
     return false;
 
@@ -133,13 +212,18 @@ bool MenuManager::parseFile(FILE *file,
           static_cast<unsigned char>(keyword[i]));
     }
 
+    size_t keywordPosition = position;
+
     position =
       stringWithin('(',
                    ')',
                    line,
-                   position,
+                   keywordPosition,
                    lineLength,
                    label);
+
+    if (label[0] == '\0')
+      position = keywordPosition;
 
     position =
       stringWithin('{',
@@ -159,25 +243,14 @@ bool MenuManager::parseFile(FILE *file,
 
     switch (key) {
 
-    /*
-     * [end]
-     */
     case 311:
       done = true;
       break;
 
-
-    /*
-     * [nop]
-     */
     case 333:
       menu->insert(label);
       break;
 
-
-    /*
-     * [exec]
-     */
     case 421:
 
       if (!(*label && *command)) {
@@ -189,31 +262,18 @@ bool MenuManager::parseFile(FILE *file,
         continue;
       }
 
-      /*
-       * Run is handled internally by Hackedbox.
-       */
       if (strcmp(label, "Run") == 0) {
-
-        menu->insert(label,
-                     HbScreen::Runbox);
 
       } else {
 
-        /*
-         * Icon support is parsed here but is not yet passed to
-         * Rootmenu::insert().
-         */
         menu->insert(label,
                      HbScreen::Execute,
-                     command);
+                     command,
+                     icon);
       }
 
       break;
 
-
-    /*
-     * [exit]
-     */
     case 442:
 
       if (!*label) {
@@ -230,20 +290,13 @@ bool MenuManager::parseFile(FILE *file,
 
       break;
 
-    /*
-     * [begin]
-     */
     case 517:
 
-        if (*label)
-         menu->setLabel(label);
+      if (*label)
+        menu->setLabel(label);
 
-        break;
+      break;
 
-
-    /*
-     * [style]
-     */
     case 561: {
 
       if (!(*label && *command)) {
@@ -265,16 +318,6 @@ bool MenuManager::parseFile(FILE *file,
       break;
     }
 
-
-    /*
-     * [config]
-     *
-     * The Configmenu is owned by HbScreen.  MenuManager does not
-     * directly access Screen's private member.
-     *
-     * This entry is handled by the root menu initialization code
-     * rather than by directly accessing configmenu here.
-     */
     case 630:
 
       if (!*label) {
@@ -286,18 +329,8 @@ bool MenuManager::parseFile(FILE *file,
         continue;
       }
 
-      /*
-       * Config menu insertion is handled by HbScreen::InitMenu().
-       *
-       * Do not attempt to access HbScreen::configmenu here because
-       * it is private.
-       */
       break;
 
-
-    /*
-     * [include]
-     */
     case 740: {
 
       if (!*label) {
@@ -342,10 +375,6 @@ bool MenuManager::parseFile(FILE *file,
       break;
     }
 
-
-    /*
-     * [submenu]
-     */
     case 767: {
 
       if (!*label) {
@@ -357,8 +386,8 @@ bool MenuManager::parseFile(FILE *file,
         continue;
       }
 
-      Rootmenu *submenu =
-        new Rootmenu(m_screen);
+      MenuManager *submenu =
+        new MenuManager(m_screen);
 
       if (*command)
         submenu->setLabel(command);
@@ -372,17 +401,9 @@ bool MenuManager::parseFile(FILE *file,
       menu->insert(label,
                    submenu);
 
-      /*
-       * Rootmenu ownership is handled by HbScreen.
-       * The current Screen interface does not expose addRootmenu().
-       */
       break;
     }
 
-
-    /*
-     * [restart]
-     */
     case 773:
 
       if (!*label) {
@@ -408,10 +429,6 @@ bool MenuManager::parseFile(FILE *file,
 
       break;
 
-
-    /*
-     * [reconfig]
-     */
     case 845:
 
       if (!*label) {
@@ -428,12 +445,6 @@ bool MenuManager::parseFile(FILE *file,
 
       break;
 
-
-    /*
-     * [stylesdir]
-     *
-     * [stylesmenu]
-     */
     case 995:
     case 1113: {
 
@@ -482,11 +493,11 @@ bool MenuManager::parseFile(FILE *file,
         continue;
       }
 
-      Rootmenu *stylesMenu;
+      MenuManager *stylesMenu;
 
       if (newMenu)
         stylesMenu =
-          new Rootmenu(m_screen);
+          new MenuManager(m_screen);
       else
         stylesMenu = menu;
 
@@ -549,19 +560,12 @@ bool MenuManager::parseFile(FILE *file,
                      stylesMenu);
       }
 
-      /*
-       * Keep the menu filename behavior from the original parser.
-       */
       m_screen->getHackedbox()->saveMenuFilename(
         stylesDirectory);
 
       break;
     }
 
-
-    /*
-     * [workspaces]
-     */
     case 1090:
 
       if (!*label) {
@@ -577,7 +581,27 @@ bool MenuManager::parseFile(FILE *file,
                    m_screen->getWorkspacemenu());
 
       break;
+    case 524: {
 
+      int index =
+        menu->insert("");
+
+      menu->setClockItem(index - 1);
+      menu->setItemEnabled(index - 1, false);
+
+      break;
+    }
+
+    case 414: {
+
+      int index =
+        menu->insert("");
+
+      menu->setDateItem(index - 1);
+      menu->setItemEnabled(index - 1, false);
+
+      break;
+    }
 
     default:
       break;

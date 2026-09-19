@@ -53,7 +53,6 @@ using std::string;
 #include "GCCache.hpp"
 #include "MenuManager.hpp"
 #include "Screen.hpp"
-#include "RootMenu.hpp"
 #include "Util.hpp"
 #include "Window.hpp"
 #include "Workspace.hpp"
@@ -117,10 +116,14 @@ HbScreen::HbScreen(Hackedbox *hb, unsigned int scrn)
 
   resource.mstyle.t_fontset =
     resource.mstyle.f_fontset =
+    resource.mstyle.clock_fontset =
+    resource.mstyle.date_fontset =
     resource.wstyle.fontset = (XFontSet) 0;
 
   resource.mstyle.t_font =
     resource.mstyle.f_font =
+    resource.mstyle.clock_font =
+    resource.mstyle.date_font =
     resource.wstyle.font = 0;
 
   geom_pixmap = None;
@@ -455,9 +458,19 @@ HbScreen::~HbScreen(void) {
     XFreeFontSet(hackedbox->getXDisplay(),
                  resource.mstyle.f_fontset);
 
+  if (resource.mstyle.clock_fontset)
+    XFreeFontSet(hackedbox->getXDisplay(),
+                 resource.mstyle.clock_fontset);
+
+  if (resource.mstyle.date_fontset)
+    XFreeFontSet(hackedbox->getXDisplay(),
+                 resource.mstyle.date_fontset);
+
   delete resource.wstyle.font;
   delete resource.mstyle.t_font;
   delete resource.mstyle.f_font;
+  delete resource.mstyle.clock_font;
+  delete resource.mstyle.date_font;
 
   XFreeGC(hackedbox->getXDisplay(), opGC);
 }
@@ -475,7 +488,7 @@ void HbScreen::InitMenu(void) {
     while (rootmenu->getCount())
       rootmenu->remove(0);
   } else {
-    rootmenu = new Rootmenu(this);
+    rootmenu = new MenuManager(this);
   }
 
   bool defaultMenu = True;
@@ -686,6 +699,14 @@ void HbScreen::LoadStyle(void) {
     XFreeFontSet(hackedbox->getXDisplay(),
                  resource.mstyle.t_fontset);
 
+  if (resource.mstyle.clock_fontset)
+    XFreeFontSet(hackedbox->getXDisplay(),
+                 resource.mstyle.clock_fontset);
+
+  if (resource.mstyle.date_fontset)
+    XFreeFontSet(hackedbox->getXDisplay(),
+                 resource.mstyle.date_fontset);
+
   resource.wstyle.fontset = 0;
   resource.wstyle.fontset_extents = 0;
 
@@ -695,13 +716,23 @@ void HbScreen::LoadStyle(void) {
   resource.mstyle.t_fontset = 0;
   resource.mstyle.t_fontset_extents = 0;
 
+  resource.mstyle.clock_fontset = 0;
+  resource.mstyle.clock_fontset_extents = 0;
+
+  resource.mstyle.date_fontset = 0;
+  resource.mstyle.date_fontset_extents = 0;
+
   delete resource.wstyle.font;
   delete resource.mstyle.f_font;
   delete resource.mstyle.t_font;
+  delete resource.mstyle.clock_font;
+  delete resource.mstyle.date_font;
 
   resource.wstyle.font = 0;
   resource.mstyle.f_font = 0;
   resource.mstyle.t_font = 0;
+  resource.mstyle.clock_font = 0;
+  resource.mstyle.date_font = 0;
 
   resource.wstyle.font =
     readDatabaseFont("window.font",
@@ -714,6 +745,14 @@ void HbScreen::LoadStyle(void) {
   resource.mstyle.f_font =
     readDatabaseFont("menu.frame.font",
                      "Menu.Frame.Font");
+
+  resource.mstyle.clock_font =
+    readDatabaseFont("menu.clock.font",
+                     "Menu.Clock.Font");
+
+  resource.mstyle.date_font =
+    readDatabaseFont("menu.date.font",
+                     "Menu.Date.Font");
 
   if (MB_CUR_MAX > 1) {
     resource.wstyle.fontset =
@@ -728,11 +767,25 @@ void HbScreen::LoadStyle(void) {
       readDatabaseFontSet("menu.frame.font",
                           "Menu.Frame.Font");
 
+    resource.mstyle.clock_fontset =
+      readDatabaseFontSet("menu.clock.font",
+                          "Menu.Clock.Font");
+
+    resource.mstyle.date_fontset =
+      readDatabaseFontSet("menu.date.font",
+                          "Menu.Date.Font");
+
     resource.mstyle.t_fontset_extents =
       XExtentsOfFontSet(resource.mstyle.t_fontset);
 
     resource.mstyle.f_fontset_extents =
       XExtentsOfFontSet(resource.mstyle.f_fontset);
+
+    resource.mstyle.clock_fontset_extents =
+      XExtentsOfFontSet(resource.mstyle.clock_fontset);
+
+    resource.mstyle.date_fontset_extents =
+      XExtentsOfFontSet(resource.mstyle.date_fontset);
 
     resource.wstyle.fontset_extents =
       XExtentsOfFontSet(resource.wstyle.fontset);
@@ -910,6 +963,40 @@ void HbScreen::LoadStyle(void) {
                       "Menu.Hilite.TextColor",
                       "black");
 
+  resource.mstyle.clock_text =
+    readDatabaseColor("menu.clock.textColor",
+                      "Menu.Clock.TextColor",
+                      "black");
+
+  resource.mstyle.date_text =
+    readDatabaseColor("menu.date.textColor",
+                      "Menu.Date.TextColor",
+                      "black");
+
+  resource.mstyle.clock_format =
+    "%I:%M:%S %p";
+
+  if (XrmGetResource(resource.stylerc,
+                     "menu.clock.format",
+                     "Menu.Clock.Format",
+                     &valueType,
+                     &value)) {
+
+    resource.mstyle.clock_format = value.addr;
+  }
+
+  resource.mstyle.date_format =
+    "%m/%d/%Y";
+
+  if (XrmGetResource(resource.stylerc,
+                     "menu.date.format",
+                     "Menu.Date.Format",
+                     &valueType,
+                     &value)) {
+
+    resource.mstyle.date_format = value.addr;
+  }
+
   resource.mstyle.t_justify = LeftJustify;
 
   if (XrmGetResource(resource.stylerc,
@@ -947,6 +1034,56 @@ void HbScreen::LoadStyle(void) {
                strstr(value.addr, "Center")) {
 
       resource.mstyle.f_justify = CenterJustify;
+    }
+  }
+
+  resource.mstyle.clock_justify = CenterJustify;
+
+  if (XrmGetResource(resource.stylerc,
+                     "menu.clock.justify",
+                     "Menu.Clock.Justify",
+                     &valueType,
+                     &value)) {
+
+    if (strstr(value.addr, "right") ||
+        strstr(value.addr, "Right")) {
+
+      resource.mstyle.clock_justify = RightJustify;
+
+    } else if (strstr(value.addr, "left") ||
+               strstr(value.addr, "Left")) {
+
+      resource.mstyle.clock_justify = LeftJustify;
+
+    } else if (strstr(value.addr, "center") ||
+               strstr(value.addr, "Center")) {
+
+      resource.mstyle.clock_justify = CenterJustify;
+    }
+  }
+
+  resource.mstyle.date_justify = CenterJustify;
+
+  if (XrmGetResource(resource.stylerc,
+                     "menu.date.justify",
+                     "Menu.Date.Justify",
+                     &valueType,
+                     &value)) {
+
+    if (strstr(value.addr, "right") ||
+        strstr(value.addr, "Right")) {
+
+      resource.mstyle.date_justify = RightJustify;
+
+    } else if (strstr(value.addr, "left") ||
+               strstr(value.addr, "Left")) {
+
+      resource.mstyle.date_justify = LeftJustify;
+
+    } else if (strstr(value.addr, "center") ||
+               strstr(value.addr, "Center")) {
+
+      resource.mstyle.date_justify = CenterJustify;
     }
   }
 
@@ -993,6 +1130,50 @@ void HbScreen::LoadStyle(void) {
       resource.mstyle.bullet_pos = HbBasemenu::Right;
     }
   }
+
+  resource.mstyle.icon = true;
+
+  if (XrmGetResource(resource.stylerc,
+                     "menu.icon",
+                     "Menu.Icon",
+                     &valueType,
+                     &value)) {
+
+    if (!strncasecmp(value.addr,
+                     "false",
+                     value.size) ||
+        !strncasecmp(value.addr,
+                     "no",
+                     value.size) ||
+        !strncasecmp(value.addr,
+                     "off",
+                     value.size)) {
+
+      resource.mstyle.icon = false;
+    }
+  }
+
+resource.mstyle.icon_pos = HbBasemenu::Left;
+
+if (XrmGetResource(resource.stylerc,
+                   "menu.icon.position",
+                   "Menu.Icon.Position",
+                   &valueType,
+                   &value)) {
+
+  if (!strncasecmp(value.addr,
+                   "right",
+                   value.size)) {
+
+    resource.mstyle.icon_pos = HbBasemenu::Right;
+
+  } else if (!strncasecmp(value.addr,
+                          "left",
+                          value.size)) {
+
+    resource.mstyle.icon_pos = HbBasemenu::Left;
+  }
+}
 
   if (resource.mstyle.frame.texture() ==
       HbTexture::ParentRelativeTexture) {
@@ -1732,8 +1913,9 @@ void HbScreen::showPosition(int x, int y) {
            x,
            y);
 
-  XClearWindow(hackedbox->getXDisplay(),
-               geom_window);
+  XClearWindow(
+    hackedbox->getXDisplay(),
+    geom_window);
 
   HbPen pen(resource.wstyle.l_text_focus,
             resource.wstyle.font->xfont());
@@ -1792,8 +1974,9 @@ void HbScreen::showGeometry(unsigned int width,
            width,
            height);
 
-  XClearWindow(hackedbox->getXDisplay(),
-               geom_window);
+  XClearWindow(
+    hackedbox->getXDisplay(),
+    geom_window);
 
   HbPen pen(resource.wstyle.l_text_focus,
             resource.wstyle.font->xfont());

@@ -59,7 +59,7 @@
 #include "ClientMenu.hpp"
 #include "ImageControl.hpp"
 #include "GCCache.hpp"
-#include "RootMenu.hpp"
+#include "MenuManager.hpp"
 #include "Screen.hpp"
 #include "Util.hpp"
 #include "Window.hpp"
@@ -2161,7 +2161,7 @@ void Hackedbox::real_rereadMenu() {
 
 
 void Hackedbox::saveStyleFilename(
-  const std::string& filename) {
+    const std::string& filename) {
 
   if (filename.empty())
     return;
@@ -2171,7 +2171,7 @@ void Hackedbox::saveStyleFilename(
 
 
 void Hackedbox::saveMenuFilename(
-  const std::string& filename) {
+    const std::string& filename) {
 
   if (filename.empty())
     return;

@@ -133,22 +133,18 @@ am_hackedbox_OBJECTS = src/BaseDisplay.$(OBJEXT) \
 	src/GCCache.$(OBJEXT) src/Hackedbox.$(OBJEXT) \
 	src/IconMenu.$(OBJEXT) src/Image.$(OBJEXT) \
 	src/ImageControl.$(OBJEXT) src/MenuManager.$(OBJEXT) \
-	src/Netizen.$(OBJEXT) src/RootMenu.$(OBJEXT) \
-	src/Runbox.$(OBJEXT) src/Screen.$(OBJEXT) \
+	src/Netizen.$(OBJEXT) src/Screen.$(OBJEXT) \
 	src/Texture.$(OBJEXT) src/Timer.$(OBJEXT) src/Util.$(OBJEXT) \
 	src/Window.$(OBJEXT) src/WindowMenu.$(OBJEXT) \
 	src/Workspace.$(OBJEXT) src/WorkspaceMenu.$(OBJEXT) \
-	src/main.$(OBJEXT) hbSettings/src/Settings.$(OBJEXT) \
-	hbSettings/src/SWindow.$(OBJEXT)
+	src/main.$(OBJEXT)
 hackedbox_OBJECTS = $(am_hackedbox_OBJECTS)
-hackedbox_DEPENDENCIES = $(top_builddir)/hbtk/libhbtk.a
+hackedbox_DEPENDENCIES =
 am_hbsetbg_OBJECTS = src/hbsetbg-HbSetBg.$(OBJEXT)
 hbsetbg_OBJECTS = $(am_hbsetbg_OBJECTS)
 hbsetbg_DEPENDENCIES = $(top_builddir)/src/BaseDisplay.o \
 	$(top_builddir)/src/Color.o $(top_builddir)/src/GCCache.o \
-	$(top_builddir)/src/Texture.o $(top_builddir)/src/Timer.o \
-	$(top_builddir)/src/Image.o $(top_builddir)/src/ImageControl.o \
-	$(top_builddir)/src/Util.o
+	$(top_builddir)/src/Timer.o $(top_builddir)/src/Util.o
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -380,7 +376,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign subdir-objects
-SUBDIRS = data doc hbtk
+SUBDIRS = data doc
 DEFAULT_MENU = ~/.@PACKAGE@/menu
 DEFAULT_STYLE = $(pkgdatadir)/styles/Default
 AM_CPPFLAGS = \
@@ -388,9 +384,7 @@ AM_CPPFLAGS = \
 	@ORDEREDPSEUDO@ \
 	@DEBUG@ \
 	@TIMEDCACHE@ \
-	-I$(top_srcdir)/hbtk/include \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/hbSettings/include \
 	-I$(srcdir)/include \
 	-I/usr/include/freetype2 \
 	-DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
@@ -411,8 +405,6 @@ hackedbox_SOURCES = \
 	src/ImageControl.cpp \
 	src/MenuManager.cpp \
 	src/Netizen.cpp \
-	src/RootMenu.cpp \
-	src/Runbox.cpp \
 	src/Screen.cpp \
 	src/Texture.cpp \
 	src/Timer.cpp \
@@ -421,15 +413,13 @@ hackedbox_SOURCES = \
 	src/WindowMenu.cpp \
 	src/Workspace.cpp \
 	src/WorkspaceMenu.cpp \
-	src/main.cpp \
-	hbSettings/src/Settings.cpp \
-	hbSettings/src/SWindow.cpp
+	src/main.cpp
 
 hackedbox_LDADD = \
-	$(top_builddir)/hbtk/libhbtk.a \
 	-lX11 \
 	-lXft \
-	-lXext
+	-lXext \
+	-lImlib2
 
 hbsetbg_SOURCES = \
 	src/HbSetBg.cpp
@@ -441,10 +431,7 @@ hbsetbg_LDADD = \
 	$(top_builddir)/src/BaseDisplay.o \
 	$(top_builddir)/src/Color.o \
 	$(top_builddir)/src/GCCache.o \
-	$(top_builddir)/src/Texture.o \
 	$(top_builddir)/src/Timer.o \
-	$(top_builddir)/src/Image.o \
-	$(top_builddir)/src/ImageControl.o \
 	$(top_builddir)/src/Util.o \
 	-lImlib2 \
 	-lX11 \
@@ -466,8 +453,6 @@ EXTRA_DIST = \
 	ChangeLog.new \
 	LICENSE \
 	doc \
-	hbtk/include/*.hpp \
-	hbSettings/include/*.hpp \
 	include/*.hpp
 
 all: config.h
@@ -584,8 +569,6 @@ src/Image.$(OBJEXT): src/$(am__dirstamp)
 src/ImageControl.$(OBJEXT): src/$(am__dirstamp)
 src/MenuManager.$(OBJEXT): src/$(am__dirstamp)
 src/Netizen.$(OBJEXT): src/$(am__dirstamp)
-src/RootMenu.$(OBJEXT): src/$(am__dirstamp)
-src/Runbox.$(OBJEXT): src/$(am__dirstamp)
 src/Screen.$(OBJEXT): src/$(am__dirstamp)
 src/Texture.$(OBJEXT): src/$(am__dirstamp)
 src/Timer.$(OBJEXT): src/$(am__dirstamp)
@@ -595,11 +578,6 @@ src/WindowMenu.$(OBJEXT): src/$(am__dirstamp)
 src/Workspace.$(OBJEXT): src/$(am__dirstamp)
 src/WorkspaceMenu.$(OBJEXT): src/$(am__dirstamp)
 src/main.$(OBJEXT): src/$(am__dirstamp)
-hbSettings/src/$(am__dirstamp):
-	@$(MKDIR_P) hbSettings/src
-	@: >>hbSettings/src/$(am__dirstamp)
-hbSettings/src/Settings.$(OBJEXT): hbSettings/src/$(am__dirstamp)
-hbSettings/src/SWindow.$(OBJEXT): hbSettings/src/$(am__dirstamp)
 
 hackedbox$(EXEEXT): $(hackedbox_OBJECTS) $(hackedbox_DEPENDENCIES) $(EXTRA_hackedbox_DEPENDENCIES) 
 	@rm -f hackedbox$(EXEEXT)
@@ -612,7 +590,6 @@ hbsetbg$(EXEEXT): $(hbsetbg_OBJECTS) $(hbsetbg_DEPENDENCIES) $(EXTRA_hbsetbg_DEP
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f hbSettings/src/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
 
 distclean-compile:
@@ -973,7 +950,6 @@ clean-generic:
 distclean-generic:
 	-$(am__rm_f) $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || $(am__rm_f) $(CONFIG_CLEAN_VPATH_FILES)
-	-$(am__rm_f) hbSettings/src/$(am__dirstamp)
 	-$(am__rm_f) src/$(am__dirstamp)
 
 maintainer-clean-generic:

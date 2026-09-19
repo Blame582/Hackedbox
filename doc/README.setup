@@ -86,6 +86,9 @@ X11:
 Graphics:
 
     Imlib2
+    
+Imlib2 is required by Hackedbox for image loading. It is used for menu
+item icons and desktop background handling through hbsetbg.
 
 Font support:
 

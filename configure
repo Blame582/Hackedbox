@@ -7255,7 +7255,7 @@ ac_config_headers="$ac_config_headers config.h"
 
 
 
-ac_config_files="$ac_config_files Makefile hbtk/Makefile data/Makefile data/menu data/styles/Makefile data/styles/Default data/backgrounds/Makefile doc/hackedbox.1 doc/Makefile version.h"
+ac_config_files="$ac_config_files Makefile data/Makefile data/menu data/styles/Makefile data/styles/Default data/backgrounds/Makefile doc/hackedbox.1 doc/Makefile version.h"
 
 
 cat >confcache <<\_ACEOF
@@ -7956,7 +7956,6 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "hbtk/Makefile") CONFIG_FILES="$CONFIG_FILES hbtk/Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "data/menu") CONFIG_FILES="$CONFIG_FILES data/menu" ;;
     "data/styles/Makefile") CONFIG_FILES="$CONFIG_FILES data/styles/Makefile" ;;

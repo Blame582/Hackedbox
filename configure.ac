@@ -339,7 +339,6 @@ dnl ------------------------------------------------------------
 
 AC_CONFIG_FILES([
   Makefile
-  hbtk/Makefile
   data/Makefile
   data/menu
   data/styles/Makefile

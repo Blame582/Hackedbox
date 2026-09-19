@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -27,10 +27,13 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
+
+#include <Imlib2.h>
 
 #include <algorithm>
 #include <assert.h>
@@ -49,6 +52,7 @@ using std::max;
 
 static HbBasemenu *shown = (HbBasemenu *) 0;
 
+
 /*
  * Return the width of text using either Xft or the old X font system.
  *
@@ -63,25 +67,59 @@ static unsigned int hfontTextWidth(Display *display,
 {
   (void)screen;
 
-  if (!font || !text || len <= 0)
+  if (!display ||
+      !font ||
+      !text ||
+      len <= 0)
     return 0;
 
   if (font->isXft()) {
+    XftFont *xft_font = font->xftfont();
+
+    if (!xft_font)
+      return 0;
+
     XGlyphInfo extents;
 
-    XftTextExtentsUtf8(display,
-                       font->xftfont(),
-                       reinterpret_cast<const FcChar8 *>(text),
-                       len,
-                       &extents);
+    XftTextExtentsUtf8(
+      display,
+      xft_font,
+      reinterpret_cast<const FcChar8 *>(text),
+      len,
+      &extents);
 
-    return extents.xOff;
+    return static_cast<unsigned int>(extents.xOff);
   }
 
-  if (font->xfont())
-    return XTextWidth(font->xfont(), text, len);
+  XFontStruct *xfont = font->xfont();
+
+  if (xfont)
+    return XTextWidth(xfont, text, len);
 
   return 0;
+}
+
+
+/*
+ * Return the height of a menu font using either Xft or the old X font
+ * system.
+ */
+static unsigned int hfontHeight(HbFont *font,
+                                XFontSet fontset,
+                                XFontSetExtents *fontset_extents)
+{
+  if (!font)
+    return 0;
+
+  if (font->isXft())
+    return font->height();
+
+  if (MB_CUR_MAX > 1 &&
+      fontset &&
+      fontset_extents)
+    return fontset_extents->max_ink_extent.height;
+
+  return font->height();
 }
 
 
@@ -105,13 +143,23 @@ static void drawHbFont(Display *display,
 {
   (void)screen;
 
-  if (!font || !text || len <= 0)
+  if (!display ||
+      !visual ||
+      !font ||
+      !text ||
+      len <= 0 ||
+      window == None)
     return;
 
   /*
    * Xft / TrueType font.
    */
   if (font->isXft()) {
+    XftFont *xft_font = font->xftfont();
+
+    if (!xft_font)
+      return;
+
     XftDraw *draw =
       XftDrawCreate(display,
                     window,
@@ -124,13 +172,16 @@ static void drawHbFont(Display *display,
     XRenderColor render_color;
 
     render_color.red =
-      static_cast<unsigned short>(color.red() * 257);
+      static_cast<unsigned short>(
+        color.red() * 257U);
 
     render_color.green =
-      static_cast<unsigned short>(color.green() * 257);
+      static_cast<unsigned short>(
+        color.green() * 257U);
 
     render_color.blue =
-      static_cast<unsigned short>(color.blue() * 257);
+      static_cast<unsigned short>(
+        color.blue() * 257U);
 
     render_color.alpha = 65535;
 
@@ -142,13 +193,14 @@ static void drawHbFont(Display *display,
                            &render_color,
                            &xft_color)) {
 
-      XftDrawStringUtf8(draw,
-                        &xft_color,
-                        font->xftfont(),
-                        x,
-                        y,
-                        reinterpret_cast<const FcChar8 *>(text),
-                        len);
+      XftDrawStringUtf8(
+        draw,
+        &xft_color,
+        xft_font,
+        x,
+        y,
+        reinterpret_cast<const FcChar8 *>(text),
+        len);
 
       XftColorFree(display,
                    visual,
@@ -160,11 +212,14 @@ static void drawHbFont(Display *display,
     return;
   }
 
+
   /*
    * Old X core font.
    */
-  if (font->xfont()) {
-    HbPen pen(color, font->xfont());
+  XFontStruct *xfont = font->xfont();
+
+  if (xfont) {
+    HbPen pen(color, xfont);
 
     XDrawString(display,
                 window,
@@ -174,6 +229,119 @@ static void drawHbFont(Display *display,
                 text,
                 len);
   }
+}
+
+
+/*
+ * Draw a menu item icon from a direct image filename.
+ *
+ * The image is loaded with Imlib2 and rendered into the menu frame.
+ */
+static void drawMenuIcon(Display *display,
+                         Visual *visual,
+                         Colormap colormap,
+                         Window window,
+                         const char *filename,
+                         int x,
+                         int y,
+                         unsigned int size)
+{
+  if (!display ||
+      !visual ||
+      window == None ||
+      !filename ||
+      !*filename ||
+      size == 0)
+    return;
+
+  /*
+   * Imlib2 uses process-global context state. Set every context
+   * value required by this operation explicitly.
+   */
+  imlib_context_set_display(display);
+  imlib_context_set_visual(visual);
+  imlib_context_set_colormap(colormap);
+  imlib_context_set_drawable(window);
+
+  Imlib_Image image =
+    imlib_load_image(filename);
+
+  if (!image)
+    return;
+
+  imlib_context_set_image(image);
+
+  const int image_width =
+    imlib_image_get_width();
+
+  const int image_height =
+    imlib_image_get_height();
+
+  if (image_width <= 0 ||
+      image_height <= 0) {
+
+    imlib_free_image();
+    imlib_context_set_image(NULL);
+
+    return;
+  }
+
+  unsigned int draw_width = size;
+  unsigned int draw_height = size;
+
+  /*
+   * Use 64-bit intermediate arithmetic so a large image dimension
+   * cannot overflow the scaling calculation.
+   */
+  if (image_width > image_height) {
+
+    const unsigned long long scaled_height =
+      (static_cast<unsigned long long>(size) *
+       static_cast<unsigned long long>(image_height)) /
+      static_cast<unsigned long long>(image_width);
+
+    draw_height =
+      static_cast<unsigned int>(
+        scaled_height > size ?
+        size :
+        scaled_height);
+
+    if (!draw_height)
+      draw_height = 1;
+
+  } else if (image_height > image_width) {
+
+    const unsigned long long scaled_width =
+      (static_cast<unsigned long long>(size) *
+       static_cast<unsigned long long>(image_width)) /
+      static_cast<unsigned long long>(image_height);
+
+    draw_width =
+      static_cast<unsigned int>(
+        scaled_width > size ?
+        size :
+        scaled_width);
+
+    if (!draw_width)
+      draw_width = 1;
+  }
+
+  const int draw_x =
+    x + static_cast<int>(
+      (size - draw_width) / 2);
+
+  const int draw_y =
+    y + static_cast<int>(
+      (size - draw_height) / 2);
+
+  imlib_render_image_on_drawable_at_size(
+    draw_x,
+    draw_y,
+    static_cast<int>(draw_width),
+    static_cast<int>(draw_height));
+
+  imlib_free_image();
+  imlib_context_set_image(NULL);
 }
 
 
@@ -206,6 +374,9 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
   which_press = -1;
   which_sbl = -1;
 
+  clock_item = -1;
+  date_item = -1;
+
   menu.sublevels =
     menu.persub =
     menu.minsub = 0;
@@ -229,15 +400,27 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
       (menu.bevel_w * 2);
   }
 
-  if (MB_CUR_MAX > 1 && !style->f_font->isXft()) {
-    menu.item_h =
-      style->f_fontset_extents->max_ink_extent.height +
-      menu.bevel_w;
-  } else {
-    menu.item_h =
-      style->f_font->height() +
-      menu.bevel_w;
-  }
+  menu.item_h =
+    hfontHeight(style->f_font,
+                style->f_fontset,
+                style->f_fontset_extents) +
+    menu.bevel_w;
+
+  const unsigned int clock_h =
+    hfontHeight(style->clock_font,
+                style->clock_fontset,
+                style->clock_fontset_extents) +
+    menu.bevel_w;
+
+  const unsigned int date_h =
+    hfontHeight(style->date_font,
+                style->date_fontset,
+                style->date_fontset_extents) +
+    menu.bevel_w;
+
+  menu.item_h =
+    max(menu.item_h,
+        max(clock_h, date_h));
 
   menu.height = menu.title_h + screen->getBorderWidth() + menu.frame_h;
 
@@ -397,19 +580,36 @@ int HbBasemenu::insert(HbBasemenuItem *item, int pos) {
 
 
 int HbBasemenu::insert(const string& label,
-                     int function,
-                     const string& exec,
-                     int pos) {
+                       int function,
+                       const string& exec,
+                       int pos) {
   HbBasemenuItem *item =
-    new HbBasemenuItem(label, function, exec);
+    new HbBasemenuItem(label,
+                       function,
+                       exec);
 
   return insert(item, pos);
 }
 
 
 int HbBasemenu::insert(const string& label,
-                     HbBasemenu *submenu,
-                     int pos) {
+                       int function,
+                       const string& exec,
+                       const string& icon,
+                       int pos) {
+  HbBasemenuItem *item =
+    new HbBasemenuItem(label,
+                       function,
+                       exec,
+                       icon);
+
+  return insert(item, pos);
+}
+
+
+int HbBasemenu::insert(const string& label,
+                       HbBasemenu *submenu,
+                       int pos) {
   HbBasemenuItem *item =
     new HbBasemenuItem(label, submenu);
 
@@ -443,6 +643,16 @@ int HbBasemenu::remove(int index) {
   else if (which_sub > index)
     which_sub--;
 
+  if (clock_item == index)
+    clock_item = -1;
+  else if (clock_item > index)
+    clock_item--;
+
+  if (date_item == index)
+    date_item = -1;
+  else if (date_item > index)
+    date_item--;
+
   menuitems.erase(menuitems.begin() + index);
 
   return menuitems.size();
@@ -452,37 +662,6 @@ int HbBasemenu::remove(int index) {
 void HbBasemenu::update(void) {
   const MenuStyle *const style =
     screen->getMenuStyle();
-
-  /*
-   * Menu clock:
-   *
-   * The clock occupies the title area of the menu as:
-   *
-   *     Hackedbox Menu
-   *     09/07/2026
-   *     10:42:31 AM
-   *
-   * The Clock object itself remains responsible for
-   * maintaining the current date/time strings.
-   */
-  const bool menu_clock =
-    hackedbox->getClock() &&
-    hackedbox->getClockEnabled() &&
-    (hackedbox->getClockTarget() == "menu" ||
-     hackedbox->getClockTarget() == "both");
-
-    FILE *log = fopen("/home/blame/.hackedbox/hackedbox.log", "a");
-    if (log) {
-      fprintf(log,
-              "HBTRACE: menu_clock=%d enabled=%d target='%s'\n",
-              menu_clock,
-              hackedbox->getClockEnabled(),
-              hackedbox->getClockTarget().c_str());
-      fclose(log);
-    }
-
-  if (menu_clock)
-    hackedbox->getClock()->update();
 
   unsigned int title_font_h;
 
@@ -507,39 +686,51 @@ void HbBasemenu::update(void) {
   }
 
   /*
-   * Normal title height is one line.
-   *
-   * With the menu clock enabled the title becomes three lines:
-   *
-   *     title
-   *     date
-   *     time
+   * Clock and date rows can use fonts different from the normal
+   * menu frame font. Make the common row height large enough for
+   * either of them.
+   */
+  const unsigned int clock_h =
+    hfontHeight(style->clock_font,
+                style->clock_fontset,
+                style->clock_fontset_extents) +
+    menu.bevel_w;
+
+  const unsigned int date_h =
+    hfontHeight(style->date_font,
+                style->date_fontset,
+                style->date_fontset_extents) +
+    menu.bevel_w;
+
+  menu.item_h =
+    max(menu.item_h,
+        max(clock_h, date_h));
+
+  /*
+   * The menu title is always one line.
    */
   menu.title_h =
     title_font_h +
     (menu.bevel_w * 2);
 
-  if (menu_clock)
-    menu.title_h =
-      (title_font_h * 3) +
-      (menu.bevel_w * 2);
-
   /*
-   * Measure title text using the same backend that will
-   * actually render it.
+   * Measure text using the supplied font and fontset.
    */
-  auto titleTextWidth =
-    [&](const char *text, int len) -> unsigned int {
+  auto textWidth =
+    [&](HbFont *font,
+        XFontSet fontset,
+        const char *text,
+        int len) -> unsigned int {
 
-      if (!text || len <= 0)
+      if (!font || !text || len <= 0)
         return 0;
 
-      if (style->t_font->isXft()) {
+      if (font->isXft()) {
 
         return hfontTextWidth(
           display,
           screen->getScreenNumber(),
-          style->t_font,
+          font,
           text,
           len);
 
@@ -548,7 +739,7 @@ void HbBasemenu::update(void) {
         XRectangle ink, logical;
 
         XmbTextExtents(
-          style->t_fontset,
+          fontset,
           text,
           len,
           &ink,
@@ -561,7 +752,7 @@ void HbBasemenu::update(void) {
         return hfontTextWidth(
           display,
           screen->getScreenNumber(),
-          style->t_font,
+          font,
           text,
           len);
       }
@@ -573,39 +764,13 @@ void HbBasemenu::update(void) {
     const int l = strlen(s);
 
     menu.item_w =
-      titleTextWidth(s, l);
+      textWidth(style->t_font,
+                style->t_fontset,
+                s,
+                l);
 
     menu.item_w +=
       menu.bevel_w * 2;
-
-    /*
-     * The date/time must also fit in the title.
-     */
-    if (menu_clock) {
-
-      const std::string &date =
-        hackedbox->getClock()->date();
-
-      const std::string &time =
-        hackedbox->getClock()->time();
-
-      const unsigned int date_w =
-        titleTextWidth(
-          date.c_str(),
-          date.length());
-
-      const unsigned int time_w =
-        titleTextWidth(
-          time.c_str(),
-          time.length());
-
-      const unsigned int clock_w =
-        max(date_w, time_w) +
-        (menu.bevel_w * 2);
-
-      if (menu.item_w < clock_w)
-        menu.item_w = clock_w;
-    }
 
   } else {
 
@@ -619,46 +784,42 @@ void HbBasemenu::update(void) {
 
   for (; it != end; ++it) {
 
+    const int index =
+      it - menuitems.begin();
+
     const char *s = (*it)->label();
     const int l = strlen(s);
 
-    if (style->f_font->isXft()) {
+    HbFont *font = style->f_font;
+    XFontSet fontset = style->f_fontset;
 
-      ii =
-        hfontTextWidth(
-          display,
-          screen->getScreenNumber(),
-          style->f_font,
-          s,
-          l);
+    if (index == clock_item) {
+      font = style->clock_font;
+      fontset = style->clock_fontset;
+    } else if (index == date_item) {
+      font = style->date_font;
+      fontset = style->date_fontset;
+    }
 
-    } else if (MB_CUR_MAX > 1) {
+    ii =
+      textWidth(font,
+                fontset,
+                s,
+                l);
 
-      XRectangle ink, logical;
-
-      XmbTextExtents(
-        style->f_fontset,
-        s,
-        l,
-        &ink,
-        &logical);
-
-      ii = logical.width;
-
+    /*
+     * Keep the existing two item-height columns of horizontal
+     * room when icons are enabled. One is the icon area and the
+     * other is the bullet/spacing area.
+     */
+    if (style->icon) {
+      ii += menu.item_h * 2;
     } else {
-
-      ii =
-        hfontTextWidth(
-          display,
-          screen->getScreenNumber(),
-          style->f_font,
-          s,
-          l);
+      ii += menu.item_h;
     }
 
     ii +=
-      (menu.bevel_w * 2) +
-      (menu.item_h * 2);
+      menu.bevel_w * 2;
 
     menu.item_w =
       ((menu.item_w < ii) ?
@@ -890,30 +1051,6 @@ void HbBasemenu::redrawTitle(void) {
   const MenuStyle *const style =
     screen->getMenuStyle();
 
-  const bool menu_clock =
-    hackedbox->getClock() &&
-    hackedbox->getClockEnabled() &&
-    (hackedbox->getClockTarget() == "menu" ||
-     hackedbox->getClockTarget() == "both");
-
-  /*
-   * Determine the title font line height.
-   */
-  unsigned int line_h;
-
-  if (MB_CUR_MAX > 1 &&
-      !style->f_font->isXft()) {
-
-    line_h =
-      style->t_fontset_extents->
-        max_ink_extent.height;
-
-  } else {
-
-    line_h =
-      style->t_font->height();
-  }
-
   /*
    * Measure text using the actual rendering backend.
    */
@@ -1019,7 +1156,7 @@ void HbBasemenu::redrawTitle(void) {
     };
 
   /*
-   * First line: normal menu title.
+   * One normal menu title line.
    */
   int baseline;
 
@@ -1047,37 +1184,11 @@ void HbBasemenu::redrawTitle(void) {
     title,
     title_len,
     baseline);
-
-  /*
-   * Menu clock:
-   *
-   *     Hackedbox Menu
-   *     09/07/2026
-   *     10:42:31 AM
-   */
-  if (menu_clock) {
-
-    const std::string &date =
-      hackedbox->getClock()->date();
-
-    const std::string &time =
-      hackedbox->getClock()->time();
-
-    drawCentered(
-      date.c_str(),
-      date.length(),
-      baseline + line_h);
-
-    drawCentered(
-      time.c_str(),
-      time.length(),
-      baseline + (line_h * 2));
-  }
 }
 
 
 void HbBasemenu::redrawClock(void) {
-  if (!visible || !title_vis)
+  if (!visible)
     return;
 
   if (!hackedbox->getClockEnabled())
@@ -1090,15 +1201,51 @@ void HbBasemenu::redrawClock(void) {
       target != "both")
     return;
 
+  const MenuStyle *const style =
+    screen->getMenuStyle();
+
   /*
-   * Clear only the title window, then redraw all
-   * three title lines with the current clock values.
+   * Keep the global Clock object's formatting independent from
+   * the menu clock/date formatting.
    */
-  XClearWindow(display, menu.title);
+  time_t now = time((time_t *) 0);
 
-  hackedbox->getClock()->update();
+  struct tm local_time;
 
-  redrawTitle();
+  if (!localtime_r(&now, &local_time))
+    return;
+
+  if (clock_item >= 0 &&
+      !style->clock_format.empty()) {
+
+    char buffer[256];
+
+    const size_t len =
+      strftime(buffer,
+               sizeof(buffer),
+               style->clock_format.c_str(),
+               &local_time);
+
+    if (len)
+      changeItemLabel(clock_item,
+                      buffer);
+  }
+
+  if (date_item >= 0 &&
+      !style->date_format.empty()) {
+
+    char buffer[256];
+
+    const size_t len =
+      strftime(buffer,
+               sizeof(buffer),
+               style->date_format.c_str(),
+               &local_time);
+
+    if (len)
+      changeItemLabel(date_item,
+                      buffer);
+  }
 }
 
 
@@ -1228,8 +1375,8 @@ void HbBasemenu::drawSubmenu(int index) {
     } else {
       y =
         (((shifted) ?
-          menu.y_shift :
-          menu.y) +
+         menu.y_shift :
+         menu.y) +
          (menu.item_h * i) +
          ((title_vis) ?
           menu.title_h +
@@ -1248,8 +1395,8 @@ void HbBasemenu::drawSubmenu(int index) {
 
       y =
         (((shifted) ?
-          menu.y_shift :
-          menu.y) +
+         menu.y_shift :
+         menu.y) +
          menu.height -
          submenu->menu.height);
     }
@@ -1307,12 +1454,12 @@ bool HbBasemenu::hasSubmenu(int index) {
 
 
 void HbBasemenu::drawItem(int index,
-                        bool highlight,
-                        bool clear,
-                        int x,
-                        int y,
-                        unsigned int w,
-                        unsigned int h) {
+                          bool highlight,
+                          bool clear,
+                          int x,
+                          int y,
+                          unsigned int w,
+                          unsigned int h) {
   HbBasemenuItem *item = find(index);
 
   if (!item)
@@ -1345,6 +1492,63 @@ void HbBasemenu::drawItem(int index,
   const unsigned int len =
     strlen(text);
 
+  const MenuStyle *const style =
+    screen->getMenuStyle();
+
+  /*
+   * Select the font, fontset, color and justification for this
+   * particular row.
+   */
+  HbFont *item_font =
+    style->f_font;
+
+  XFontSet item_fontset =
+    style->f_fontset;
+
+  XFontSetExtents *item_fontset_extents =
+    style->f_fontset_extents;
+
+  TextJustify item_justify =
+    style->f_justify;
+
+  const HbColor *item_text_color =
+    &style->f_text;
+
+if (index == clock_item) {
+
+  item_font =
+    style->clock_font;
+
+  item_fontset =
+    style->clock_fontset;
+
+  item_fontset_extents =
+    style->clock_fontset_extents;
+
+  item_justify =
+    style->clock_justify;
+
+  item_text_color =
+    &style->clock_text;
+
+} else if (index == date_item) {
+
+  item_font =
+    style->date_font;
+
+  item_fontset =
+    style->date_fontset;
+
+  item_fontset_extents =
+    style->date_fontset_extents;
+
+  item_justify =
+    style->date_justify;
+
+  item_text_color =
+    &style->date_text;
+}
+
   int text_x = 0;
   int text_y = 0;
 
@@ -1366,33 +1570,30 @@ void HbBasemenu::drawItem(int index,
   unsigned int text_w = 0;
   unsigned int text_h = 0;
 
-  const MenuStyle *const style =
-    screen->getMenuStyle();
-
+  /*
+   * Measure text using the selected font backend.
+   */
   if (text) {
 
-    /*
-     * Measure text using the correct font backend.
-     */
-    if (style->f_font->isXft()) {
+    if (item_font->isXft()) {
 
       text_w =
         hfontTextWidth(display,
                        screen->getScreenNumber(),
-                       style->f_font,
+                       item_font,
                        text,
                        len);
 
       text_y =
         item_y +
-        style->f_font->ascent() +
+        item_font->ascent() +
         (menu.bevel_w / 2);
 
     } else if (MB_CUR_MAX > 1) {
 
       XRectangle ink, logical;
 
-      XmbTextExtents(style->f_fontset,
+      XmbTextExtents(item_fontset,
                      text,
                      len,
                      &ink,
@@ -1403,48 +1604,103 @@ void HbBasemenu::drawItem(int index,
       text_y =
         item_y +
         (menu.bevel_w / 2) -
-        style->f_fontset_extents->
-          max_ink_extent.y;
+          (item_fontset_extents ?
+           item_fontset_extents->max_ink_extent.y :
+           0);
 
     } else {
 
       text_w =
         hfontTextWidth(display,
                        screen->getScreenNumber(),
-                       style->f_font,
+                       item_font,
                        text,
                        len);
 
       text_y =
         item_y +
-        style->f_font->ascent() +
+        item_font->ascent() +
         (menu.bevel_w / 2);
     }
 
-    switch (style->f_justify) {
+    /*
+     * Icon space is only reserved when icons are enabled.
+     *
+     * The bullet occupies the opposite edge when possible.
+     */
+    const unsigned int icon_space =
+      style->icon ?
+      menu.item_h :
+      0;
+
+    const unsigned int bullet_space =
+      menu.item_h;
+
+    switch (item_justify) {
 
     case LeftJustify:
+
       text_x =
         item_x +
         menu.bevel_w +
-        menu.item_h +
+        ((style->icon &&
+          style->icon_pos == Left) ?
+         icon_space :
+         0) +
         1;
       break;
 
     case RightJustify:
+
       text_x =
         item_x +
         menu.item_w -
-        (menu.item_h +
-         menu.bevel_w +
-         text_w);
+        menu.bevel_w -
+        text_w -
+        ((style->icon &&
+          style->icon_pos == Right) ?
+         icon_space :
+         ((style->bullet_pos == Right) ?
+          bullet_space :
+          0));
       break;
 
-    case CenterJustify:
+    case CenterJustify: {
+
+      const unsigned int left_space =
+        ((style->icon &&
+          style->icon_pos == Left) ?
+         icon_space :
+         ((style->bullet_pos == Left) ?
+          bullet_space :
+          0));
+
+      const unsigned int right_space =
+        ((style->icon &&
+          style->icon_pos == Right) ?
+         icon_space :
+         ((style->bullet_pos == Right) ?
+          bullet_space :
+          0));
+
+      const unsigned int available =
+        (menu.item_w >
+         (left_space +
+          right_space +
+          text_w)) ?
+        menu.item_w -
+        left_space -
+        right_space -
+        text_w :
+        0;
+
       text_x =
         item_x +
-        ((menu.item_w + 1 - text_w) / 2);
+        left_space +
+        (available / 2);
+
       break;
+    }
     }
 
     text_h =
@@ -1460,22 +1716,26 @@ void HbBasemenu::drawItem(int index,
   /*
    * HbPen is only given an XFontStruct when using
    * the old X core font backend.
-   *
-   * An Xft font gets no XFontStruct.
    */
   const HbPen textpen(
-    (highlight) ?
-      style->h_text :
-      item->isEnabled() ?
-        style->f_text :
-        style->d_text,
-    style->f_font->isXft() ?
+    (index == clock_item ||
+     index == date_item) ?
+      *item_text_color :
+      (highlight) ?
+        style->h_text :
+        item->isEnabled() ?
+          style->f_text :
+          style->d_text,
+    item_font->isXft() ?
       0 :
-      style->f_font->xfont());
+      item_font->xfont());
 
   const HbPen hipen(
     style->hilite.color());
 
+  /*
+   * Submenu bullet position.
+   */
   sel_x = item_x;
 
   if (style->bullet_pos == Right)
@@ -1628,9 +1888,51 @@ void HbBasemenu::drawItem(int index,
   }
 
   /*
-   * TEXT RENDERING
+   * MENU ICON
    *
-   * This is the critical fix.
+   * Icons are controlled entirely by the menu style.
+   *
+   *     menu.icon: true
+   *     menu.icon.position: left
+   *
+   * or:
+   *
+   *     menu.icon: false
+   *
+   * The menu still uses the direct filename supplied by the
+   * menu entry. No desktop-file or icon-theme lookup is done.
+   */
+  if (style->icon &&
+      item->icon() &&
+      *item->icon()) {
+
+    const unsigned int icon_size =
+      menu.item_h;
+
+    int icon_x =
+      item_x +
+      menu.bevel_w;
+
+    if (style->icon_pos == Right)
+      icon_x =
+        item_x +
+        menu.item_w -
+        menu.bevel_w -
+        icon_size;
+
+    drawMenuIcon(
+      display,
+      screen->getVisual(),
+      screen->getColormap(),
+      menu.frame,
+      item->icon(),
+      icon_x,
+      item_y,
+      icon_size);
+  }
+
+  /*
+   * TEXT RENDERING
    *
    * Never call XDrawString/XmbDrawString with an Xft-only
    * HbFont.
@@ -1638,31 +1940,34 @@ void HbBasemenu::drawItem(int index,
   if (dotext && text) {
 
     const HbColor &text_color =
-      (highlight) ?
-        style->h_text :
-        item->isEnabled() ?
-          style->f_text :
-          style->d_text;
+      (index == clock_item ||
+       index == date_item) ?
+        *item_text_color :
+        (highlight) ?
+          style->h_text :
+          item->isEnabled() ?
+            style->f_text :
+            style->d_text;
 
-    if (style->f_font->isXft()) {
+    if (item_font->isXft()) {
 
       drawHbFont(display,
-                screen->getScreenNumber(),
-                screen->getVisual(),
-                screen->getColormap(),
-                menu.frame,
-                style->f_font,
-                text_color,
-                text_x,
-                text_y,
-                text,
-                len);
+                 screen->getScreenNumber(),
+                 screen->getVisual(),
+                 screen->getColormap(),
+                 menu.frame,
+                 item_font,
+                 text_color,
+                 text_x,
+                 text_y,
+                 text,
+                 len);
 
     } else if (MB_CUR_MAX > 1) {
 
       XmbDrawString(display,
                     menu.frame,
-                    style->f_fontset,
+                    item_fontset,
                     textpen.gc(),
                     text_x,
                     text_y,
@@ -2253,10 +2558,23 @@ void HbBasemenu::reconfigure(void) {
 
 
 void HbBasemenu::changeItemLabel(unsigned int index,
-                               const string& label) {
+                                  const string& label) {
   HbBasemenuItem *item = find(index);
 
   assert(item);
 
   item->newLabel(label);
+
+  if (visible)
+    drawItem(index, false, true);
+}
+
+
+void HbBasemenu::setClockItem(int index) {
+  clock_item = index;
+}
+
+
+void HbBasemenu::setDateItem(int index) {
+  date_item = index;
 }

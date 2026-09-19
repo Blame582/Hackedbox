@@ -25,19 +25,27 @@
 
 #include <cstdio>
 
-class HbScreen;
-class Rootmenu;
+#include "BaseMenu.hpp"
 
-class MenuManager {
+class HbScreen;
+
+class MenuManager : public HbBasemenu {
+private:
+  MenuManager(const MenuManager&);
+  MenuManager& operator=(const MenuManager&);
+
+  HbScreen *m_screen;
+
+protected:
+  virtual void itemSelected(int button,
+                             unsigned int index) override;
+
 public:
   explicit MenuManager(HbScreen *screen);
-  ~MenuManager() = default;
+  ~MenuManager() override;
 
   bool parseFile(FILE *file,
-                 Rootmenu *menu);
-
-private:
-  HbScreen *m_screen;
+                 MenuManager *menu);
 };
 
 #endif // HACKEDBOX_MENUMANAGER_HPP

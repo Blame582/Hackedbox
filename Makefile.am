@@ -21,7 +21,7 @@
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-SUBDIRS = data doc hbtk
+SUBDIRS = data doc
 
 DEFAULT_MENU = ~/.@PACKAGE@/menu
 DEFAULT_STYLE = $(pkgdatadir)/styles/Default
@@ -31,9 +31,7 @@ AM_CPPFLAGS = \
 	@ORDEREDPSEUDO@ \
 	@DEBUG@ \
 	@TIMEDCACHE@ \
-	-I$(top_srcdir)/hbtk/include \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/hbSettings/include \
 	-I$(srcdir)/include \
 	-I/usr/include/freetype2 \
 	-DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
@@ -56,8 +54,6 @@ hackedbox_SOURCES = \
 	src/ImageControl.cpp \
 	src/MenuManager.cpp \
 	src/Netizen.cpp \
-	src/RootMenu.cpp \
-	src/Runbox.cpp \
 	src/Screen.cpp \
 	src/Texture.cpp \
 	src/Timer.cpp \
@@ -66,15 +62,13 @@ hackedbox_SOURCES = \
 	src/WindowMenu.cpp \
 	src/Workspace.cpp \
 	src/WorkspaceMenu.cpp \
-	src/main.cpp \
-	hbSettings/src/Settings.cpp \
-	hbSettings/src/SWindow.cpp
+	src/main.cpp
 
 hackedbox_LDADD = \
-	$(top_builddir)/hbtk/libhbtk.a \
 	-lX11 \
 	-lXft \
-	-lXext
+	-lXext \
+	-lImlib2
 
 hbsetbg_SOURCES = \
 	src/HbSetBg.cpp
@@ -86,10 +80,7 @@ hbsetbg_LDADD = \
 	$(top_builddir)/src/BaseDisplay.o \
 	$(top_builddir)/src/Color.o \
 	$(top_builddir)/src/GCCache.o \
-	$(top_builddir)/src/Texture.o \
 	$(top_builddir)/src/Timer.o \
-	$(top_builddir)/src/Image.o \
-	$(top_builddir)/src/ImageControl.o \
 	$(top_builddir)/src/Util.o \
 	-lImlib2 \
 	-lX11 \
@@ -111,8 +102,6 @@ EXTRA_DIST = \
 	ChangeLog.new \
 	LICENSE \
 	doc \
-	hbtk/include/*.hpp \
-	hbSettings/include/*.hpp \
 	include/*.hpp
 
 uninstall-local:
