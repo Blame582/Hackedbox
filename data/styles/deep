@@ -1,77 +1,97 @@
 # deep - by safari_al
-#tr@rebel.net.au
+#[tr@rebel.net.au](mailto:tr@rebel.net.au)
 #the scent of deep heat is wafting through the air.  inhale.
-#updated: 		(09/2026) for hackedbox-0.8.8 
+#updated: 09/2026 for hackedbox-0.8.8+
 
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
+root.background:                /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode:            center
 # Background folder for automatic image rotation
-#root.background.folder: ~/.hackedbox/backgrounds
+#root.background.folder:         ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer: 0
+#root.background.timer:          0
 
-menu.title.font: 				Hack-14
-menu.title:						flat gradient horizontal 
-menu.title.color:				#223256
-menu.title.colorTo:				#3f5881
-menu.title.textColor:			#d3d3d3
+menu.title.font:                Hack-14
+menu.title:                     flat gradient horizontal
+menu.title.color:               #223256
+menu.title.colorTo:             #3F5881
+menu.title.textColor:           #D3D3D3
+menu.title.justify:             left
 
-menu.frame.font: 				Hack-12
-menu.frame:						flat gradient horizontal
-menu.frame.color:				#a3a3a3
-menu.frame.colorTo:				#d3d3d3
-menu.frame.textColor:			black
+menu.frame.font:                Hack-12
+menu.frame:                     flat gradient horizontal
+menu.frame.color:               #A3A3A3
+menu.frame.colorTo:             #D3D3D3
+menu.frame.textColor:           #000000
+menu.frame.justify:             left
 
-menu.hilite:					flat gradient horizontal
-menu.hilite.color:				#a3a3a3
-menu.hilite.colorTo:			#3f5881
-menu.hilite.textColor:			black
+menu.hilite:                    flat gradient horizontal
+menu.hilite.color:              #A3A3A3
+menu.hilite.colorTo:            #3F5881
+menu.hilite.textColor:          #000000
 
-menu.bullet: 					empty
-menu.bullet.position:			left
+menu.clock.font:                Hack-12
+menu.clock.textColor:           #000000
+menu.clock.format:              %I:%M:%S %p
+menu.clock.justify:             left
 
-window.title.focus:				flat gradient vertical
-window.title.focus.color:		#d3d3d3
-window.title.focus.colorTo:		#a3a3a3
-window.title.unfocus:			flat gradient vertical
-window.title.unfocus.color:		#d3d3d3
-window.title.unfocus.colorTo:	#a3a3a3
+menu.date.font:                 Hack-12
+menu.date.textColor:            #000000
+menu.date.format:               %m/%d/%Y
+menu.date.justify:              left
 
-window.label.focus:				flat gradient horizontal
-window.label.focus.color:		#223256
-window.label.focus.colorTo:		#3f5881
-window.label.focus.textColor:	#d3d3d3
-window.label.unfocus:			flat solid
-window.label.unfocus.color:		#223256
-window.label.unfocus.textColor:	#d3d3d3
+menu.bullet:                    empty
+menu.bullet.position:           left
 
-window.button.focus:			parentrelative
-window.button.focus.picColor:	black
-window.button.unfocus:			parentrelative
-window.button.unfocus.picColor:	black
+menu.icon:                      true
+menu.icon.position:             left
 
-window.button.pressed:			flat gradient vertical
-window.button.pressed.color:	#d3d3d3
-window.button.pressed.colorTo:	#3f5881
+window.title.focus:             flat gradient vertical
+window.title.focus.color:       #D3D3D3
+window.title.focus.colorTo:     #A3A3A3
 
-window.frame.focusColor:		#d3d3d3
-window.frame.unfocusColor:		#a3a3a3
+window.title.unfocus:           flat gradient vertical
+window.title.unfocus.color:     #D3D3D3
+window.title.unfocus.colorTo:   #A3A3A3
 
-window.handle.focus:			flat solid
-window.handle.focus.color:		#d3d3d3
-window.handle.unfocus:			flat solid
-window.handle.unfocus.color:	#a3a3a3
+window.label.focus:             flat gradient horizontal
+window.label.focus.color:       #223256
+window.label.focus.colorTo:     #3F5881
+window.label.focus.textColor:   #D3D3D3
 
-window.grip.focus:				flat solid
-window.grip.focus.color:		#3f5881
-window.grip.unfocus:			flat solid
-window.grip.unfocus.color:		#223526
+window.label.unfocus:           flat solid
+window.label.unfocus.color:     #223256
+window.label.unfocus.textColor: #D3D3D3
 
-borderColor:					black
+window.button.focus:            parentrelative
+window.button.focus.picColor:   #000000
 
-*justify:						left
+window.button.unfocus:          parentrelative
+window.button.unfocus.picColor: #000000
 
-borderWidth:					1
-bevelWidth:						1
-frameWidth:						1
-handleWidth:					3
+window.button.pressed:          flat gradient vertical
+window.button.pressed.color:    #D3D3D3
+window.button.pressed.colorTo:  #3F5881
+
+window.frame.focusColor:        #D3D3D3
+window.frame.unfocusColor:      #A3A3A3
+
+window.handle.focus:            flat solid
+window.handle.focus.color:      #D3D3D3
+
+window.handle.unfocus:          flat solid
+window.handle.unfocus.color:    #A3A3A3
+
+window.grip.focus:              flat solid
+window.grip.focus.color:        #3F5881
+
+window.grip.unfocus:            flat solid
+window.grip.unfocus.color:      #223526
+
+borderColor:                    #000000
+
+*justify:                       left
+
+borderWidth:                    1
+bevelWidth:                     1
+frameWidth:                     1
+handleWidth:                    3

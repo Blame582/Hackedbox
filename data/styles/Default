@@ -1,4 +1,4 @@
-#Name: Greenday Default
+#Name:  Default
 #Author Blame (08/2026)
 
 root.background: /usr/share/hackedbox/backgrounds/default.jpg
@@ -10,25 +10,38 @@ root.background.mode: center
 
 menu.title.font: Hack-14
 menu.title: raised gradient diagonal
-menu.title.color: rgb:90/94/98
-menu.title.colorTo: rgb:20/24/28
-menu.title.textColor: white
+menu.title.color: #5A5E62
+menu.title.colorTo: #14181C
+menu.title.textColor: #FFFFFF
 menu.title.justify: center
 
-menu.frame.font: Hack-10
+menu.frame.font: Hack-13
 menu.frame: sunken gradient diagonal
-menu.frame.color: rgb:10/20/30
-menu.frame.colorTo: rgb:70/80/90
-menu.frame.textColor: rgb:90/a0/b0
+menu.frame.color: #0A141E
+menu.frame.colorTo: #46505A
+menu.frame.textColor: #5A6A7A
 menu.frame.justify: center
 
 menu.hilite: raised gradient diagonal
-menu.hilite.color: rgb:90/94/98
-menu.hilite.colorTo: rgb:20/24/28
-menu.hilite.textColor: green
+menu.hilite.color: #5A5E62
+menu.hilite.colorTo: #14181C
+menu.hilite.textColor: #00FF00
+
+menu.clock.font: Hack-13
+menu.clock.textColor: #5A6A7A
+menu.clock.format: %I:%M:%S %p
+menu.clock.justify: center
+
+menu.date.font: Hack-13
+menu.date.textColor: #5A6A7A
+menu.date.format: %m/%d/%Y
+menu.date.justify: center
 
 menu.bullet: true
 menu.bullet.position: right
+
+menu.icon: true
+menu.icon.position: left
 
 window.title.focus: raised gradient vertical
 window.title.focus.color: rgb:80/84/88

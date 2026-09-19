@@ -29,8 +29,21 @@ menu.hilite.color:				#21354a
 menu.hilite.colorTo:			#406285
 menu.hilite.textColor:			#a8bed6
 
+menu.clock.font:				Hack-12
+menu.clock.textColor:			#5A6A7A
+menu.clock.format:				%I:%M:%S %p
+menu.clock.justify:				center
+
+menu.date.font:					Hack-12
+menu.date.textColor:			#5A6A7A
+menu.date.format:				%m/%d/%Y
+menu.date.justify:				center
+
 menu.bullet:					Triangle
 menu.bullet.position:			Right
+
+menu.icon:						true
+menu.icon.position:				left
 
 window.title.focus:				Raised Bevel1 Gradient Vertical
 window.title.focus.color:		#414b57

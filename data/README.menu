@@ -20,10 +20,13 @@ User-defined menus are normally kept in:
 
 Menu Syntax
 -----------
-
-A menu entry consists of up to three fields:
+A menu entry normally consists of up to three fields:
 
     [tag] (label) {command}
+
+Some entries, including [exec], may also have an optional icon field:
+
+    [tag] (label) {command} </path/to/icon>
 
 The fields used depend on the tag. Some tags use only a label, while others
 use the label as a filename or use the command field for additional data.
@@ -53,13 +56,13 @@ Menu Tags
         [end]
 
 
-[exec] (label) {command}
+[exec] (label) {command} </path/to/icon>
 
     Adds an entry that executes the specified command when selected.
 
     Normal commands can be used:
 
-        [exec] (Terminal) {xterm}
+        [exec] (Terminal) {xterm} 
         [exec] (File Manager) {fileman}
         [exec] (Web Browser) {firefox}
 
@@ -79,6 +82,25 @@ Menu Tags
         [exec] (Keys File) {hackedpad ~/.hackedbox/keybinds.rc}
         [exec] (Style File) {hackedpad $style}
 
+    [exec] entries may optionally specify an icon after the command field.
+
+    Example:
+
+        [exec] (Cudatext) {cudatext}</usr/src/cudatext/cudatext-512.png>
+
+    The icon pathname is enclosed in '<' and '>'.
+
+    Hackedbox loads the icon using Imlib2 and displays it in the menu
+    item when the menu is drawn.
+
+    The icon is optional. An [exec] entry without an icon remains valid:
+
+        [exec] (Terminal) {qterminal}
+
+    The icon pathname may be absolute or may refer to any pathname that
+    can be opened by the Hackedbox process.
+
+    Hackedbox scales the icon proportionally to fit the menu's icon area.
 
 [exit] (label)
 
@@ -420,7 +442,7 @@ Style configuration is documented separately in README.style.
 
 Default Entries:    
     
-    submenu] (Styles) {Choose a style...}
+    [submenu] (Styles) {Choose a style...}
         [nop] ( *** User Styles *** )
         [stylesdir] (~/.hackedbox/styles)
         [nop] ( *** System Styles *** )

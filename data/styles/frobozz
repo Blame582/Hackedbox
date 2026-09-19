@@ -35,6 +35,9 @@ menu.bullet:					Triangle
 menu.bullet.position:			Right
 menu.frame.disableColor:		#ffffff
 
+menu.icon:                      False
+menu.icon.position:             right
+
 window.button.focus:			Flat Solid PipeCross
 window.button.focus.color:		#484848
 window.button.focus.colorTo:	#ffffff
