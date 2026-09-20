@@ -1,4 +1,4 @@
-// Icon.hpp for Hackedbox - an X Window manager
+// HbSetBg.hpp for Hackedbox - an X window manager
 // Copyright (c) 2026 Kevin Day (blame582@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -45,7 +45,8 @@ private:
     Center,
     Tile,
     StretchToCenter,
-    StretchToEdge
+    StretchToEdge,
+    Solid
   };
 
   void process_event(XEvent *event) override;
@@ -63,6 +64,10 @@ private:
                    int width,
                    int height);
 
+  Pixmap createSolidPixmap(int screen,
+                            int width,
+                            int height);
+
   Pixmap createPixmap(int screen,
                       int width,
                       int height);
@@ -73,6 +78,7 @@ private:
   void usage(int exit_code = 0);
 
   std::string image_file;
+  std::string color;
 
   Mode mode;
 

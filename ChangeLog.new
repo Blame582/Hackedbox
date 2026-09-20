@@ -1,5 +1,11 @@
 # Hackedbox 0.8.8 — Change Log
 
+2026-09-20
+- Added solid color background support to hbsetbg with -color/--color.
+- Added Imlib2 dependency detection to the build configuration.
+- Renamed the default style file to lowercase default to avoid case-related menu naming issues.
+- Removed the obsolete steelblue style from the styles build list.
+
 ## Core / Project Direction
 
 * Continued the conversion and modernization of Hackedbox from its original Blackbox-derived codebase. now completed

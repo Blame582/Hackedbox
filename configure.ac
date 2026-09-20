@@ -83,6 +83,11 @@ test x$no_x = "xyes" && AC_MSG_ERROR(
 test x$x_includes = "x" && x_includes="/usr/include"
 test x$x_libraries = "x" && x_libraries="/usr/lib"
 
+PKG_CHECK_MODULES([IMLIB2], [imlib2],
+  [],
+  [AC_MSG_ERROR([Hackedbox requires imlib2.])]
+)
+
 CFLAGS="$CFLAGS $X_CFLAGS"
 CXXFLAGS="$CXXFLAGS $X_CFLAGS"
 LIBS="$LIBS $X_LIBS"
@@ -342,7 +347,7 @@ AC_CONFIG_FILES([
   data/Makefile
   data/menu
   data/styles/Makefile
-  data/styles/Default
+  data/styles/default
   data/backgrounds/Makefile
   doc/hackedbox.1
   doc/Makefile

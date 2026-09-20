@@ -2,7 +2,7 @@
 
 styledir = $(pkgdatadir)/styles
 MAINTAINERCLEANFILES = Makefile.in
-style_DATA = Default Hackedbox artwiz bluebox cthulhain deep flux frobozz frobust nyz nyzclone operation outcomes shade steelblue steelblue2 orangish trisb twice
+style_DATA = default hackedbox artwiz bluebox cthulhain deep flux frobozz frobust nyz nyzclone operation outcomes shade steelblue2 orangish trisb twice
 
 distclean-local:
 	rm -f *\~

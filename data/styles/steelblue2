@@ -1,93 +1,107 @@
-#name:		steelblue2
-#author:	miklos
-#date:		Feb 28, 2002
-#updated: 		(09/2026) for hackedbox-0.8.8 
+#Name: steelblue2
+#Author: miklos
+#Date: Feb 28, 2002
+#updated: (09/2026) for hackedbox-0.8.8+
 
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
+root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode:                center
 # Background folder for automatic image rotation
-#root.background.folder: ~/.hackedbox/backgrounds
+#root.background.folder:             ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer: 0
+#root.background.timer:              0
 
-menu.title.font: 				Hack-14
-menu.title:	Raised Bevel1 Gradient Diagonal
-menu.title.color:	#6e7b8b
-menu.title.colorTo:	#555f6b
-menu.title.textColor:	#d7e0ee
-menu.title.justify:	Center
+menu.title.font:                     Hack-14
+menu.title:                           raised bevel1 gradient diagonal
+menu.title.color:                    #6E7B8B
+menu.title.colorTo:                  #555F6B
+menu.title.textColor:                #D7E0EE
+menu.title.justify:                  center
 
-menu.frame.font: 				Hack-12
-menu.frame:	Sunken Bevel2 Gradient Diagonal
-menu.frame.color:	#8fa0b5
-menu.frame.colorTo:	#6e7b8b
-menu.frame.textColor:	#ffffff
-menu.frame.justify:	Right
+menu.frame.font:                     Hack-12
+menu.frame:                           sunken bevel2 gradient diagonal
+menu.frame.color:                    #8FA0B5
+menu.frame.colorTo:                  #6E7B8B
+menu.frame.textColor:                #FFFFFF
+menu.frame.justify:                  right
 
-menu.hilite:	Raised Bevel1 Gradient Diagonal
-menu.hilite.color:	#6e7b8b
-menu.hilite.colorTo:	#555f6b
-menu.hilite.textColor:	#ffffff
+menu.hilite:                          raised bevel1 gradient diagonal
+menu.hilite.color:                   #6E7B8B
+menu.hilite.colorTo:                 #555F6B
+menu.hilite.textColor:               #FFFFFF
 
-menu.bullet:	Empty
-menu.bullet.position:	Right
-menu.frame.disableColor:	#ffffff
+menu.clock.font:                     Hack-12
+menu.clock.textColor:                #FFFFFF
+menu.clock.format:                   %I:%M:%S %p
+menu.clock.justify:                  right
 
-window.button.focus:	Flat Gradient CrossDiagonal
-window.button.focus.color:	#6e7b8b
-window.button.focus.colorTo:	#555f6b
-window.button.focus.picColor:	#ddeeff
+menu.date.font:                      Hack-12
+menu.date.textColor:                 #FFFFFF
+menu.date.format:                    %m/%d/%Y
+menu.date.justify:                   right
 
-window.button.unfocus:	Flat Gradient Vertical
-window.button.unfocus.color:	#6e7b8b
-window.button.unfocus.colorTo:	#555f6b
-window.button.unfocus.picColor:	#748293
+menu.bullet:                          daimond
+menu.bullet.position:                 right
+menu.frame.disableColor:             #FFFFFF
 
-window.grip.focus:	Raised Bevel1 Gradient Diagonal
-window.grip.focus.color:	#8fa0b5
-window.grip.focus.colorTo:	#6e7b8b
+menu.icon:                            true
+menu.icon.position:                   right
 
-window.grip.unfocus:	Raised Bevel1 Gradient Diagonal
-window.grip.unfocus.color:	#6e7b8b
-window.grip.unfocus.colorTo:	#555f6b
+window.button.focus:                 flat gradient crossdiagonal
+window.button.focus.color:           #6E7B8B
+window.button.focus.colorTo:         #555F6B
+window.button.focus.picColor:        #DDEEFF
 
-window.handle.focus:	Raised Bevel1 Gradient Diagonal
-window.handle.focus.color:	#6e7b8b
-window.handle.focus.colorTo:	#555f6b
+window.button.unfocus:               flat gradient vertical
+window.button.unfocus.color:         #6E7B8B
+window.button.unfocus.colorTo:       #555F6B
+window.button.unfocus.picColor:      #748293
 
-window.handle.unfocus:	Raised Bevel1 Gradient Diagonal
-window.handle.unfocus.color:	#6e7b8b
-window.handle.unfocus.colorTo:	#555f6b
+window.grip.focus:                   raised bevel1 gradient diagonal
+window.grip.focus.color:             #8FA0B5
+window.grip.focus.colorTo:           #6E7B8B
 
-window.label.focus:	Sunken Bevel1 Gradient Diagonal
-window.label.focus.color:	#8fa0b5
-window.label.focus.colorTo:	#555f6b
-window.label.focus.textColor:	#e6f0ff
-window.label.focus.justify:	Left
+window.grip.unfocus:                 raised bevel1 gradient diagonal
+window.grip.unfocus.color:           #6E7B8B
+window.grip.unfocus.colorTo:         #555F6B
 
-window.justify:	Left
-window.label.unfocus:	Sunken Bevel1 Gradient Diagonal
-window.label.unfocus.color:	#6e7b8b
-window.label.unfocus.colorTo:	#555f6b
-window.label.unfocus.textColor:	#748293
+window.handle.focus:                 raised bevel1 gradient diagonal
+window.handle.focus.color:           #6E7B8B
+window.handle.focus.colorTo:         #555F6B
 
-window.title.focus:	Raised Bevel1 Gradient Vertical
-window.title.focus.color:	#6e7b8b
-window.title.focus.colorTo:	#555f6b
+window.handle.unfocus:               raised bevel1 gradient diagonal
+window.handle.unfocus.color:         #6E7B8B
+window.handle.unfocus.colorTo:       #555F6B
 
-window.title.unfocus:	Raised Bevel1 Gradient Vertical
-window.title.unfocus.color:	#6e7b8b
-window.title.unfocus.colorTo:	#555f6b
+window.label.focus:                  sunken bevel1 gradient diagonal
+window.label.focus.color:            #8FA0B5
+window.label.focus.colorTo:          #555F6B
+window.label.focus.textColor:        #E6F0FF
+window.label.focus.justify:          left
 
-window.button.pressed:	Sunken Bevel1 Gradient Diagonal
-window.button.pressed.color:	#6e7b8b
-window.button.pressed.colorTo:	#8fa0b5
+window.justify:                      left
 
-window.frame.focusColor:	#ffffff
-window.frame.unfocusColor:	#555f6b
-handleWidth:	4
-frameWidth:	0
-bevelWidth:	1
-borderWidth:	1
-borderColor:	#000000
+window.label.unfocus:                sunken bevel1 gradient diagonal
+window.label.unfocus.color:          #6E7B8B
+window.label.unfocus.colorTo:        #555F6B
+window.label.unfocus.textColor:      #748293
 
+window.title.focus:                  raised bevel1 gradient vertical
+window.title.focus.color:            #6E7B8B
+window.title.focus.colorTo:          #555F6B
+
+window.title.unfocus:                raised bevel1 gradient vertical
+window.title.unfocus.color:          #6E7B8B
+window.title.unfocus.colorTo:        #555F6B
+
+window.button.pressed:               sunken bevel1 gradient diagonal
+window.button.pressed.color:         #6E7B8B
+window.button.pressed.colorTo:       #8FA0B5
+
+window.frame.focusColor:             #FFFFFF
+window.frame.unfocusColor:           #555F6B
+
+handleWidth:                         4
+frameWidth:                          0
+bevelWidth:                          1
+borderWidth:                         1
+borderColor:                         #000000

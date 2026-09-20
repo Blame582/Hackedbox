@@ -1,5 +1,5 @@
 // HbSetBg.cpp for Hackedbox - an X window manager
-// Copyright (c) 2026 Kevin Day  (blame582@gmail.com)
+// Copyright (c) 2026 Kevin Day (blame582@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -34,7 +34,6 @@
 #include <X11/Xatom.h>
 
 #include "BaseDisplay.hpp"
-
 #include "HbSetBg.hpp"
 
 
@@ -91,6 +90,16 @@ HbSetBg::HbSetBg(int argc, char **argv, char *display_name)
 
       image_file = argv[i];
 
+    } else if (!std::strcmp(argv[i], "-solid") ||
+               !std::strcmp(argv[i], "--solid")) {
+
+      mode = Mode::Solid;
+
+      if (++i >= argc)
+        usage(1);
+
+      color = argv[i];
+
     } else if (!std::strcmp(argv[i], "-display") ||
                !std::strcmp(argv[i], "--display")) {
 
@@ -110,15 +119,20 @@ HbSetBg::HbSetBg(int argc, char **argv, char *display_name)
        * A bare filename means center mode.
        */
 
-      if (image_file.empty()) {
+      if (image_file.empty() &&
+          color.empty()) {
+
         image_file = argv[i];
+
       } else {
+
         usage(1);
       }
     }
   }
 
-  if (image_file.empty())
+  if (image_file.empty() &&
+      color.empty())
     usage(1);
 
   setBackground();
@@ -139,6 +153,7 @@ HbSetBg::~HbSetBg()
     RetainPermanent
   );
 }
+
 
 void HbSetBg::setTimer(long milliseconds)
 {
@@ -164,6 +179,7 @@ void HbSetBg::setTimer(long milliseconds)
   timer->start();
 }
 
+
 void HbSetBg::timeout()
 {
   if (timer_interval <= 0)
@@ -174,6 +190,7 @@ void HbSetBg::timeout()
   timer->setTimeout(timer_interval);
   timer->start();
 }
+
 
 void HbSetBg::process_event(XEvent *event)
 {
@@ -190,7 +207,6 @@ bool HbSetBg::handleSignal(int signal)
 
 void HbSetBg::setBackground()
 {
-
   const unsigned int screens = getNumberOfScreens();
 
   for (unsigned int screen = 0;
@@ -203,20 +219,46 @@ void HbSetBg::setBackground()
     const int height =
       getScreenInfo(screen)->getHeight();
 
-    Pixmap pixmap =
-      loadImage(
-        static_cast<int>(screen),
-        image_file,
-        width,
-        height
-      );
+    Pixmap pixmap = None;
+
+    if (mode == Mode::Solid) {
+
+      pixmap =
+        createSolidPixmap(
+          static_cast<int>(screen),
+          width,
+          height
+        );
+
+    } else {
+
+      pixmap =
+        loadImage(
+          static_cast<int>(screen),
+          image_file,
+          width,
+          height
+        );
+    }
 
     if (!pixmap) {
-      std::fprintf(
-        stderr,
-        "hbsetbg: unable to load '%s'\n",
-        image_file.c_str()
-      );
+
+      if (mode == Mode::Solid) {
+
+        std::fprintf(
+          stderr,
+          "hbsetbg: unable to create solid color '%s'\n",
+          color.c_str()
+        );
+
+      } else {
+
+        std::fprintf(
+          stderr,
+          "hbsetbg: unable to load '%s'\n",
+          image_file.c_str()
+        );
+      }
 
       continue;
     }
@@ -239,6 +281,130 @@ void HbSetBg::setBackground()
   }
 
   XFlush(getXDisplay());
+}
+
+
+Pixmap HbSetBg::createSolidPixmap(int screen,
+                                  int width,
+                                  int height)
+{
+  Display *display =
+    getXDisplay();
+
+  const ScreenInfo *screen_info =
+    getScreenInfo(screen);
+
+  const int depth =
+    screen_info->getDepth();
+
+  Pixmap pixmap =
+    XCreatePixmap(
+      display,
+      screen_info->getRootWindow(),
+      static_cast<unsigned int>(width),
+      static_cast<unsigned int>(height),
+      static_cast<unsigned int>(depth)
+    );
+
+  if (!pixmap) {
+
+    std::fprintf(
+      stderr,
+      "hbsetbg: XCreatePixmap failed\n"
+    );
+
+    return None;
+  }
+
+  Colormap colormap =
+    DefaultColormap(display, screen);
+
+  XColor xcolor;
+
+  xcolor.red = 0;
+  xcolor.green = 0;
+  xcolor.blue = 0;
+  xcolor.pixel = 0;
+
+  if (!XParseColor(
+        display,
+        colormap,
+        color.c_str(),
+        &xcolor)) {
+
+    std::fprintf(
+      stderr,
+      "hbsetbg: invalid color '%s'\n",
+      color.c_str()
+    );
+
+    XFreePixmap(
+      display,
+      pixmap
+    );
+
+    return None;
+  }
+
+  if (!XAllocColor(
+        display,
+        colormap,
+        &xcolor)) {
+
+    std::fprintf(
+      stderr,
+      "hbsetbg: unable to allocate color '%s'\n",
+      color.c_str()
+    );
+
+    XFreePixmap(
+      display,
+      pixmap
+    );
+
+    return None;
+  }
+
+  GC gc =
+    XCreateGC(
+      display,
+      pixmap,
+      0,
+      nullptr
+    );
+
+  if (!gc) {
+
+    XFreePixmap(
+      display,
+      pixmap
+    );
+
+    return None;
+  }
+
+  XSetForeground(
+    display,
+    gc,
+    xcolor.pixel
+  );
+
+  XFillRectangle(
+    display,
+    pixmap,
+    gc,
+    0,
+    0,
+    static_cast<unsigned int>(width),
+    static_cast<unsigned int>(height)
+  );
+
+  XFreeGC(
+    display,
+    gc
+  );
+
+  return pixmap;
 }
 
 
@@ -275,6 +441,7 @@ Pixmap HbSetBg::loadImage(int screen,
     imlib_load_image(file.c_str());
 
   if (!image) {
+
     std::fprintf(
       stderr,
       "hbsetbg: Imlib2 failed to load image '%s'\n",
@@ -358,6 +525,9 @@ Pixmap HbSetBg::loadImage(int screen,
       offset_x = 0;
       offset_y = 0;
       break;
+
+    case Mode::Solid:
+      break;
   }
 
   Pixmap pixmap =
@@ -370,6 +540,7 @@ Pixmap HbSetBg::loadImage(int screen,
     );
 
   if (!pixmap) {
+
     std::fprintf(
       stderr,
       "hbsetbg: XCreatePixmap failed\n"
@@ -392,6 +563,7 @@ Pixmap HbSetBg::loadImage(int screen,
     );
 
   if (!gc) {
+
     XFreePixmap(
       display,
       pixmap
@@ -500,7 +672,6 @@ Pixmap HbSetBg::loadImage(int screen,
 }
 
 
-
 Pixmap HbSetBg::createPixmap(int screen,
                              int width,
                              int height)
@@ -592,6 +763,8 @@ void HbSetBg::usage(int exit_code)
     "                         stretch image proportionally and center\n"
     "  -s2e, --stretch2edge <image>\n"
     "                         stretch image to the screen\n"
+    "  -solid, --solid <color>\n"
+    "                         fill the screen with a solid color. Uses #HEX code.\n"
     "  -display, --display <display>\n"
     "                         X display\n"
     "  -help, --help          show this help\n"
@@ -606,9 +779,10 @@ int main(int argc,
          char **argv)
 {
   if (argc < 2) {
+
     std::fprintf(
       stderr,
-      "hbsetbg: no image specified\n"
+      "hbsetbg: no image or color specified\n"
     );
 
     return 1;

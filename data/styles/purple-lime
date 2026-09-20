@@ -1,0 +1,97 @@
+#Name: Purple Lime
+#Author: Blame
+#Date: (9/2026)
+#Made for hackedbox-0.8.8+
+
+root.background:                    ~/.hackedbox/backgrounds/purpleLime.jpg
+root.background.mode:                center
+# Background folder for automatic image rotation
+#root.background.folder:             ~/.hackedbox/backgrounds
+# Background rotation timer in seconds (0 = disabled)
+#root.background.timer:              0
+
+menu.title.font:                     Hack-14
+menu.title:                           flat crossdiagonal gradient
+menu.title.color:                    #8066CC
+menu.title.colorTo:                  #443366
+menu.title.textColor:                #FFFFFF
+menu.title.justify:                  center
+
+menu.frame.font:                     Hack-12
+menu.frame:                           flat crossdiagonal gradient
+menu.frame.color:                    #666666
+menu.frame.colorTo:                  #333333
+menu.frame.textColor:                #D9D9D9
+menu.frame.disableColor:             #444444
+menu.frame.justify:                  center
+
+menu.clock.font:                     Hack-14
+menu.clock.textColor:                #D9D9D9
+menu.clock.format:                   %I:%M:%S %p
+menu.clock.justify:                  center
+
+menu.date.font:                      Hack-14
+menu.date.textColor:                 #D9D9D9
+menu.date.format:                    %m/%d/%Y
+menu.date.justify:                   cemter
+
+menu.bullet.position:                 right
+menu.bullet:                          triangle
+
+menu.icon:                            true
+menu.icon.position:                   left
+
+menu.hilite:                          flat crossdiagonal gradient
+menu.hilite.color:                   #99FF00
+menu.hilite.colorTo:                 #66AA00
+menu.hilite.textColor:               #000000
+
+window.title.focus:                  flat diagonal gradient
+window.title.focus.color:            #8066CC
+window.title.focus.colorTo:          #554477
+window.title.unfocus:                flat solid
+window.title.unfocus.color:          #4D4D4D
+
+window.label.focus:                  flat crossdiagonal gradient
+window.label.focus.color:            #666666
+window.label.focus.colorTo:          #333333
+window.label.focus.textColor:        #FFFFFF
+window.label.unfocus:                flat crossdiagonal gradient
+window.label.unfocus.color:          #4D4D4D
+window.label.unfocus.colorTo:        #333333
+window.label.unfocus.textColor:      #999999
+
+window.button.focus:                 flat diagonal gradient
+window.button.focus.color:           #554477
+window.button.focus.colorTo:         #7755AA
+window.button.focus.picColor:        #444444
+window.button.unfocus:               flat solid
+window.button.unfocus.color:         #4D4D4D
+window.button.unfocus.picColor:      #333333
+window.button.pressed:               flat crossdiagonal gradient
+window.button.pressed.color:         #666666
+window.button.pressed.colorTo:       #333333
+
+window.handle.focus:                 flat crossdiagonal gradient
+window.handle.focus.color:           #8066CC
+window.handle.focus.colorTo:         #443366
+window.handle.unfocus:               flat solid
+window.handle.unfocus.color:         #4D4D4D
+
+window.grip.focus:                   flat crossdiagonal gradient
+window.grip.focus.color:             #666666
+window.grip.focus.colorTo:           #333333
+window.grip.unfocus:                 flat crossdiagonal gradient
+window.grip.unfocus.color:           #4D4D4D
+window.grip.unfocus.colorTo:         #333333
+
+window.frame.focusColor:             #8066CC
+window.frame.unfocusColor:           #4D4D4D
+
+window.justify:                      center
+
+borderColor:                         #1A1A1A
+
+bevelWidth:                          1
+borderWidth:                         2
+handleWidth:                         4
