@@ -47,38 +47,32 @@ static void showHelp(int exitval)
     "  -help\t\t\tdisplay this help text and exit.\n\n",
     __hackedbox_version);
 
+  const char *debug_status =
+#ifdef DEBUG
+    "yes";
+#else
+    "no";
+#endif
+
+  const char *shape_status =
+#ifdef SHAPE
+    "yes";
+#else
+    "no";
+#endif
+
   printf(
     "Compile time options:\n"
     " Debugging:\t\t\t%s\n"
-    " Shape:\t\t\t%s\n"
-    " 8bpp Ordered Dithering:\t%s\n\n",
-
-#ifdef DEBUG
-    "yes",
-#else
-    "no",
-#endif
-
-#ifdef SHAPE
-    "yes",
-#else
-    "no",
-#endif
-
-#ifdef ORDEREDPSEUDO
-    "yes"
-#else
-    "no"
-#endif
-  );
+    " Shape:\t\t\t%s\n",
+    debug_status,
+    shape_status);
 
   ::exit(exitval);
 }
 
 int main(int argc, char **argv)
 {
-  fprintf(stderr, "HBTRACE: main() entered\n");
-
   char *session_display = nullptr;
   char *rc_file = nullptr;
 
@@ -128,17 +122,9 @@ int main(int argc, char **argv)
   _chdir2(getenv("X11ROOT"));
 #endif // __EMX__
 
-  fprintf(stderr, "HBTRACE: before Hackedbox constructor\n");
-
   Hackedbox hackedbox(argv, session_display, rc_file);
 
-  fprintf(stderr, "HBTRACE: Hackedbox constructor complete\n");
-
-  fprintf(stderr, "HBTRACE: entering eventLoop\n");
-
   hackedbox.eventLoop();
-
-  fprintf(stderr, "HBTRACE: eventLoop returned\n");
 
   return 0;
 }

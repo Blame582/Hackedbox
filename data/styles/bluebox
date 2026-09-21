@@ -10,18 +10,18 @@ root.background.mode: center
 # Background rotation timer in seconds (0 = disabled)
 #root.background.timer: 0
 
-menu.title.font: 				Hack-14
+menu.title.font: 				Hack-18
 menu.title:						Raised Gradient Vertical
 menu.title.color:				#414b57
 menu.title.colorTo:				#67788b
-menu.title.textColor:			#8998ab
+menu.title.textColor:			#6F8294
 menu.title.justify:				Center
 
 menu.frame.font: 				Hack-12
 menu.frame:						Flat Gradient Horizontal
 menu.frame.color:				#2c333b
 menu.frame.colorTo:				#6a7b8f
-menu.frame.textColor:			#becad
+menu.frame.textColor:			#000000
 menu.frame.justify:				Left
 
 menu.hilite:					Sunken Bevel1 Gradient Horizontal
@@ -30,12 +30,12 @@ menu.hilite.colorTo:			#406285
 menu.hilite.textColor:			#a8bed6
 
 menu.clock.font:				Hack-12
-menu.clock.textColor:			#5A6A7A
+menu.clock.textColor:			#000000
 menu.clock.format:				%I:%M:%S %p
 menu.clock.justify:				center
 
 menu.date.font:					Hack-12
-menu.date.textColor:			#5A6A7A
+menu.date.textColor:			#000000
 menu.date.format:				%m/%d/%Y
 menu.date.justify:				center
 

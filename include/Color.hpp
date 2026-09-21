@@ -66,15 +66,27 @@ public:
     return b;
   }
 
+  inline int alpha(void) const {
+    return a;
+  }
 
-  void setRGB(int _r,
-              int _g,
-              int _b) {
+
+  void setRGBA(int _r,
+               int _g,
+               int _b,
+               int _a) {
     deallocate();
 
     r = _r;
     g = _g;
     b = _b;
+    a = _a;
+  }
+
+  void setRGB(int _r,
+              int _g,
+              int _b) {
+    setRGBA(_r, _g, _b, 255);
   }
 
 
@@ -111,7 +123,8 @@ public:
   inline bool operator==(const HbColor &c) const {
     return r == c.r &&
            g == c.g &&
-           b == c.b;
+           b == c.b &&
+           a == c.a;
   }
 
   inline bool operator!=(const HbColor &c) const {
@@ -133,6 +146,7 @@ private:
   int r;
   int g;
   int b;
+  int a;
 
   unsigned long p;
 

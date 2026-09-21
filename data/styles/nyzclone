@@ -1,82 +1,94 @@
+#Name: NYZClone
+#Author: miklos
+#Date: March 3, 2002
+#updated: (09/2026) for hackedbox-0.8.8+
 
-#name:		nyzclone
-#author:	miklos
-#date:		March 3, 2002
-#updated: 		(09/2026) for hackedbox-0.8.8 
-
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
+root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode:                center
 # Background folder for automatic image rotation
-#root.background.folder: ~/.hackedbox/backgrounds
+#root.background.folder:             ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer: 0
+#root.background.timer:              0
 
-menu.title.font: 				Hack-14
-menu.title:						Raised Bevel1 Solid
-menu.title.color:				#506c90
-menu.title.textColor:			#ffffff
-menu.title.justify:				Center
+menu.title.font:                     Hack-14
+menu.title:                           Raised Bevel1 Solid
+menu.title.color:                    #506C90
+menu.title.textColor:                #FFFFFF
+menu.title.justify:                  center
 
-menu.frame.font: 				Hack-12
-menu.frame:						Raised Bevel1 Solid
-menu.frame.color:				#c8c8c8
-menu.frame.textColor:			#000000
-menu.frame.justify:				Center
-menu.frame.disableColor:		#ffffff
+menu.frame.font:                     Hack-12
+menu.frame:                           Raised Bevel1 Solid
+menu.frame.color:                    #C8C8C8
+menu.frame.textColor:                #000000
+menu.frame.justify:                  center
+menu.frame.disableColor:             #FFFFFF
 
-menu.hilite:					Flat Solid
-menu.hilite.color:				#506890
-menu.hilite.textColor:			#ffffff
+menu.hilite:                          Flat Solid
+menu.hilite.color:                   #506890
+menu.hilite.textColor:               #FFFFFF
 
-menu.bullet:					Empty
-menu.bullet.position:			Right
+menu.clock.font:                     Hack-12
+menu.clock.textColor:                #000000
+menu.clock.format:                   %I:%M:%S %p
+menu.clock.justify:                  center
 
-window.button.focus:			Flat Solid
-window.button.focus.color:		#506c90
-window.button.focus.picColor:	#ffffff
+menu.date.font:                      Hack-12
+menu.date.textColor:                 #000000
+menu.date.format:                    %m/%d/%Y
+menu.date.justify:                   center
 
-window.button.unfocus:			Flat Solid
-window.button.unfocus.color:	#c8c8c8
-window.button.unfocus.picColor:	#787c78
+menu.bullet:                          empty
+menu.bullet.position:                 right
 
-window.grip.focus:				Raised Bevel1 Solid
-window.grip.focus.color:		#506890
+menu.icon:                            true
+menu.icon.position:                   left
 
-window.grip.unfocus:			Raised Bevel1 Solid
-window.grip.unfocus.color:		#c8c8c8
+window.title.focus:                  Raised Bevel1 Solid
+window.title.focus.color:            #506890
 
-window.handle.focus:			Raised Bevel1 Solid
-window.handle.focus.color:		#506890
+window.title.unfocus:                Raised Bevel1 Solid
+window.title.unfocus.color:          #C8C8C8
 
-window.handle.unfocus:			Raised Bevel1 Solid
-window.handle.unfocus.color:	#c8c8c8
+window.label.focus:                  Flat Solid
+window.label.focus.color:            #506890
+window.label.focus.textColor:        #FFFFFF
+window.label.focus.justify:          center
 
-window.label.focus:				Flat Solid
-window.label.focus.color:		#506890
-window.label.focus.textColor:	#ffffff
-window.label.focus.justify:		Center
+window.label.unfocus:                Flat Solid
+window.label.unfocus.color:          #C8C8C8
+window.label.unfocus.textColor:      #787C78
 
-window.justify:					Center
-window.label.unfocus:			Flat Solid
-window.label.unfocus.color:		#c8c8c8
-window.label.unfocus.textColor:	#787c78
+window.button.focus:                 Flat Solid
+window.button.focus.color:           #506C90
+window.button.focus.picColor:        #FFFFFF
 
-window.title.focus:				Raised Bevel1 Solid
-window.title.focus.color:		#506890
+window.button.unfocus:               Flat Solid
+window.button.unfocus.color:         #C8C8C8
+window.button.unfocus.picColor:      #787C78
 
-window.title.unfocus:			Raised Bevel1 Solid
-window.title.unfocus.color:		#c8c8c8
+window.button.pressed:               Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:         #506890
+window.button.pressed.colorTo:       #A0A0A0
 
-window.button.pressed:			Sunken Bevel1 Gradient Diagonal
-window.button.pressed.color:	#506890
-window.button.pressed.colorTo:	#a0a0a0
+window.handle.focus:                 Raised Bevel1 Solid
+window.handle.focus.color:           #506890
 
-window.frame.focusColor:		#ffffff
-window.frame.unfocusColor:		#202428
+window.handle.unfocus:               Raised Bevel1 Solid
+window.handle.unfocus.color:         #C8C8C8
 
-handleWidth:					5	
-frameWidth:						0
-bevelWidth:						1
-borderWidth:					1
-borderColor:					#000000
+window.grip.focus:                   Raised Bevel1 Solid
+window.grip.focus.color:             #506890
 
+window.grip.unfocus:                 Raised Bevel1 Solid
+window.grip.unfocus.color:           #C8C8C8
+
+window.frame.focusColor:             #FFFFFF
+window.frame.unfocusColor:           #202428
+
+window.justify:                      center
+
+handleWidth:                         5
+frameWidth:                          0
+bevelWidth:                          1
+borderWidth:                         1
+borderColor:                         #000000

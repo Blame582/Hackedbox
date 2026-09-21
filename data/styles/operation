@@ -1,74 +1,93 @@
-#name:			Operation
-#author:		Unknown
-#updated: 		(09/2026) for hackedbox-0.8.8 
+#Name: Operation
+#Author: Unknown
+#updated: (09/2026) for hackedbox-0.8.8+
 
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
+root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode:                center
 # Background folder for automatic image rotation
-#root.background.folder: ~/.hackedbox/backgrounds
+#root.background.folder:             ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer: 0
+#root.background.timer:              0
 
-menu.title.font: 			Hack-14
-menu.title:					flat crossdiagonal gradient
-menu.title.color:			rgb:6/9/c
-menu.title.colorTo:			rgb:3/48/6
-menu.title.textColor:		white
-menu.title.justify:			right
+menu.title.font:                     Hack-14
+menu.title:                           flat crossdiagonal gradient
+menu.title.color:                    #6699CC
+menu.title.colorTo:                  #334866
+menu.title.textColor:                #FFFFFF
+menu.title.justify:                  right
 
-menu.frame:					flat crossdiagonal gradient
-menu.frame.color:			grey50
-menu.frame.colorTo:			grey80
-menu.frame.textColor:		grey20
-menu.frame.disableColor:	grey40
-menu.frame.font:			Hack-12
-menu.frame.justify:			center
+menu.frame.font:                     Hack-12
+menu.frame:                           flat crossdiagonal gradient
+menu.frame.color:                    #808080
+menu.frame.colorTo:                  #CCCCCC
+menu.frame.textColor:                #333333
+menu.frame.disableColor:             #666666
+menu.frame.justify:                  center
 
-menu.hilite:				flat crossdiagonal gradient
-menu.hilite.color:			rgb:6/9/c
-menu.hilite.colorTo:		rgb:3/48/6
-menu.hilite.textColor:		white
+menu.hilite:                          flat crossdiagonal gradient
+menu.hilite.color:                   #6699CC
+menu.hilite.colorTo:                 #334866
+menu.hilite.textColor:               #FFFFFF
 
-menu.bullet.position:		right
-menu.bullet:				triangle
+menu.clock.font:                     Hack-12
+menu.clock.textColor:                #333333
+menu.clock.format:                   %I:%M:%S %p
+menu.clock.justify:                  center
 
-window.title.focus:		flat crossdiagonal gradient
-window.title.focus.color:	rgb:6/9/c
-window.title.focus.colorTo:	rgb:3/48/6
-window.title.unfocus:		flat diagonal gradient
-window.title.unfocus.color:	grey50
-window.title.unfocus.colorTo:	grey20
+menu.date.font:                      Hack-12
+menu.date.textColor:                 #333333
+menu.date.format:                    %m/%d/%Y
+menu.date.justify:                   center
 
-window.label.focus:		parentrelative
-window.label.focus.textColor:	white
-window.label.unfocus:		parentrelative
-window.label.unfocus.textColor:	grey60
+menu.bullet:                          triangle
+menu.bullet.position:                 right
 
-window.button.focus:		parentrelative
-window.button.focus.picColor:	grey85
-window.button.unfocus:		parentrelative
-window.button.unfocus.picColor:	grey60
-window.button.pressed:		flat crossdiagonal gradient
-window.button.pressed.color:	grey50
-window.button.pressed.colorTo:	grey80
+menu.icon:                            true
+menu.icon.position:                   left
 
-window.handle.focus:		flat crossdiagonal gradient
-window.handle.focus.color:	rgb:6/9/c
-window.handle.focus.colorTo:	rgb:3/48/6
-window.handle.unfocus:		flat diagonal gradient
-window.handle.unfocus.color:	grey50
-window.handle.unfocus.colorTo:	grey20
+window.title.focus:                  flat crossdiagonal gradient
+window.title.focus.color:            #6699CC
+window.title.focus.colorTo:          #334866
 
-window.grip.focus:		parentrelative
-window.grip.unfocus:		parentrelative
+window.title.unfocus:                flat diagonal gradient
+window.title.unfocus.color:          #808080
+window.title.unfocus.colorTo:        #333333
 
-window.frame.focusColor:	rgb:6/9/c
-window.frame.unfocusColor:	grey50
+window.label.focus:                  parentrelative
+window.label.focus.textColor:        #FFFFFF
 
-window.justify:			right
+window.label.unfocus:                parentrelative
+window.label.unfocus.textColor:      #999999
 
-borderColor:			rgb:2/3/4
+window.button.focus:                 parentrelative
+window.button.focus.picColor:        #D9D9D9
 
-bevelWidth:				1
-borderWidth:			1
-handleWidth:			4
+window.button.unfocus:               parentrelative
+window.button.unfocus.picColor:      #999999
+
+window.button.pressed:               flat crossdiagonal gradient
+window.button.pressed.color:         #808080
+window.button.pressed.colorTo:       #CCCCCC
+
+window.handle.focus:                 flat crossdiagonal gradient
+window.handle.focus.color:           #6699CC
+window.handle.focus.colorTo:         #334866
+
+window.handle.unfocus:               flat diagonal gradient
+window.handle.unfocus.color:         #808080
+window.handle.unfocus.colorTo:       #333333
+
+window.grip.focus:                   parentrelative
+
+window.grip.unfocus:                 parentrelative
+
+window.frame.focusColor:             #6699CC
+window.frame.unfocusColor:           #808080
+
+window.justify:                      right
+
+borderColor:                         #223344
+
+bevelWidth:                          1
+borderWidth:                         1
+handleWidth:                         4

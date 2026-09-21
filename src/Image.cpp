@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 //
 // See the AUTHORS file for the complete list of contributors.
-//
+// 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
@@ -28,6 +28,10 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+
+#ifdef HAVE_XRENDER
+#  include <X11/extensions/Xrender.h>
+#endif
 
 using std::max;
 using std::min;
@@ -82,6 +86,236 @@ Pixmap HbImage::render(const HbTexture &texture)
     return render_gradient(texture);
 
   return None;
+}
+
+
+Pixmap HbImage::renderARGB(const HbTexture &texture)
+{
+#ifndef HAVE_XRENDER
+  return render(texture);
+#else
+  Display *display =
+    control->getBaseDisplay()->getXDisplay();
+
+  /*
+   * Render the texture normally first. This preserves all of the
+   * existing Hackedbox texture, gradient, interlace, bevel, and
+   * dithering behavior.
+   *
+   * This is done even when the texture is fully opaque. renderARGB()
+   * is explicitly requesting an ARGB32 result, so it must never return
+   * the normal screen-depth pixmap directly.
+   */
+  Pixmap source_pixmap = render(texture);
+
+  if (source_pixmap == None ||
+      source_pixmap == ParentRelative)
+    return source_pixmap;
+
+  /*
+   * The existing renderer produces an RGB pixmap using the normal
+   * screen visual. Use that as the source picture and apply the
+   * requested alpha through an A8 mask.
+   */
+  XRenderPictFormat *source_format =
+    XRenderFindVisualFormat(
+      display,
+      control->getVisual()
+    );
+
+  XRenderPictFormat *argb_format =
+    XRenderFindStandardFormat(
+      display,
+      PictStandardARGB32
+    );
+
+  XRenderPictFormat *alpha_format =
+    XRenderFindStandardFormat(
+      display,
+      PictStandardA8
+    );
+
+  if (!source_format ||
+      !argb_format ||
+      !alpha_format) {
+    XFreePixmap(display, source_pixmap);
+    return None;
+  }
+
+  /*
+   * ARGB32 is a standard XRender format:
+   *
+   *   31..24 = alpha
+   *   23..16 = red
+   *   15..08 = green
+   *   07..00 = blue
+   */
+  Pixmap argb_pixmap =
+    XCreatePixmap(
+      display,
+      control->getDrawable(),
+      width,
+      height,
+      32
+    );
+
+  if (argb_pixmap == None) {
+    XFreePixmap(display, source_pixmap);
+    return None;
+  }
+
+  Picture source_picture =
+    XRenderCreatePicture(
+      display,
+      source_pixmap,
+      source_format,
+      0,
+      nullptr
+    );
+
+  Picture destination_picture =
+    XRenderCreatePicture(
+      display,
+      argb_pixmap,
+      argb_format,
+      0,
+      nullptr
+    );
+
+  if (source_picture == None ||
+      destination_picture == None) {
+
+    if (source_picture != None)
+      XRenderFreePicture(display, source_picture);
+
+    if (destination_picture != None)
+      XRenderFreePicture(display, destination_picture);
+
+    XFreePixmap(display, source_pixmap);
+    XFreePixmap(display, argb_pixmap);
+
+    return None;
+  }
+
+  /*
+   * Clear the destination to fully transparent.
+   */
+  XRenderColor transparent;
+  transparent.red = 0;
+  transparent.green = 0;
+  transparent.blue = 0;
+  transparent.alpha = 0;
+
+  XRenderFillRectangle(
+    display,
+    PictOpSrc,
+    destination_picture,
+    &transparent,
+    0,
+    0,
+    width,
+    height
+  );
+
+  /*
+   * A one-pixel A8 picture is sufficient because the requested
+   * texture alpha is uniform across the rendered texture.
+   */
+  Pixmap alpha_pixmap =
+    XCreatePixmap(
+      display,
+      control->getDrawable(),
+      1,
+      1,
+      8
+    );
+
+  if (alpha_pixmap == None) {
+    XRenderFreePicture(display, source_picture);
+    XRenderFreePicture(display, destination_picture);
+    XFreePixmap(display, source_pixmap);
+    XFreePixmap(display, argb_pixmap);
+
+    return None;
+  }
+
+  Picture alpha_picture =
+    XRenderCreatePicture(
+      display,
+      alpha_pixmap,
+      alpha_format,
+      0,
+      nullptr
+    );
+
+  if (alpha_picture == None) {
+    XFreePixmap(display, alpha_pixmap);
+    XRenderFreePicture(display, source_picture);
+    XRenderFreePicture(display, destination_picture);
+    XFreePixmap(display, source_pixmap);
+    XFreePixmap(display, argb_pixmap);
+
+    return None;
+  }
+
+  XRenderPictureAttributes alpha_attributes;
+  alpha_attributes.repeat = RepeatNormal;
+
+  XRenderChangePicture(
+    display,
+    alpha_picture,
+    CPRepeat,
+    &alpha_attributes
+  );
+
+  XRenderColor alpha;
+  alpha.red = 0;
+  alpha.green = 0;
+  alpha.blue = 0;
+  alpha.alpha =
+    static_cast<unsigned short>(texture.color().alpha()) * 257U;
+
+  XRenderFillRectangle(
+    display,
+    PictOpSrc,
+    alpha_picture,
+    &alpha,
+    0,
+    0,
+    1,
+    1
+  );
+
+  /*
+   * Apply the A8 alpha mask to the RGB texture and write the result
+   * into the ARGB32 destination.
+   */
+  XRenderComposite(
+    display,
+    PictOpOver,
+    source_picture,
+    alpha_picture,
+    destination_picture,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    width,
+    height
+  );
+
+  XRenderFreePicture(display, alpha_picture);
+  XFreePixmap(display, alpha_pixmap);
+
+  XRenderFreePicture(display, source_picture);
+  XRenderFreePicture(display, destination_picture);
+
+  XFreePixmap(display, source_pixmap);
+
+  return argb_pixmap;
+#endif
 }
 
 
@@ -339,69 +573,6 @@ void HbImage::TrueColorDither(unsigned int bit_depth,
   }
 }
 
-
-#ifdef ORDEREDPSEUDO
-
-static const unsigned char dither8[8][8] = {
-  { 0, 32, 8, 40, 2, 34, 10, 42},
-  {48, 16, 56, 24,50, 18, 58, 26},
-  {12, 44, 4, 36,14, 46, 6, 38},
-  {60, 28,52, 20,62, 30,54, 22},
-  { 3, 35,11, 43, 1, 33, 9, 41},
-  {51, 19,59, 27,49, 17,57, 25},
-  {15, 47, 7, 39,13, 45, 5, 37},
-  {63, 31,55, 23,61, 29,53, 21}
-};
-
-
-void HbImage::OrderedPseudoColorDither(int bytes_per_line,
-                                        unsigned char *pixel_data)
-{
-  unsigned int x, y, dithx, dithy, r, g, b, er, eg, eb, offset;
-  unsigned long pixel;
-  unsigned char *ppixel_data = pixel_data;
-
-  for (y = 0, offset = 0; y < height; y++) {
-    dithy = y & 7;
-
-    for (x = 0; x < width; x++, offset++) {
-      dithx = x & 7;
-
-      r = red[offset];
-      g = green[offset];
-      b = blue[offset];
-
-      er = r & (red_bits - 1);
-      eg = g & (green_bits - 1);
-      eb = b & (blue_bits - 1);
-
-      r = red_table[r];
-      g = green_table[g];
-      b = blue_table[b];
-
-      if ((dither8[dithy][dithx] < er) &&
-          (r < red_table[255]))
-        r++;
-
-      if ((dither8[dithy][dithx] < eg) &&
-          (g < green_table[255]))
-        g++;
-
-      if ((dither8[dithy][dithx] < eb) &&
-          (b < blue_table[255]))
-        b++;
-
-      pixel = (r * cpccpc) + (g * cpc) + b;
-      *(pixel_data++) = colors[pixel].pixel;
-    }
-
-    pixel_data = (ppixel_data += bytes_per_line);
-  }
-}
-
-#endif
-
-
 void HbImage::PseudoColorDither(int bytes_per_line,
                                 unsigned char *pixel_data)
 {
@@ -553,11 +724,7 @@ XImage *HbImage::renderXImage()
 
     case StaticColor:
     case PseudoColor:
-#ifdef ORDEREDPSEUDO
-      OrderedPseudoColorDither(image->bytes_per_line, d);
-#else
       PseudoColorDither(image->bytes_per_line, d);
-#endif
       break;
 
     default:
@@ -589,8 +756,8 @@ XImage *HbImage::renderXImage()
       break;
 
     case TrueColor:
-      for (y = 0, offset = 0; y < height; y++) {
-        for (x = 0; x < width; x++, offset++) {
+      for (y = 0, offset = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x, ++offset) {
           r = red_table[red[offset]];
           g = green_table[green[offset]];
           b = blue_table[blue[offset]];
@@ -608,8 +775,8 @@ XImage *HbImage::renderXImage()
 
     case StaticGray:
     case GrayScale:
-      for (y = 0, offset = 0; y < height; y++) {
-        for (x = 0; x < width; x++, offset++) {
+      for (y = 0, offset = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x, ++offset) {
           r = red_table[red[offset]];
           g = green_table[green[offset]];
           b = blue_table[blue[offset]];
@@ -1420,7 +1587,7 @@ void HbImage::rgradient()
 
   rsign = (drx < 0) ? -2 : 2;
   gsign = (dgx < 0) ? -2 : 2;
-  bsign = (dbx < 0) ? -2 : 2;
+  bsign = (dby < 0) ? -2 : 2;
 
   xr = yr = drx / 2;
   xg = yg = dgx / 2;
@@ -1549,11 +1716,11 @@ void HbImage::egradient()
 
   rsign = (drx < 0) ? -1 : 1;
   gsign = (dgx < 0) ? -1 : 1;
-  bsign = (dbx < 0) ? -1 : 1;
+  bsign = (dby < 0) ? -1 : 1;
 
   xr = yr = drx / 2;
   xg = yg = dgx / 2;
-  xb = yb = dbx / 2;
+  xb = yb = dby / 2;
 
   drx /= width;
   dgx /= width;
@@ -1678,11 +1845,11 @@ void HbImage::pcgradient()
 
   rsign = (drx < 0) ? -2 : 2;
   gsign = (dgx < 0) ? -2 : 2;
-  bsign = (dbx < 0) ? -2 : 2;
+  bsign = (dby < 0) ? -2 : 2;
 
   xr = yr = drx / 2;
   xg = yg = dgx / 2;
-  xb = yb = dbx / 2;
+  xb = yb = dby / 2;
 
   drx /= width;
   dgx /= width;

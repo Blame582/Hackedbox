@@ -1,1 +1,1 @@
-#define __hackedbox_version "0.8.8"
+#define __hackedbox_version "0.9.0"

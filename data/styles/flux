@@ -8,14 +8,14 @@ root.background.mode:            center
 # Background rotation timer in seconds (0 = disabled)
 #root.background.timer:          0
 
-menu.title.font:                Hack-14
+menu.title.font:                Hack-18
 menu.title:                     flat crossdiagonal gradient
 menu.title.color:               #888877
 menu.title.colorTo:             #FFFFDD
 menu.title.textColor:           #22221C
 menu.title.justify:             right
 
-menu.frame.font:                Hack-12
+menu.frame.font:                Hack-14
 menu.frame:                     flat solid
 menu.frame.color:               #666654
 menu.frame.textColor:           #D9D9D9
@@ -26,12 +26,12 @@ menu.hilite:                    flat solid
 menu.hilite.color:              #444438
 menu.hilite.textColor:          #FFFFFF
 
-menu.clock.font:                Hack-12
+menu.clock.font:                Hack-18
 menu.clock.textColor:           #D9D9D9
 menu.clock.format:              %I:%M:%S %p
 menu.clock.justify:             center
 
-menu.date.font:                 Hack-12
+menu.date.font:                 Hack-18
 menu.date.textColor:            #D9D9D9
 menu.date.format:               %m/%d/%Y
 menu.date.justify:              center

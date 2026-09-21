@@ -1,84 +1,102 @@
-#name:			NYZ
-#author:		UnKnown
-#updated: 		(09/2026) for hackedbox-0.8.8 
+#Name: NYZ
+#Author: UnKnown
+#updated: (09/2026) for hackedbox-0.8.8+
 
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
+root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode:                center
 # Background folder for automatic image rotation
-#root.background.folder: ~/.hackedbox/backgrounds
+#root.background.folder:             ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer: 0
+#root.background.timer:              0
 
+menu.title.font:                     Hack-14
+menu.title:                           flat crossdiagonal gradient
+menu.title.color:                    #6699CC
+menu.title.colorTo:                  #334866
+menu.title.textColor:                #FFFFFF
+menu.title.justify:                  right
 
-menu.title:					flat crossdiagonal gradient
-menu.title.color:			rgb:6/9/c
-menu.title.colorTo:			rgb:3/48/6
-menu.title.textColor:		white
-menu.title.font:			Hack-14
-menu.title.justify:			right
+menu.frame.font:                     Hack-12
+menu.frame:                           flat crossdiagonal gradient
+menu.frame.color:                    #666666
+menu.frame.colorTo:                  #333333
+menu.frame.textColor:                #D9D9D9
+menu.frame.disableColor:             #444438
+menu.frame.justify:                  center
 
-menu.frame:					flat crossdiagonal gradient
-menu.frame.color:			grey40
-menu.frame.colorTo:			grey20
-menu.frame.textColor:		grey85
-menu.frame.disableColor:	rgb:4/4/38
-menu.frame.font:			Hack-12
-menu.frame.justify:			center
+menu.hilite:                          flat crossdiagonal gradient
+menu.hilite.color:                   #6699CC
+menu.hilite.colorTo:                 #334866
+menu.hilite.textColor:               #FFFFFF
 
-menu.hilite:				flat crossdiagonal gradient
-menu.hilite.color:			rgb:6/9/c
-menu.hilite.colorTo:		rgb:3/48/6
-menu.hilite.textColor:		white
+menu.clock.font:                     Hack-12
+menu.clock.textColor:                #D9D9D9
+menu.clock.format:                   %I:%M:%S %p
+menu.clock.justify:                  center
 
-menu.bullet.position:		right
-menu.bullet:				triangle
+menu.date.font:                      Hack-12
+menu.date.textColor:                 #D9D9D9
+menu.date.format:                    %m/%d/%Y
+menu.date.justify:                   center
 
-window.title.focus:		flat diagonal gradient
-window.title.focus.color:	rgb:6/9/c
-window.title.focus.colorTo:	rgb:4/6/8
-window.title.unfocus:		flat solid
-window.title.unfocus.color:	grey30
+menu.bullet:                          triangle
+menu.bullet.position:                 right
 
-window.label.focus:		flat crossdiagonal gradient
-window.label.focus.color:	grey40
-window.label.focus.colorTo:	grey20
-window.label.focus.textColor:	white
-window.label.unfocus:		flat crossdiagonal gradient
-window.label.unfocus.color:	grey30
-window.label.unfocus.colorTo:	grey20
-window.label.unfocus.textColor:	grey60
+menu.icon:                            true
+menu.icon.position:                   left
 
-window.button.focus:		flat diagonal gradient
-window.button.focus.color:	rgb:4/6/8
-window.button.focus.colorTo:	rgb:5/78/a
-window.button.focus.picColor:	rgb:1/18/2
-window.button.unfocus:		flat solid
-window.button.unfocus.color:	grey30
-window.button.unfocus.picColor:	grey20
-window.button.pressed:		flat crossdiagonal gradient
-window.button.pressed.color:	grey40
-window.button.pressed.colorTo:	grey20
+window.title.focus:                  flat diagonal gradient
+window.title.focus.color:            #6699CC
+window.title.focus.colorTo:          #446688
 
-window.handle.focus:		flat crossdiagonal gradient
-window.handle.focus.color:	rgb:6/9/c
-window.handle.focus.colorTo:	rgb:3/48/6
-window.handle.unfocus:		flat solid
-window.handle.unfocus.color:	grey30
+window.title.unfocus:                flat solid
+window.title.unfocus.color:          #4D4D4D
 
-window.grip.focus:		flat crossdiagonal gradient
-window.grip.focus.color:	grey40
-window.grip.focus.colorTo:	grey20
-window.grip.unfocus:		flat crossdiagonal gradient
-window.grip.unfocus.color:	grey30
-window.grip.unfocus.colorTo:	grey20
+window.label.focus:                  flat crossdiagonal gradient
+window.label.focus.color:            #666666
+window.label.focus.colorTo:          #333333
+window.label.focus.textColor:        #FFFFFF
 
-window.frame.focusColor:	rgb:6/9/c
-window.frame.unfocusColor:	grey30
+window.label.unfocus:                flat crossdiagonal gradient
+window.label.unfocus.color:          #4D4D4D
+window.label.unfocus.colorTo:        #333333
+window.label.unfocus.textColor:      #999999
 
-window.justify:			right
+window.button.focus:                 flat diagonal gradient
+window.button.focus.color:           #446688
+window.button.focus.colorTo:         #55788A
+window.button.focus.picColor:        #111882
 
-borderColor:			grey10
+window.button.unfocus:               flat solid
+window.button.unfocus.color:         #4D4D4D
+window.button.unfocus.picColor:      #333333
 
-bevelWidth:			1
-borderWidth:			2
-handleWidth:			4
+window.button.pressed:               flat crossdiagonal gradient
+window.button.pressed.color:         #666666
+window.button.pressed.colorTo:       #333333
+
+window.handle.focus:                 flat crossdiagonal gradient
+window.handle.focus.color:           #6699CC
+window.handle.focus.colorTo:         #334866
+
+window.handle.unfocus:               flat solid
+window.handle.unfocus.color:         #4D4D4D
+
+window.grip.focus:                   flat crossdiagonal gradient
+window.grip.focus.color:             #666666
+window.grip.focus.colorTo:           #333333
+
+window.grip.unfocus:                 flat crossdiagonal gradient
+window.grip.unfocus.color:           #4D4D4D
+window.grip.unfocus.colorTo:         #333333
+
+window.frame.focusColor:             #6699CC
+window.frame.unfocusColor:           #4D4D4D
+
+window.justify:                      right
+
+borderColor:                         #1A1A1A
+
+bevelWidth:                          1
+borderWidth:                         2
+handleWidth:                         4

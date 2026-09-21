@@ -28,7 +28,6 @@ DEFAULT_STYLE = $(pkgdatadir)/styles/Default
 
 AM_CPPFLAGS = \
 	@SHAPE@ \
-	@ORDEREDPSEUDO@ \
 	@DEBUG@ \
 	@TIMEDCACHE@ \
 	-I$(top_srcdir)/include \
@@ -68,6 +67,7 @@ hackedbox_LDADD = \
 	-lX11 \
 	-lXft \
 	-lXext \
+	-lXrender \
 	-lImlib2
 
 hbsetbg_SOURCES = \

@@ -49,7 +49,13 @@ public:
 
     unsigned long pixel1;
     unsigned long pixel2;
+
+    int alpha1;
+    int alpha2;
+
     unsigned long texture;
+
+    bool argb;
   };
 
   HbImageControl(BaseDisplay *display,
@@ -106,6 +112,10 @@ public:
   Pixmap renderImage(unsigned int width,
                      unsigned int height,
                      const HbTexture &texture);
+
+  Pixmap renderImageARGB(unsigned int width,
+                         unsigned int height,
+                         const HbTexture &texture);
 
   void installRootColormap(void);
 
@@ -189,7 +199,8 @@ private:
                      unsigned int height,
                      unsigned long texture,
                      const HbColor &color1,
-                     const HbColor &color2);
+                     const HbColor &color2,
+                     bool argb);
 };
 
 extern HbImageControl *ctrl;

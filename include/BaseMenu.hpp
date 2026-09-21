@@ -1,6 +1,6 @@
 // Basemenu.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
-// look in the Authors file for credits and Copyrights
+// look in the Authors file for credits and copyrights
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -55,6 +55,18 @@ private:
   bool title_vis;
   bool shifted;
   bool hide_tree;
+
+  /*
+   * Menu-specific ARGB visual state.
+   *
+   * Normal Hackedbox windows continue to use the visual, depth, and
+   * colormap supplied by ScreenInfo. These values are used only when
+   * a menu needs an ARGB visual for translucent rendering.
+   */
+  Visual *menu_visual;
+  Colormap menu_colormap;
+  int menu_depth;
+  bool menu_argb;
 
   Display *display;
 
@@ -126,11 +138,11 @@ protected:
   virtual void internal_hide(void);
 
 public:
-  HbBasemenu(const HbBasemenu &) = default;
-  HbBasemenu(HbBasemenu &&) = default;
+  HbBasemenu(const HbBasemenu &) = delete;
+  HbBasemenu(HbBasemenu &&) = delete;
 
-  HbBasemenu &operator=(const HbBasemenu &) = default;
-  HbBasemenu &operator=(HbBasemenu &&) = default;
+  HbBasemenu &operator=(const HbBasemenu &) = delete;
+  HbBasemenu &operator=(HbBasemenu &&) = delete;
 
   HbBasemenu(HbScreen *scrn);
   virtual ~HbBasemenu(void);
@@ -320,6 +332,5 @@ public:
   inline void setSelected(int s)
     { selected = s; }
 };
-
 
 #endif // HACKEDBOX_BASEMENU_HPP

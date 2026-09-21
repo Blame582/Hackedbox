@@ -42,6 +42,7 @@ HbColor::HbColor(const BaseDisplay * const _display,
     r(-1),
     g(-1),
     b(-1),
+    a(255),
     p(0),
     dpy(_display),
     scrn(_screen)
@@ -57,6 +58,7 @@ HbColor::HbColor(int _r,
     r(_r),
     g(_g),
     b(_b),
+    a(255),
     p(0),
     dpy(_display),
     scrn(_screen)
@@ -70,6 +72,7 @@ HbColor::HbColor(const std::string &_name,
     r(-1),
     g(-1),
     b(-1),
+    a(255),
     p(0),
     dpy(_display),
     scrn(_screen),
@@ -125,6 +128,35 @@ void HbColor::parseColorName(void) {
 
   if (scrn == ~(0u))
     scrn = DefaultScreen(display()->getXDisplay());
+
+  /*
+   * XParseColor() does not support an alpha channel.
+   * Handle #RRGGBBAA directly before falling back to X11
+   * color-name parsing.
+   */
+  if (colorname.size() == 9 &&
+      colorname[0] == '#') {
+
+    unsigned int red;
+    unsigned int green;
+    unsigned int blue;
+    unsigned int alpha;
+
+    if (sscanf(colorname.c_str(),
+               "#%2x%2x%2x%2x",
+               &red,
+               &green,
+               &blue,
+               &alpha) == 4) {
+
+      setRGBA(static_cast<int>(red),
+              static_cast<int>(green),
+              static_cast<int>(blue),
+              static_cast<int>(alpha));
+
+      return;
+    }
+  }
 
   Colormap colormap =
     display()->getScreenInfo(scrn)->getColormap();
@@ -259,7 +291,7 @@ void HbColor::deallocate(void) {
 HbColor &HbColor::operator=(const HbColor &c) {
   deallocate();
 
-  setRGB(c.r, c.g, c.b);
+  setRGBA(c.r, c.g, c.b, c.a);
 
   colorname = c.colorname;
   dpy = c.dpy;

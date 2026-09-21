@@ -112,8 +112,6 @@ AM_V_at = $(am__v_at_$(V))
 am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
 am__v_at_1 = 
-depcomp =
-am__maybe_remake_depfiles =
 SOURCES =
 DIST_SOURCES =
 am__can_run_installinfo = \
@@ -160,14 +158,14 @@ AUTOHEADER = ${SHELL} '/home/blame/projects/hackedbox/missing' autoheader
 AUTOMAKE = ${SHELL} '/home/blame/projects/hackedbox/missing' automake-1.18
 AWK = gawk
 CC = gcc -std=gnu23
-CCDEPMODE = depmode=none
+CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2 
 CPP = gcc -std=gnu23 -E
 CPPFLAGS = 
 CSCOPE = cscope
 CTAGS = ctags
 CXX = g++
-CXXDEPMODE = depmode=none
+CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2  -Wall -W -pedantic
 CYGPATH_W = echo
 DEBUG = -DNDEBUG
@@ -178,6 +176,8 @@ ECHO_N = -n
 ECHO_T = 
 ETAGS = etags
 EXEEXT = 
+IMLIB2_CFLAGS = 
+IMLIB2_LIBS = -lImlib2
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -185,29 +185,32 @@ INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LDFLAGS =     -lSM -lICE
 LIBOBJS = 
-LIBS =   -lX11 -lXft  -lXext
+LIBS =   -lX11 -lXft  -lXrender -lXext
 LTLIBOBJS = 
 MAINT = #
 MAKEINFO = ${SHELL} '/home/blame/projects/hackedbox/missing' makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
-ORDEREDPSEUDO = 
 PACKAGE = hackedbox
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = Hackedbox
-PACKAGE_STRING = Hackedbox 0.8.8
+PACKAGE_STRING = Hackedbox 0.9.0
 PACKAGE_TARNAME = hackedbox
 PACKAGE_URL = 
-PACKAGE_VERSION = 0.8.8
+PACKAGE_VERSION = 0.9.0
 PATH_SEPARATOR = :
+PKG_CONFIG = /usr/bin/pkg-config
+PKG_CONFIG_LIBDIR = 
+PKG_CONFIG_PATH = 
 RANLIB = ranlib
 SET_MAKE = 
 SHAPE = -DSHAPE
 SHELL = /bin/sh
 STRIP = 
 TIMEDCACHE = -DTIMEDCACHE
-VERSION = 0.8.8
+VERSION = 0.9.0
 XMKMF = 
+XRENDER_LIB = -lXrender
 X_CFLAGS = 
 X_EXTRA_LIBS = 
 X_LIBS = 
@@ -274,9 +277,9 @@ $(srcdir)/Makefile.in: # $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps data/backgrounds/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu data/backgrounds/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu --ignore-deps data/backgrounds/Makefile
+	  $(AUTOMAKE) --gnu data/backgrounds/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

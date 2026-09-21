@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -32,6 +32,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
+
+#ifdef HAVE_XRENDER
+#  include <X11/extensions/Xrender.h>
+#endif
 
 #include <Imlib2.h>
 
@@ -51,6 +55,116 @@ using std::max;
 
 
 static HbBasemenu *shown = (HbBasemenu *) 0;
+
+
+/*
+ * Select a 32-bit TrueColor visual with an alpha channel for menus.
+ *
+ * The normal ScreenInfo visual remains unchanged. This visual is used
+ * only by menu windows that need ARGB rendering.
+ */
+static Visual *findARGBVisual(Display *display,
+                              int screen,
+                              int *depth)
+{
+#ifndef HAVE_XRENDER
+  (void)display;
+  (void)screen;
+  (void)depth;
+
+  return (Visual *) 0;
+#else
+  if (!display ||
+      !depth)
+    return (Visual *) 0;
+
+  XVisualInfo visual_template;
+  visual_template.screen = screen;
+  visual_template.depth = 32;
+  visual_template.c_class = TrueColor;
+
+  int count = 0;
+
+  XVisualInfo *visuals =
+    XGetVisualInfo(display,
+                   VisualScreenMask |
+                   VisualDepthMask |
+                   VisualClassMask,
+                   &visual_template,
+                   &count);
+
+  if (!visuals)
+    return (Visual *) 0;
+
+  Visual *result = (Visual *) 0;
+
+  for (int i = 0; i < count; i++) {
+    XRenderPictFormat *format =
+      XRenderFindVisualFormat(
+        display,
+        visuals[i].visual);
+
+    if (!format)
+      continue;
+
+    if (format->type != PictTypeDirect)
+      continue;
+
+    if (!format->direct.alphaMask)
+      continue;
+
+    result = visuals[i].visual;
+    *depth = visuals[i].depth;
+    break;
+  }
+
+  XFree(visuals);
+
+  return result;
+#endif
+}
+
+
+/*
+ * Allocate an RGB border color in the menu colormap.
+ *
+ * HbColor::pixel() belongs to the normal screen colormap and therefore
+ * cannot be reused when the menu uses a different visual/colormap.
+ */
+static unsigned long allocateMenuColor(Display *display,
+                                        Colormap colormap,
+                                        const HbColor &color)
+{
+  if (!display ||
+      colormap == None)
+    return 0;
+
+  XColor xcolor;
+
+  xcolor.red =
+    static_cast<unsigned short>(
+      color.red() * 257U);
+
+  xcolor.green =
+    static_cast<unsigned short>(
+      color.green() * 257U);
+
+  xcolor.blue =
+    static_cast<unsigned short>(
+      color.blue() * 257U);
+
+  xcolor.flags =
+    DoRed |
+    DoGreen |
+    DoBlue;
+
+  if (XAllocColor(display,
+                  colormap,
+                  &xcolor))
+    return xcolor.pixel;
+
+  return 0;
+}
 
 
 /*
@@ -183,7 +297,9 @@ static void drawHbFont(Display *display,
       static_cast<unsigned short>(
         color.blue() * 257U);
 
-    render_color.alpha = 65535;
+    render_color.alpha =
+      static_cast<unsigned short>(
+        color.alpha() * 257U);
 
     XftColor xft_color;
 
@@ -353,6 +469,43 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
   parent = (HbBasemenu *) 0;
   alignment = AlignDontCare;
 
+  /*
+   * Normal menu state starts with the screen visual. If an ARGB visual
+   * is available, it is selected below without changing ScreenInfo.
+   */
+  menu_visual = screen->getVisual();
+  menu_colormap = screen->getColormap();
+  menu_depth = screen->getDepth();
+  menu_argb = False;
+
+#ifdef HAVE_XRENDER
+  {
+    int argb_depth = 0;
+
+    Visual *argb_visual =
+      findARGBVisual(
+        display,
+        screen->getScreenNumber(),
+        &argb_depth);
+
+    if (argb_visual) {
+      Colormap argb_colormap =
+        XCreateColormap(
+          display,
+          screen->getRootWindow(),
+          argb_visual,
+          AllocNone);
+
+      if (argb_colormap != None) {
+        menu_visual = argb_visual;
+        menu_colormap = argb_colormap;
+        menu_depth = argb_depth;
+        menu_argb = True;
+      }
+    }
+  }
+#endif
+
   title_vis =
     movable =
     hide_tree = True;
@@ -431,11 +584,25 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
   XSetWindowAttributes attrib;
 
   attrib.background_pixmap = None;
-  attrib.background_pixel =
-    attrib.border_pixel =
-      screen->getBorderColor()->pixel();
 
-  attrib.colormap = screen->getColormap();
+  /*
+   * An ARGB menu starts transparent. The actual frame/title textures
+   * are installed as 32-bit ARGB pixmaps during update().
+   */
+  if (menu_argb) {
+    attrib.background_pixel = 0;
+    attrib.border_pixel =
+      allocateMenuColor(
+        display,
+        menu_colormap,
+        *screen->getBorderColor());
+  } else {
+    attrib.background_pixel =
+      attrib.border_pixel =
+        screen->getBorderColor()->pixel();
+  }
+
+  attrib.colormap = menu_colormap;
   attrib.override_redirect = True;
 
   attrib.event_mask =
@@ -452,9 +619,9 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
                   menu.width,
                   menu.height,
                   screen->getBorderWidth(),
-                  screen->getDepth(),
+                  menu_depth,
                   InputOutput,
-                  screen->getVisual(),
+                  menu_visual,
                   attrib_mask,
                   &attrib);
 
@@ -466,8 +633,22 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
     CWBorderPixel |
     CWEventMask;
 
-  attrib.background_pixel =
-    screen->getBorderColor()->pixel();
+  attrib.background_pixmap = None;
+
+  if (menu_argb) {
+    attrib.background_pixel = 0;
+    attrib.border_pixel =
+      allocateMenuColor(
+        display,
+        menu_colormap,
+        *screen->getBorderColor());
+  } else {
+    attrib.background_pixel =
+      screen->getBorderColor()->pixel();
+
+    attrib.border_pixel =
+      screen->getBorderColor()->pixel();
+  }
 
   attrib.event_mask |=
     EnterWindowMask |
@@ -481,9 +662,9 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
                   menu.width,
                   menu.height,
                   0,
-                  screen->getDepth(),
+                  menu_depth,
                   InputOutput,
-                  screen->getVisual(),
+                  menu_visual,
                   attrib_mask,
                   &attrib);
 
@@ -499,9 +680,9 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
                   menu.width,
                   menu.frame_h,
                   0,
-                  screen->getDepth(),
+                  menu_depth,
                   InputOutput,
-                  screen->getVisual(),
+                  menu_visual,
                   attrib_mask,
                   &attrib);
 
@@ -555,6 +736,21 @@ HbBasemenu::~HbBasemenu(void) {
 
   hackedbox->removeMenuSearch(menu.window);
   XDestroyWindow(display, menu.window);
+
+  /*
+   * The ARGB colormap is owned by this menu object.
+   * The normal screen colormap belongs to ScreenInfo and must never
+   * be destroyed here.
+   */
+  if (menu_argb &&
+      menu_colormap != None) {
+
+    XFreeColormap(
+      display,
+      menu_colormap);
+
+    menu_colormap = None;
+  }
 }
 
 
@@ -891,14 +1087,45 @@ void HbBasemenu::update(void) {
 
       menu.title_pixmap = None;
 
-      XSetWindowBackground(
-        display,
-        menu.title,
-        texture->color().pixel());
+      if (menu_argb) {
+
+        if (texture->color().alpha() < 255) {
+          menu.title_pixmap =
+            image_ctrl->renderImageARGB(
+              menu.width,
+              menu.title_h,
+              *texture);
+
+          XSetWindowBackgroundPixmap(
+            display,
+            menu.title,
+            menu.title_pixmap);
+        } else {
+          XSetWindowBackground(
+            display,
+            menu.title,
+            allocateMenuColor(
+              display,
+              menu_colormap,
+              texture->color()));
+        }
+
+      } else {
+
+        XSetWindowBackground(
+          display,
+          menu.title,
+          texture->color().pixel());
+      }
 
     } else {
 
       menu.title_pixmap =
+        menu_argb ?
+        image_ctrl->renderImageARGB(
+          menu.width,
+          menu.title_h,
+          *texture) :
         image_ctrl->renderImage(
           menu.width,
           menu.title_h,
@@ -924,14 +1151,48 @@ void HbBasemenu::update(void) {
 
     menu.frame_pixmap = None;
 
-    XSetWindowBackground(
-      display,
-      menu.frame,
-      texture->color().pixel());
+    if (menu_argb) {
+
+      if (texture->color().alpha() < 255) {
+
+        menu.frame_pixmap =
+          image_ctrl->renderImageARGB(
+            menu.width,
+            menu.frame_h,
+            *texture);
+
+        XSetWindowBackgroundPixmap(
+          display,
+          menu.frame,
+          menu.frame_pixmap);
+
+      } else {
+
+        XSetWindowBackground(
+          display,
+          menu.frame,
+          allocateMenuColor(
+            display,
+            menu_colormap,
+            texture->color()));
+      }
+
+    } else {
+
+      XSetWindowBackground(
+        display,
+        menu.frame,
+        texture->color().pixel());
+    }
 
   } else {
 
     menu.frame_pixmap =
+      menu_argb ?
+      image_ctrl->renderImageARGB(
+        menu.width,
+        menu.frame_h,
+        *texture) :
       image_ctrl->renderImage(
         menu.width,
         menu.frame_h,
@@ -957,6 +1218,11 @@ void HbBasemenu::update(void) {
   } else {
 
     menu.hilite_pixmap =
+      menu_argb ?
+      image_ctrl->renderImageARGB(
+        menu.item_w,
+        menu.item_h,
+        *texture) :
       image_ctrl->renderImage(
         menu.item_w,
         menu.item_h,
@@ -979,6 +1245,11 @@ void HbBasemenu::update(void) {
     const int hw = menu.item_h / 2;
 
     menu.sel_pixmap =
+      menu_argb ?
+      image_ctrl->renderImageARGB(
+        hw,
+        hw,
+        *texture) :
       image_ctrl->renderImage(
         hw,
         hw,
@@ -1112,8 +1383,8 @@ void HbBasemenu::redrawTitle(void) {
         drawHbFont(
           display,
           screen->getScreenNumber(),
-          screen->getVisual(),
-          screen->getColormap(),
+          menu_visual,
+          menu_colormap,
           menu.title,
           style->t_font,
           style->t_text,
@@ -1514,40 +1785,40 @@ void HbBasemenu::drawItem(int index,
   const HbColor *item_text_color =
     &style->f_text;
 
-if (index == clock_item) {
+  if (index == clock_item) {
 
-  item_font =
-    style->clock_font;
+    item_font =
+      style->clock_font;
 
-  item_fontset =
-    style->clock_fontset;
+    item_fontset =
+      style->clock_fontset;
 
-  item_fontset_extents =
-    style->clock_fontset_extents;
+    item_fontset_extents =
+      style->clock_fontset_extents;
 
-  item_justify =
-    style->clock_justify;
+    item_justify =
+      style->clock_justify;
 
-  item_text_color =
-    &style->clock_text;
+    item_text_color =
+      &style->clock_text;
 
-} else if (index == date_item) {
+  } else if (index == date_item) {
 
-  item_font =
-    style->date_font;
+    item_font =
+      style->date_font;
 
-  item_fontset =
-    style->date_fontset;
+    item_fontset =
+      style->date_fontset;
 
-  item_fontset_extents =
-    style->date_fontset_extents;
+    item_fontset_extents =
+      style->date_fontset_extents;
 
-  item_justify =
-    style->date_justify;
+    item_justify =
+      style->date_justify;
 
-  item_text_color =
-    &style->date_text;
-}
+    item_text_color =
+      &style->date_text;
+  }
 
   int text_x = 0;
   int text_y = 0;
@@ -1922,8 +2193,8 @@ if (index == clock_item) {
 
     drawMenuIcon(
       display,
-      screen->getVisual(),
-      screen->getColormap(),
+      menu_visual,
+      menu_colormap,
       menu.frame,
       item->icon(),
       icon_x,
@@ -1953,8 +2224,8 @@ if (index == clock_item) {
 
       drawHbFont(display,
                  screen->getScreenNumber(),
-                 screen->getVisual(),
-                 screen->getColormap(),
+                 menu_visual,
+                 menu_colormap,
                  menu.frame,
                  item_font,
                  text_color,
@@ -2535,15 +2806,28 @@ void HbBasemenu::leaveNotifyEvent(XCrossingEvent *ce) {
 
 
 void HbBasemenu::reconfigure(void) {
+  unsigned long border_pixel =
+    screen->getBorderColor()->pixel();
+
+  if (menu_argb) {
+    border_pixel =
+      allocateMenuColor(
+        display,
+        menu_colormap,
+        *screen->getBorderColor());
+  }
+
   XSetWindowBackground(
     display,
     menu.window,
-    screen->getBorderColor()->pixel());
+    menu_argb ?
+      0 :
+      screen->getBorderColor()->pixel());
 
   XSetWindowBorder(
     display,
     menu.window,
-    screen->getBorderColor()->pixel());
+    border_pixel);
 
   XSetWindowBorderWidth(
     display,

@@ -318,7 +318,7 @@ bool MenuManager::parseFile(FILE *file,
       break;
     }
 
-    case 630:
+    case 630: {
 
       if (!*label) {
         fprintf(stderr,
@@ -329,7 +329,14 @@ bool MenuManager::parseFile(FILE *file,
         continue;
       }
 
+      Configmenu *configMenu =
+        new Configmenu(m_screen);
+
+      menu->insert(label,
+                   configMenu);
+
       break;
+    }
 
     case 740: {
 

@@ -105,6 +105,12 @@
 /* Define to 1 if you have the 'vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 
+/* Define to 1 if you have the <X11/extensions/Xrender.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XRENDER_H
+
+/* Define if XRender is available. */
+#undef HAVE_XRENDER
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 

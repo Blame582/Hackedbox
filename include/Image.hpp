@@ -3,7 +3,7 @@
 //
 // Additional historical authors and contributors are credited in the
 // Authors file.
-//
+// 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
@@ -80,12 +80,8 @@ private:
   void PseudoColorDither(int bytes_per_line,
                          unsigned char *pixel_data);
 
-#ifdef ORDEREDPSEUDO
-  void OrderedPseudoColorDither(int bytes_per_line,
-                                unsigned char *pixel_data);
-#endif
-
   Pixmap renderPixmap(void);
+  
 
   Pixmap render_solid(const HbTexture &texture);
 
@@ -115,6 +111,8 @@ public:
   ~HbImage(void);
 
   Pixmap render(const HbTexture &texture);
+  
+  Pixmap renderARGB(const HbTexture &texture);
 };
 
 

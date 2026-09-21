@@ -1,5 +1,8 @@
-// Icon.hpp for Hackedbox - an X Window manager
-// Copyright (c) 2026 Kevin Day (blame582@gmail.com)
+// Image.hpp for Hackedbox - an X Window manager
+// Copyright (c) 2026 Kevin Day <blame582@gmail.com>
+//
+// Additional historical authors and contributors are credited in the
+// Authors file.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -19,15 +22,96 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef   __Icon_hpp
-#define   __Icon_hpp
+#ifndef HACKEDBOX_IMAGE_HPP
+#define HACKEDBOX_IMAGE_HPP
 
-class HackedboxWindow;
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
-void CreateIconWindow(
-    HackedboxWindow *tmp_win, 
-    int def_x, 
-    int def_y
-);
+#include "BaseDisplay.hpp"
+#include "Color.hpp"
+#include "Timer.hpp"
 
-#endif // __Icon_hpp
+class HbImageControl;
+class HbTexture;
+
+
+class HbImage {
+private:
+  HbImageControl *control;
+
+  bool interlaced;
+
+  XColor *colors;
+
+  HbColor from;
+  HbColor to;
+
+  int red_offset;
+  int green_offset;
+  int blue_offset;
+
+  int red_bits;
+  int green_bits;
+  int blue_bits;
+
+  int ncolors;
+  int cpc;
+  int cpccpc;
+
+  unsigned char *red;
+  unsigned char *green;
+  unsigned char *blue;
+
+  unsigned char *red_table;
+  unsigned char *green_table;
+  unsigned char *blue_table;
+
+  unsigned int width;
+  unsigned int height;
+
+  unsigned int *xtable;
+  unsigned int *ytable;
+
+  void TrueColorDither(unsigned int bit_depth,
+                        int bytes_per_line,
+                        unsigned char *pixel_data);
+
+  void PseudoColorDither(int bytes_per_line,
+                         unsigned char *pixel_data);
+
+  Pixmap renderPixmap(void);
+
+  Pixmap render_solid(const HbTexture &texture);
+
+  Pixmap render_gradient(const HbTexture &texture);
+
+  XImage *renderXImage(void);
+
+  void invert(void);
+
+  void bevel1(void);
+  void bevel2(void);
+
+  void dgradient(void);
+  void egradient(void);
+  void hgradient(void);
+  void pgradient(void);
+  void rgradient(void);
+  void vgradient(void);
+
+  void cdgradient(void);
+  void pcgradient(void);
+
+public:
+  // Signed dimensions allow invalid sizes to be detected and normalized.
+  HbImage(HbImageControl *control, int width, int height);
+
+  ~HbImage(void);
+
+  Pixmap render(const HbTexture &texture);
+
+  Pixmap renderARGB(const HbTexture &texture);
+};
+
+#endif

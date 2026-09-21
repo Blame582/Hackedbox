@@ -1,7 +1,7 @@
 dnl configure.ac for Hackedbox
 dnl Initialize autoconf and automake
 
-AC_INIT([Hackedbox], [0.8.8])
+AC_INIT([Hackedbox], [0.9.0])
 AC_CONFIG_SRCDIR([src/Hackedbox.cpp])
 
 AM_INIT_AUTOMAKE([no-define])
@@ -152,7 +152,44 @@ AC_CHECK_LIB(
   [AC_MSG_ERROR([Could not find XftFontOpenName in -lXft.])]
 )
 
-LIBS="$LIBS $X_EXTRA_LIBS"
+dnl ------------------------------------------------------------
+dnl XRender extension
+dnl ------------------------------------------------------------
+
+XRENDER_LIB=""
+
+AC_MSG_CHECKING(
+  [whether XRender support is available]
+)
+
+AC_CHECK_HEADERS(
+  [X11/extensions/Xrender.h],
+  [
+    AC_CHECK_LIB(
+      [Xrender],
+      [XRenderFindVisualFormat],
+      [
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(
+          [HAVE_XRENDER],
+          [1],
+          [Define if XRender is available.]
+        )
+        XRENDER_LIB="-lXrender"
+      ],
+      [
+        AC_MSG_RESULT([no])
+      ]
+    )
+  ],
+  [
+    AC_MSG_RESULT([no])
+  ]
+)
+
+AC_SUBST([XRENDER_LIB])
+
+LIBS="$LIBS $X_EXTRA_LIBS $XRENDER_LIB"
 
 dnl ------------------------------------------------------------
 dnl XShape extension
@@ -219,39 +256,6 @@ fi
 AC_SUBST([SHAPE])
 
 LIBS="$LIBS $Xext_lib"
-
-
-dnl ------------------------------------------------------------
-dnl Ordered 8bpp dithering
-dnl ------------------------------------------------------------
-
-ORDEREDPSEUDO=""
-
-AC_MSG_CHECKING(
-  [whether to include Pseudocolor ordered dithering code]
-)
-
-AC_ARG_ENABLE(
-  [ordered-pseudo],
-
-  [AS_HELP_STRING([--enable-ordered-pseudo],
-                  [include code for ordered pseudocolor (8bpp) dithering @<:@default=no@:>@])],
-
-  if test x$enableval = "xyes"; then
-
-    AC_MSG_RESULT([yes])
-    ORDEREDPSEUDO="-DORDEREDPSEUDO"
-
-  else
-
-    AC_MSG_RESULT([no])
-
-  fi,
-
-  AC_MSG_RESULT([no])
-)
-
-AC_SUBST([ORDEREDPSEUDO])
 
 dnl ------------------------------------------------------------
 dnl Debugging

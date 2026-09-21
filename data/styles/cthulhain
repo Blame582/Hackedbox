@@ -1,18 +1,14 @@
 #Title:     cthulhain
-#By:        cthulhain (http://lordzork.com/blackbox/
-#Email:     [cthulhain@lordzork.com](mailto:cthulhain@lordzork.com)
+#By:        cthulhain (http://lordzork.com/blackbox/)
+#Email:     [cthulhain@lordzork.com]
 #Comment:   no comment
 #Updated:   09/2026 for Hackedbox 0.8.8+
 
 root.background:                /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode:            center
-
 # Background folder for automatic image rotation
-
 #root.background.folder:         ~/.hackedbox/backgrounds
-
 # Background rotation timer in seconds (0 = disabled)
-
 #root.background.timer:          0
 
 menu.title.font:                Hack-14
