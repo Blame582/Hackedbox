@@ -17,56 +17,56 @@ AC_PROG_INSTALL
 
 AC_CHECK_PROGS([regex_cmd], [sed])
 if test x$regex_cmd = "x"; then
-  AC_MSG_ERROR([sed is required to build the default menu file.])
+AC_MSG_ERROR([sed is required to build the default menu file.])
 fi
 
 dnl Check for system header files
 AC_CHECK_HEADERS([
-  ctype.h
-  dirent.h
-  fcntl.h
-  libgen.h
-  locale.h
-  nl_types.h
-  process.h
-  signal.h
-  stdarg.h
-  stdio.h
-  stdlib.h
-  string.h
-  time.h
-  unistd.h
-  sys/param.h
-  sys/select.h
-  sys/signal.h
-  sys/stat.h
-  sys/time.h
-  sys/types.h
-  sys/wait.h
+ctype.h
+dirent.h
+fcntl.h
+libgen.h
+locale.h
+nl_types.h
+process.h
+signal.h
+stdarg.h
+stdio.h
+stdlib.h
+string.h
+time.h
+unistd.h
+sys/param.h
+sys/select.h
+sys/signal.h
+sys/stat.h
+sys/time.h
+sys/types.h
+sys/wait.h
 ])
 
 dnl Check for existence of basename(), setlocale() and strftime()
 AC_CHECK_FUNCS([
-  basename
-  getpid
-  setlocale
-  sigaction
-  strftime
-  strcasestr
-  snprintf
-  vsnprintf
-  catopen
-  catgets
-  catclose
+basename
+getpid
+setlocale
+sigaction
+strftime
+strcasestr
+snprintf
+vsnprintf
+catopen
+catgets
+catclose
 ])
 
 AC_CHECK_LIB(
-  [gen],
-  [basename],
-  [
-    AC_DEFINE([HAVE_BASENAME], [1], [Define if basename() is available in libgen.])
-    LIBS="$LIBS -lgen"
-  ]
+[gen],
+[basename],
+[
+AC_DEFINE([HAVE_BASENAME], [1], [Define if basename() is available in libgen.])
+LIBS="$LIBS -lgen"
+]
 )
 
 AC_CHECK_LIB([nsl], [t_open], [LIBS="$LIBS -lnsl"])
@@ -77,16 +77,70 @@ AC_PATH_X
 AC_PATH_XTRA
 
 test x$no_x = "xyes" && AC_MSG_ERROR(
-  [Hackedbox requires the X Window System libraries and headers.]
+[Hackedbox requires the X Window System libraries and headers.]
 )
 
 test x$x_includes = "x" && x_includes="/usr/include"
 test x$x_libraries = "x" && x_libraries="/usr/lib"
 
-PKG_CHECK_MODULES([IMLIB2], [imlib2],
-  [],
-  [AC_MSG_ERROR([Hackedbox requires imlib2.])]
+dnl ------------------------------------------------------------
+dnl Image libraries
+dnl ------------------------------------------------------------
+
+dnl PNG
+AC_CHECK_HEADERS(
+[png.h],
+[],
+[AC_MSG_ERROR([Hackedbox requires libpng and png.h.])]
 )
+
+AC_CHECK_LIB(
+[png16],
+[png_create_read_struct],
+[PNG_LIBS="-lpng16"],
+[
+AC_CHECK_LIB(
+[png],
+[png_create_read_struct],
+[PNG_LIBS="-lpng"],
+[AC_MSG_ERROR([Hackedbox requires libpng.])]
+)
+]
+)
+
+AC_SUBST([PNG_LIBS])
+
+dnl JPEG
+AC_CHECK_HEADERS(
+[jpeglib.h],
+[],
+[AC_MSG_ERROR([Hackedbox requires libjpeg and jpeglib.h.])]
+)
+
+AC_CHECK_LIB(
+[jpeg],
+[jpeg_std_error],
+[JPEG_LIBS="-ljpeg"],
+[AC_MSG_ERROR([Hackedbox requires libjpeg.])]
+)
+
+AC_SUBST([JPEG_LIBS])
+
+dnl WebP
+AC_CHECK_HEADERS(
+[webp/decode.h],
+[],
+[AC_MSG_ERROR([Hackedbox requires libwebp and webp/decode.h.])]
+)
+
+AC_CHECK_LIB(
+[webp],
+[WebPGetInfo],
+[WEBP_LIBS="-lwebp"],
+[AC_MSG_ERROR([Hackedbox requires libwebp.])]
+)
+
+AC_SUBST([WEBP_LIBS])
 
 CFLAGS="$CFLAGS $X_CFLAGS"
 CXXFLAGS="$CXXFLAGS $X_CFLAGS"
@@ -98,58 +152,63 @@ AC_MSG_CHECKING([for GCC])
 
 if test x$GCC = "xyes"; then
 
-  AC_MSG_RESULT([yes])
+AC_MSG_RESULT([yes])
 
-  CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
+CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
 
 else
 
-  AC_MSG_RESULT([no, trying other compilers])
+AC_MSG_RESULT([no, trying other compilers])
 
-  AC_MSG_CHECKING([for MIPSpro])
+AC_MSG_CHECKING([for MIPSpro])
 
-  mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
+mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
 
-  if test "x$mips_pro_ver" = "x"; then
+if test "x$mips_pro_ver" = "x"; then
 
-    AC_MSG_RESULT([no])
 
-  else
+AC_MSG_RESULT([no])
 
-    AC_MSG_RESULT([yes, version $mips_pro_ver.])
 
-    AC_MSG_CHECKING([for -LANG:std in CXXFLAGS])
+else
 
-    lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
 
-    if test "x$lang_std_not_set" = "x"; then
+AC_MSG_RESULT([yes, version $mips_pro_ver.])
 
-      AC_MSG_RESULT([not set, setting.])
+AC_MSG_CHECKING([for -LANG:std in CXXFLAGS])
 
-      CXXFLAGS="${CXXFLAGS} -LANG:std"
+lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
 
-    else
+if test "x$lang_std_not_set" = "x"; then
 
-      AC_MSG_RESULT([already set.])
+  AC_MSG_RESULT([not set, setting.])
 
-    fi
-  fi
+  CXXFLAGS="${CXXFLAGS} -LANG:std"
+
+else
+
+  AC_MSG_RESULT([already set.])
+
+fi
+
+
+fi
 fi
 
 dnl Check for required functions in -lX11
 AC_CHECK_LIB(
-  [X11],
-  [XOpenDisplay],
-  [LIBS="$LIBS -lX11"],
-  [AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])]
+[X11],
+[XOpenDisplay],
+[LIBS="$LIBS -lX11"],
+[AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])]
 )
 
 dnl Check for required functions in -lXft
 AC_CHECK_LIB(
-  [Xft],
-  [XftFontOpenName],
-  [LIBS="$LIBS -lXft"],
-  [AC_MSG_ERROR([Could not find XftFontOpenName in -lXft.])]
+[Xft],
+[XftFontOpenName],
+[LIBS="$LIBS -lXft"],
+[AC_MSG_ERROR([Could not find XftFontOpenName in -lXft.])]
 )
 
 dnl ------------------------------------------------------------
@@ -159,32 +218,32 @@ dnl ------------------------------------------------------------
 XRENDER_LIB=""
 
 AC_MSG_CHECKING(
-  [whether XRender support is available]
+[whether XRender support is available]
 )
 
 AC_CHECK_HEADERS(
-  [X11/extensions/Xrender.h],
-  [
-    AC_CHECK_LIB(
-      [Xrender],
-      [XRenderFindVisualFormat],
-      [
-        AC_MSG_RESULT([yes])
-        AC_DEFINE(
-          [HAVE_XRENDER],
-          [1],
-          [Define if XRender is available.]
-        )
-        XRENDER_LIB="-lXrender"
-      ],
-      [
-        AC_MSG_RESULT([no])
-      ]
-    )
-  ],
-  [
-    AC_MSG_RESULT([no])
-  ]
+[X11/extensions/Xrender.h],
+[
+AC_CHECK_LIB(
+[Xrender],
+[XRenderFindVisualFormat],
+[
+AC_MSG_RESULT([yes])
+AC_DEFINE(
+[HAVE_XRENDER],
+[1],
+[Define if XRender is available.]
+)
+XRENDER_LIB="-lXrender"
+],
+[
+AC_MSG_RESULT([no])
+]
+)
+],
+[
+AC_MSG_RESULT([no])
+]
 )
 
 AC_SUBST([XRENDER_LIB])
@@ -199,57 +258,60 @@ Xext_lib=""
 SHAPE=""
 
 AC_MSG_CHECKING(
-  [whether to build support for the XShape extension]
+[whether to build support for the XShape extension]
 )
 
 AC_ARG_ENABLE(
-  [shape],
-  [AS_HELP_STRING([--enable-shape],
-                  [enable support of the XShape extension @<:@default=yes@:>@])]
+[shape],
+[AS_HELP_STRING([--enable-shape],
+[enable support of the XShape extension @<:@default=yes@:>@])]
 )
 
 : ${enableval="yes"}
 
 if test x$enableval = "xyes"; then
 
-  AC_MSG_RESULT([yes])
+AC_MSG_RESULT([yes])
 
-  AC_CHECK_LIB(
-    [Xext],
-    [XShapeCombineShape],
+AC_CHECK_LIB(
+[Xext],
+[XShapeCombineShape],
 
-    AC_MSG_CHECKING(
-      [for X11/extensions/shape.h]
-    )
 
-    AC_LINK_IFELSE(
-      [
-        AC_LANG_PROGRAM(
-          [[
+AC_MSG_CHECKING(
+  [for X11/extensions/shape.h]
+)
+
+AC_LINK_IFELSE(
+  [
+    AC_LANG_PROGRAM(
+      [[
+
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
-          ]],
-          [[
+]],
+[[
 long foo = ShapeSet;
 (void) foo;
-          ]]
-        )
-      ],
-      [
-        AC_MSG_RESULT([yes])
-        SHAPE="-DSHAPE"
-        Xext_lib="-lXext"
-      ],
-      [
-        AC_MSG_RESULT([no])
-      ]
-    )
-  )
+]]
+)
+],
+[
+AC_MSG_RESULT([yes])
+SHAPE="-DSHAPE"
+Xext_lib="-lXext"
+],
+[
+AC_MSG_RESULT([no])
+]
+)
+)
 
 else
 
-  AC_MSG_RESULT([no])
+AC_MSG_RESULT([no])
 
 fi
 
@@ -264,38 +326,42 @@ dnl ------------------------------------------------------------
 DEBUG=""
 
 AC_MSG_CHECKING(
-  [whether to include verbose debugging code]
+[whether to include verbose debugging code]
 )
 
 AC_ARG_ENABLE(
-  [debug],
+[debug],
 
-  [AS_HELP_STRING([--enable-debug],
-                  [include verbose debugging code @<:@default=no@:>@])],
+[AS_HELP_STRING([--enable-debug],
+[include verbose debugging code @<:@default=no@:>@])],
 
-  if test x$enableval = "xyes"; then
+if test x$enableval = "xyes"; then
 
-    AC_MSG_RESULT([yes])
 
-    if test x$GCC = "xyes"; then
+AC_MSG_RESULT([yes])
 
-      DEBUG="-DDEBUG -fno-inline -g"
+if test x$GCC = "xyes"; then
 
-    else
+  DEBUG="-DDEBUG -fno-inline -g"
 
-      DEBUG="-DDEBUG"
+else
 
-    fi
+  DEBUG="-DDEBUG"
 
-  else
+fi
 
-    AC_MSG_RESULT([no])
-    DEBUG="-DNDEBUG"
 
-  fi,
+else
 
-  AC_MSG_RESULT([no])
-  DEBUG="-DNDEBUG"
+
+AC_MSG_RESULT([no])
+DEBUG="-DNDEBUG"
+
+
+fi,
+
+AC_MSG_RESULT([no])
+DEBUG="-DNDEBUG"
 )
 
 AC_SUBST([DEBUG])
@@ -307,28 +373,32 @@ dnl ------------------------------------------------------------
 TIMEDCACHE=""
 
 AC_MSG_CHECKING(
-  [whether to use the new timed pixmap cache]
+[whether to use the new timed pixmap cache]
 )
 
 AC_ARG_ENABLE(
-  [timed-cache],
+[timed-cache],
 
-  [AS_HELP_STRING([--enable-timed-cache],
-                  [use new timed pixmap cache @<:@default=yes@:>@])],
+[AS_HELP_STRING([--enable-timed-cache],
+[use new timed pixmap cache @<:@default=yes@:>@])],
 
-  if test x$enableval = "xyes"; then
+if test x$enableval = "xyes"; then
 
-    AC_MSG_RESULT([yes])
-    TIMEDCACHE="-DTIMEDCACHE"
 
-  else
+AC_MSG_RESULT([yes])
+TIMEDCACHE="-DTIMEDCACHE"
 
-    AC_MSG_RESULT([no])
 
-  fi,
+else
 
-  AC_MSG_RESULT([yes])
-  TIMEDCACHE="-DTIMEDCACHE"
+
+AC_MSG_RESULT([no])
+
+
+fi,
+
+AC_MSG_RESULT([yes])
+TIMEDCACHE="-DTIMEDCACHE"
 )
 
 AC_SUBST([TIMEDCACHE])
@@ -347,15 +417,15 @@ dnl Output files
 dnl ------------------------------------------------------------
 
 AC_CONFIG_FILES([
-  Makefile
-  data/Makefile
-  data/menu
-  data/styles/Makefile
-  data/styles/default
-  data/backgrounds/Makefile
-  doc/hackedbox.1
-  doc/Makefile
-  version.h
+Makefile
+data/Makefile
+data/menu
+data/styles/Makefile
+data/styles/default
+data/backgrounds/Makefile
+doc/hackedbox.1
+doc/Makefile
+version.h
 ])
 
 AC_OUTPUT

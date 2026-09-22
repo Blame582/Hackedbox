@@ -51,6 +51,7 @@ hackedbox_SOURCES = \
 	src/IconMenu.cpp \
 	src/Image.cpp \
 	src/ImageControl.cpp \
+	src/ImageLoader.cpp \
 	src/MenuManager.cpp \
 	src/Netizen.cpp \
 	src/Screen.cpp \
@@ -64,14 +65,17 @@ hackedbox_SOURCES = \
 	src/main.cpp
 
 hackedbox_LDADD = \
+	$(PNG_LIBS) \
+	$(JPEG_LIBS) \
+	$(WEBP_LIBS) \
 	-lX11 \
 	-lXft \
 	-lXext \
-	-lXrender \
-	-lImlib2
+	-lXrender
 
 hbsetbg_SOURCES = \
-	src/HbSetBg.cpp
+	src/HbSetBg.cpp \
+	src/ImageLoader.cpp
 
 hbsetbg_CPPFLAGS = \
 	$(AM_CPPFLAGS)
@@ -82,7 +86,9 @@ hbsetbg_LDADD = \
 	$(top_builddir)/src/GCCache.o \
 	$(top_builddir)/src/Timer.o \
 	$(top_builddir)/src/Util.o \
-	-lImlib2 \
+	$(PNG_LIBS) \
+	$(JPEG_LIBS) \
+	$(WEBP_LIBS) \
 	-lX11 \
 	-lXft \
 	-lXext

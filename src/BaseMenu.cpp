@@ -37,14 +37,13 @@
 #  include <X11/extensions/Xrender.h>
 #endif
 
-#include <Imlib2.h>
-
 #include <algorithm>
 #include <assert.h>
 
 #include "Hackedbox.hpp"
 #include "BaseMenu.hpp"
 #include "ImageControl.hpp"
+#include "ImageLoader.hpp"
 #include "GCCache.hpp"
 #include "Screen.hpp"
 
@@ -347,117 +346,266 @@ static void drawHbFont(Display *display,
   }
 }
 
+/*
+
+* Draw a menu item icon from a direct image filename.
+*
+* The image is loaded with HbImageLoader and rendered into the menu frame.
+  */
+  static void drawMenuIcon(Display *display,
+  Visual *visual,
+  Colormap colormap,
+  Window window,
+  const char *filename,
+  int x,
+  int y,
+  unsigned int size)
+  {
+  if (!display ||
+  !visual ||
+  window == None ||
+  !filename ||
+  !*filename ||
+  size == 0)
+  return;
+
+(void)colormap;
+
+HbImageData image;
+std::string error;
+
+if (!HbImageLoader::load(
+filename,
+image,
+error) ||
+!image.valid())
+return;
+
+if (image.width == 0 ||
+image.height == 0 ||
+image.stride < image.width * 4)
+return;
 
 /*
- * Draw a menu item icon from a direct image filename.
- *
- * The image is loaded with Imlib2 and rendered into the menu frame.
- */
-static void drawMenuIcon(Display *display,
-                         Visual *visual,
-                         Colormap colormap,
-                         Window window,
-                         const char *filename,
-                         int x,
-                         int y,
-                         unsigned int size)
-{
-  if (!display ||
-      !visual ||
-      window == None ||
-      !filename ||
-      !*filename ||
-      size == 0)
-    return;
 
-  /*
-   * Imlib2 uses process-global context state. Set every context
-   * value required by this operation explicitly.
-   */
-  imlib_context_set_display(display);
-  imlib_context_set_visual(visual);
-  imlib_context_set_colormap(colormap);
-  imlib_context_set_drawable(window);
-
-  Imlib_Image image =
-    imlib_load_image(filename);
-
-  if (!image)
-    return;
-
-  imlib_context_set_image(image);
-
-  const int image_width =
-    imlib_image_get_width();
-
-  const int image_height =
-    imlib_image_get_height();
-
-  if (image_width <= 0 ||
-      image_height <= 0) {
-
-    imlib_free_image();
-    imlib_context_set_image(NULL);
-
-    return;
-  }
-
+* Preserve the original aspect ratio.
+  */
   unsigned int draw_width = size;
   unsigned int draw_height = size;
 
-  /*
-   * Use 64-bit intermediate arithmetic so a large image dimension
-   * cannot overflow the scaling calculation.
-   */
-  if (image_width > image_height) {
+if (image.width > image.height) {
 
-    const unsigned long long scaled_height =
-      (static_cast<unsigned long long>(size) *
-       static_cast<unsigned long long>(image_height)) /
-      static_cast<unsigned long long>(image_width);
 
-    draw_height =
-      static_cast<unsigned int>(
-        scaled_height > size ?
-        size :
-        scaled_height);
+const unsigned long long scaled_height =
+  (static_cast<unsigned long long>(size) *
+   static_cast<unsigned long long>(image.height)) /
+  static_cast<unsigned long long>(image.width);
 
-    if (!draw_height)
-      draw_height = 1;
+draw_height =
+  static_cast<unsigned int>(scaled_height);
 
-  } else if (image_height > image_width) {
+if (draw_height == 0)
+  draw_height = 1;
 
-    const unsigned long long scaled_width =
-      (static_cast<unsigned long long>(size) *
-       static_cast<unsigned long long>(image_width)) /
-      static_cast<unsigned long long>(image_height);
 
-    draw_width =
-      static_cast<unsigned int>(
-        scaled_width > size ?
-        size :
-        scaled_width);
+} else if (image.height > image.width) {
 
-    if (!draw_width)
-      draw_width = 1;
+
+const unsigned long long scaled_width =
+  (static_cast<unsigned long long>(size) *
+   static_cast<unsigned long long>(image.width)) /
+  static_cast<unsigned long long>(image.height);
+
+draw_width =
+  static_cast<unsigned int>(scaled_width);
+
+if (draw_width == 0)
+  draw_width = 1;
+
+
+}
+
+const int draw_x =
+x + static_cast<int>((size - draw_width) / 2);
+
+const int draw_y =
+y + static_cast<int>((size - draw_height) / 2);
+
+/*
+
+* Get the actual depth of the menu window.
+*
+* This is important because Hackedbox menus can use a 32-bit
+* ARGB visual while the root screen may use a different depth.
+  */
+  Window root;
+  int window_x;
+  int window_y;
+  unsigned int window_width;
+  unsigned int window_height;
+  unsigned int border_width;
+  unsigned int depth;
+
+if (!XGetGeometry(
+display,
+window,
+&root,
+&window_x,
+&window_y,
+&window_width,
+&window_height,
+&border_width,
+&depth))
+return;
+
+if (depth == 0)
+return;
+
+XImage *ximage =
+XCreateImage(
+display,
+visual,
+depth,
+ZPixmap,
+0,
+nullptr,
+draw_width,
+draw_height,
+32,
+0);
+
+if (!ximage)
+return;
+
+const size_t image_bytes =
+static_cast<size_t>(ximage->bytes_per_line) *
+static_cast<size_t>(draw_height);
+
+if (image_bytes == 0) {
+ximage->data = nullptr;
+XDestroyImage(ximage);
+return;
+}
+
+ximage->data =
+static_cast<char *>(calloc(1, image_bytes));
+
+if (!ximage->data) {
+XDestroyImage(ximage);
+return;
+}
+
+/*
+
+* Convert an 8-bit channel value into the bit range used by
+* the X11 Visual.
+  */
+  const auto scaleChannel =
+  [](unsigned int value,
+  unsigned long mask) -> unsigned long {
+
+  if (mask == 0)
+  return 0;
+
+  unsigned int shift = 0;
+  unsigned long shifted = mask;
+
+  while ((shifted & 1UL) == 0) {
+  shifted >>= 1;
+  ++shift;
   }
 
-  const int draw_x =
-    x + static_cast<int>(
-      (size - draw_width) / 2);
+  unsigned long max_value = shifted;
 
-  const int draw_y =
-    y + static_cast<int>(
-      (size - draw_height) / 2);
+  return
+  ((static_cast<unsigned long>(value) *
+  max_value) / 255UL) << shift;
+  };
 
-  imlib_render_image_on_drawable_at_size(
-    draw_x,
-    draw_y,
-    static_cast<int>(draw_width),
-    static_cast<int>(draw_height));
+const unsigned long red_mask =
+visual->red_mask;
 
-  imlib_free_image();
-  imlib_context_set_image(NULL);
+const unsigned long green_mask =
+visual->green_mask;
+
+const unsigned long blue_mask =
+visual->blue_mask;
+
+for (unsigned int py = 0;
+py < draw_height;
+++py) {
+
+
+const unsigned int src_y =
+  static_cast<unsigned int>(
+    (static_cast<unsigned long long>(py) *
+     static_cast<unsigned long long>(image.height)) /
+    static_cast<unsigned long long>(draw_height));
+
+const unsigned char *src_row =
+  image.pixels.data() +
+  static_cast<size_t>(src_y) *
+  static_cast<size_t>(image.stride);
+
+for (unsigned int px = 0;
+     px < draw_width;
+     ++px) {
+
+  const unsigned int src_x =
+    static_cast<unsigned int>(
+      (static_cast<unsigned long long>(px) *
+       static_cast<unsigned long long>(image.width)) /
+      static_cast<unsigned long long>(draw_width));
+
+  const unsigned char *pixel =
+    src_row +
+    static_cast<size_t>(src_x) * 4;
+
+  const unsigned long red =
+    scaleChannel(pixel[0], red_mask);
+
+  const unsigned long green =
+    scaleChannel(pixel[1], green_mask);
+
+  const unsigned long blue =
+    scaleChannel(pixel[2], blue_mask);
+
+  XPutPixel(
+    ximage,
+    static_cast<int>(px),
+    static_cast<int>(py),
+    red | green | blue);
+}
+
+
+}
+
+GC gc =
+XCreateGC(
+display,
+window,
+0,
+nullptr);
+
+if (!gc) {
+XDestroyImage(ximage);
+return;
+}
+
+XPutImage(
+display,
+window,
+gc,
+ximage,
+0,
+0,
+draw_x,
+draw_y,
+draw_width,
+draw_height);
+
+XFreeGC(display, gc);
+XDestroyImage(ximage);
 }
 
 
