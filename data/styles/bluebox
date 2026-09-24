@@ -1,104 +1,133 @@
-#name:			bluebox
-#author:		miklos
-#date:			Thu, Mar 21, 2002
-#updated: 		(09/2026) for hackedbox-0.8.8 
+#Name:            bluebox
+#Author:          miklos
+#Date:            Thu, Mar 21, 2002
+#Updated:         (09/2026) for hackedbox-0.9.0
 
 root.background: /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode: center
 # Background folder for automatic image rotation
 #root.background.folder: ~/.hackedbox/backgrounds
-# Background rotation timer in seconds (0 = disabled)
+# Background rotation timer in seconds
 #root.background.timer: 0
 
-menu.title.font: 				Hack-18
-menu.title:						Raised Gradient Vertical
-menu.title.color:				#414b57
-menu.title.colorTo:				#67788b
-menu.title.textColor:			#6F8294
-menu.title.justify:				Center
+menu.title.font:                 Hack-18
+menu.title:                      Raised Gradient Vertical
+menu.title.color:                #414b57
+menu.title.colorTo:              #67788b
+menu.title.textColor:            #6F8294
+menu.title.justify:              Center
+menu.title.alpha:                255
 
-menu.frame.font: 				Hack-12
-menu.frame:						Flat Gradient Horizontal
-menu.frame.color:				#2c333b
-menu.frame.colorTo:				#6a7b8f
-menu.frame.textColor:			#000000
-menu.frame.justify:				Left
+menu.frame.font:                 Hack-12
+menu.frame:                      Flat Gradient Horizontal
+menu.frame.color:                #2c333b
+menu.frame.colorTo:              #6a7b8f
+menu.frame.textColor:            #000000
+menu.frame.justify:              Left
+menu.frame.alpha:                255
 
-menu.hilite:					Sunken Bevel1 Gradient Horizontal
-menu.hilite.color:				#21354a
-menu.hilite.colorTo:			#406285
-menu.hilite.textColor:			#a8bed6
+menu.hilite:                     Sunken Bevel1 Gradient Horizontal
+menu.hilite.color:               #21354a
+menu.hilite.colorTo:             #406285
+menu.hilite.textColor:           #a8bed6
+menu.hilite.alpha:               255
 
-menu.clock.font:				Hack-12
-menu.clock.textColor:			#000000
-menu.clock.format:				%I:%M:%S %p
-menu.clock.justify:				center
+menu.clock.font:                 Hack-12
+menu.clock.textColor:            #000000
+menu.clock.format:               %I:%M:%S %p
+menu.clock.justify:              center
 
-menu.date.font:					Hack-12
-menu.date.textColor:			#000000
-menu.date.format:				%m/%d/%Y
-menu.date.justify:				center
+menu.date.font:                  Hack-12
+menu.date.textColor:             #000000
+menu.date.format:                %m/%d/%Y
+menu.date.justify:               center
 
-menu.bullet:					Triangle
-menu.bullet.position:			Right
+menu.bullet:                     Triangle
+menu.bullet.position:            Right
 
-menu.icon:						true
-menu.icon.position:				left
+menu.icon:                       true
+menu.icon.position:              left
+menu.icon.alpha:                 255
 
-window.title.focus:				Raised Bevel1 Gradient Vertical
-window.title.focus.color:		#414b57
-window.title.focus.colorTo:		#6a7b8f
-window.title.unfocus:			Raised Bevel1 Gradient Vertical
-window.title.unfocus.color:		#414b57
-window.title.unfocus.colorTo:	#6a7b8f
+window.title.focus:               Raised Bevel1 Gradient Vertical
+window.title.focus.color:         #414b57
+window.title.focus.colorTo:       #6a7b8f
 
-window.label.focus:				Sunken Bevel1 Gradient Vertical
-window.label.focus.color:		#21354a
-window.label.focus.colorTo:		#406285
-window.label.focus.textColor:	#d7e0ee
+window.title.unfocus:             Raised Bevel1 Gradient Vertical
+window.title.unfocus.color:       #414b57
+window.title.unfocus.colorTo:     #6a7b8f
 
-window.label.unfocus:			Flat Gradient Vertical
-window.label.unfocus.color:		#414b57
-window.label.unfocus.colorTo:	#6a7b8f
-window.label.unfocus.textColor:	#7e8c9d
+window.title.alpha:               255
+window.title.font:                Hack-10
 
-window.label.focus.font: 		Hack-10
-window.label.focus.justify:	Center
+window.label.focus:               Sunken Bevel1 Gradient Vertical
+window.label.focus.color:         #21354a
+window.label.focus.colorTo:       #406285
+window.label.focus.textColor:     #d7e0ee
+window.label.focus.font:          Hack-10
+window.label.focus.justify:       Center
 
-window.button.focus:			Flat Gradient Vertical
-window.button.focus.color:		#46505d
-window.button.focus.colorTo:	#67788b
-window.button.focus.picColor:	#d8e0ee
-window.button.unfocus:			Flat Gradient Vertical
-window.button.unfocus.color:	#46505d
-window.button.unfocus.colorTo:	#67788b
-window.button.unfocus.picColor:	#7e8c9d
-window.button.pressed:			Sunken Bevel1 Gradient Diagonal
-window.button.pressed.color:	#6a7482
-window.button.pressed.colorTo:	#73787e
+window.label.unfocus:             Flat Gradient Vertical
+window.label.unfocus.color:       #414b57
+window.label.unfocus.colorTo:     #6a7b8f
+window.label.unfocus.textColor:   #7e8c9d
 
-window.frame.focusColor:		#73787e
-window.frame.unfocusColor:		#62666b
+window.button.focus:              Flat Gradient Vertical
+window.button.focus.color:        #46505d
+window.button.focus.colorTo:      #67788b
+window.button.focus.picColor:     #d8e0ee
 
-window.handle.focus:			Raised Bevel1 Solid Vertical
-window.handle.focus.color:		#46505d
-window.handle.focus.colorTo:	#ffffff
-window.handle.unfocus:			Raised Bevel1 Solid Horizontal
-window.handle.unfocus.color:	#3c4550
-window.handle.unfocus.colorTo:	#ffffff
+window.button.unfocus:            Flat Gradient Vertical
+window.button.unfocus.color:      #46505d
+window.button.unfocus.colorTo:    #67788b
+window.button.unfocus.picColor:   #7e8c9d
 
-window.grip.focus:				Raised Bevel1 Solid Vertical
-window.grip.focus.color:		#46505d
-window.grip.focus.colorTo:		#ffffff
-window.grip.unfocus:			Raised Bevel1 Solid Horizontal
-window.grip.unfocus.color:		#3c4550
-window.grip.unfocus.colorTo:	#ffffff
+window.button.pressed:            Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:      #6a7482
+window.button.pressed.colorTo:    #73787e
+window.button.alpha:              255
 
-window.justify:					Center
+window.frame.focusColor:          #73787e
+window.frame.unfocusColor:        #62666b
+window.frame.alpha:               255
 
-borderColor:					#000000
+window.handle.focus:              Raised Bevel1 Solid Vertical
+window.handle.focus.color:        #46505d
+window.handle.focus.colorTo:      #ffffff
 
-bevelWidth:						1
-borderWidth:					1
-handleWidth:					5
+window.handle.unfocus:            Raised Bevel1 Solid Horizontal
+window.handle.unfocus.color:      #3c4550
+window.handle.unfocus.colorTo:    #ffffff
+window.handle.alpha:              255
 
+window.grip.focus:                Raised Bevel1 Solid Vertical
+window.grip.focus.color:          #46505d
+window.grip.focus.colorTo:        #ffffff
+
+window.grip.unfocus:              Raised Bevel1 Solid Horizontal
+window.grip.unfocus.color:        #3c4550
+window.grip.unfocus.colorTo:      #ffffff
+window.grip.alpha:                255
+
+window.justify:                   Center
+
+window.dialog.font:               Hack-12
+window.dialog.bgcolor:            #2c333b
+window.dialog.inputColor:          #21354a
+window.dialog.inputTextColor:     #d7e0ee
+window.dialog.textColor:          #d7e0ee
+window.dialog.accentColor:        #a8bed6
+window.dialog.borderColor:        #414b57
+window.dialog.borderColor.focus:  #6a7b8f
+window.dialog.buttonColor:        #46505d
+window.dialog.buttonColorTo:      #67788b
+window.dialog.buttonTextColor:    #d8e0ee
+window.dialog.buttonFocusColor:   #21354a
+window.dialog.borderWidth:        1
+window.dialog.alpha:              255
+
+borderColor:                      #000000
+
+bevelWidth:                       1
+borderWidth:                      1
+handleWidth:                      5

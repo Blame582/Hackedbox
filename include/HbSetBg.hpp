@@ -1,5 +1,5 @@
-// HbSetBg.hpp for Hackedbox - an X window manager
-// Copyright (c) 2026 Kevin Day (blame582@gmail.com)
+// HbSetBg.hpp is the included back ground setter for Hackedbox - an X Window manager 
+// Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -13,77 +13,54 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
+
 
 #ifndef HBSETBG_HPP
 #define HBSETBG_HPP
 
 #include <string>
 
-#include <X11/Xlib.h>
+#include "BaseDisplay.hpp"
 
-#include "../include/BaseDisplay.hpp"
-#include "../include/Timer.hpp"
-
-class HbSetBg :
-    public BaseDisplay,
-    public TimeoutHandler
+class HbSetBg : public BaseDisplay
 {
 public:
-  HbSetBg(int argc,
-          char **argv,
-          char *display_name);
-
+  HbSetBg(int argc, char **argv, char *display_name);
   ~HbSetBg() override;
 
+protected:
+  void process_event(XEvent *event) override;
+  bool handleSignal(int sig) override;
+
 private:
-  enum class Mode {
+  enum Mode
+  {
     Center,
-    Tile,
-    StretchToCenter,
-    StretchToEdge,
     Solid
   };
 
-  void process_event(XEvent *event) override;
-
-  bool handleSignal(int signal) override;
-
-  void timeout() override;
-
   void setBackground();
 
-  void setTimer(long milliseconds);
+  bool loadImage(int screen, const std::string &filename,
+                 int width, int height);
 
-  Pixmap loadImage(int screen,
-                   const std::string &filename,
-                   int width,
-                   int height);
+  Pixmap createPixmap(int screen, int width, int height);
 
-  Pixmap createSolidPixmap(int screen,
-                            int width,
-                            int height);
+  Pixmap createSolidPixmap(int screen, int width, int height,
+                           const std::string &color);
 
-  Pixmap createPixmap(int screen,
-                      int width,
-                      int height);
+  void setPixmapProperty(int screen, Pixmap pixmap);
 
-  void setPixmapProperty(int screen,
-                         Pixmap pixmap);
-
-  void usage(int exit_code = 0);
+  static void usage();
 
   std::string image_file;
   std::string color;
-
   Mode mode;
-
-  HbTimer *timer;
-  long timer_interval;
 };
 
 #endif // HBSETBG_HPP

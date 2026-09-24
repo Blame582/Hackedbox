@@ -111,6 +111,8 @@ AM_V_at = $(am__v_at_$(V))
 am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
 am__v_at_1 = 
+depcomp =
+am__maybe_remake_depfiles =
 SOURCES =
 DIST_SOURCES =
 am__can_run_installinfo = \
@@ -177,13 +179,12 @@ ECHO_N = -n
 ECHO_T = 
 ETAGS = etags
 EXEEXT = 
-IMLIB2_CFLAGS = 
-IMLIB2_LIBS = -lImlib2
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
+JPEG_LIBS = -ljpeg
 LDFLAGS =     -lSM -lICE
 LIBOBJS = 
 LIBS =   -lX11 -lXft  -lXrender -lXext
@@ -203,13 +204,17 @@ PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
 PKG_CONFIG_LIBDIR = 
 PKG_CONFIG_PATH = 
+PNG_LIBS = -lpng16
 RANLIB = ranlib
+RSVG_CFLAGS = -I/usr/include/librsvg-2.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glycin-2 -I/usr/include/cairo -I/usr/include/libxml2 -I/usr/include/pango-1.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -pthread -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+RSVG_LIBS = -lrsvg-2 -lgdk_pixbuf-2.0 -lgio-2.0 -lcairo -lgobject-2.0 -lglib-2.0
 SET_MAKE = 
 SHAPE = -DSHAPE
 SHELL = /bin/sh
 STRIP = 
 TIMEDCACHE = -DTIMEDCACHE
 VERSION = 0.9.0
+WEBP_LIBS = -lwebp
 XMKMF = 
 XRENDER_LIB = -lXrender
 X_CFLAGS = 
@@ -279,9 +284,9 @@ $(srcdir)/Makefile.in: # $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu doc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps doc/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu doc/Makefile
+	  $(AUTOMAKE) --gnu --ignore-deps doc/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

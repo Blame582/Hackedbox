@@ -1,6 +1,6 @@
 #Author: Larry Owens (C) 2003
 #E-mail:
-#Updated: 09/2026 for Hackedbox 0.8.8+
+#Updated: 09/2026 for Hackedbox 0.9.0
 
 root.background:                 /usr/share/hackedbox/backgrounds/flamed-1920x1080.jpg
 root.background.mode:             center
@@ -15,6 +15,7 @@ menu.title.color:               #5A5E62
 menu.title.colorTo:             #14181C
 menu.title.textColor:           #FFFFFF
 menu.title.justify:             center
+menu.title.alpha:               255
 
 menu.frame.font:                Hack-14
 menu.frame:                     sunken gradient diagonal
@@ -22,6 +23,7 @@ menu.frame.color:               #0A141E
 menu.frame.colorTo:             #46505A
 menu.frame.textColor:           #5AA0B0
 menu.frame.justify:             center
+menu.frame.alpha:               255
 
 menu.clock.font:                Hack-14
 menu.clock.textColor:           #5AA0B0
@@ -37,19 +39,23 @@ menu.hilite:                    raised gradient diagonal
 menu.hilite.color:              #5A5E62
 menu.hilite.colorTo:            #14181C
 menu.hilite.textColor:          #FF0000
+menu.hilite.alpha:              255
 
 menu.bullet:                    triangle
 menu.bullet.position:           right
 
 menu.icon:                      true
 menu.icon.position:             left
+menu.icon.alpha:                255
 
+window.title.font:              Hack-20
 window.title.focus:             raised gradient vertical
 window.title.focus.color:       #505458
 window.title.focus.colorTo:     #1E2226
 window.title.unfocus:           raised vertical gradient
 window.title.unfocus.color:     #32363A
 window.title.unfocus.colorTo:   #000000
+window.title.alpha:             255
 
 window.label.focus:             sunken diagonal gradient
 window.label.focus.color:       #0A141E
@@ -71,9 +77,11 @@ window.button.unfocus.picColor: #464A4E
 window.button.pressed:          sunken gradient diagonal
 window.button.pressed.color:    #142832
 window.button.pressed.colorTo:  #3C4650
+window.button.alpha:            255
 
 window.frame.focusColor:        #282C30
 window.frame.unfocusColor:      #14181C
+window.frame.alpha:             255
 
 window.handle.focus:            raised gradient diagonal
 window.handle.focus.color:      #464A4E
@@ -81,6 +89,7 @@ window.handle.focus.colorTo:    #282C30
 window.handle.unfocus:          raised gradient diagonal
 window.handle.unfocus.color:    #32363A
 window.handle.unfocus.colorTo:  #000000
+window.handle.alpha:            255
 
 window.grip.focus:              sunken diagonal gradient
 window.grip.focus.color:        #1E2832
@@ -88,6 +97,22 @@ window.grip.focus.colorTo:      #3C4650
 window.grip.unfocus:            sunken diagonal gradient
 window.grip.unfocus.color:      #000000
 window.grip.unfocus.colorTo:    #1E2832
+window.grip.alpha:              255
+
+window.dialog.font:             Hack-14
+window.dialog.bgcolor:          #0A141E
+window.dialog.inputColor:       #5A5E62
+window.dialog.inputTextColor:   #FFFFFF
+window.dialog.textColor:        #5AA0B0
+window.dialog.accentColor:      #FF0000
+window.dialog.borderColor:      #282C30
+window.dialog.borderColor.focus:#5A5E62
+window.dialog.buttonColor:      #32363A
+window.dialog.buttonColorTo:    #5A5E62
+window.dialog.buttonTextColor:  #FFFFFF
+window.dialog.buttonFocusColor: #FF0000
+window.dialog.borderWidth:      1
+window.dialog.alpha:            255
 
 window.justify:                 center
 

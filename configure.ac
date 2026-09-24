@@ -142,6 +142,17 @@ AC_CHECK_LIB(
 
 AC_SUBST([WEBP_LIBS])
 
+dnl SVG / librsvg
+PKG_CHECK_MODULES(
+[RSVG],
+[librsvg-2.0],
+[],
+[AC_MSG_ERROR([Hackedbox requires librsvg-2.0.])]
+)
+
+AC_SUBST([RSVG_CFLAGS])
+AC_SUBST([RSVG_LIBS])
+
 CFLAGS="$CFLAGS $X_CFLAGS"
 CXXFLAGS="$CXXFLAGS $X_CFLAGS"
 LIBS="$LIBS $X_LIBS"

@@ -237,7 +237,7 @@ bool MenuManager::parseFile(FILE *file,
       stringWithin('<',
                    '>',
                    line,
-                   position,
+                   keywordPosition,
                    lineLength,
                    icon);
 
@@ -405,8 +405,7 @@ bool MenuManager::parseFile(FILE *file,
 
       submenu->update();
 
-      menu->insert(label,
-                   submenu);
+      menu->insert(label, submenu, icon);
 
       break;
     }

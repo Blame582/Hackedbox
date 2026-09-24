@@ -1,7 +1,7 @@
 #Name: Frobust
 #Author: miklos
 #Date: Tue, 03.05.02
-#updated: (09/2026) for hackedbox-0.8.8+
+#updated: (09/2026) for hackedbox-0.9.0
 
 root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode:                center
@@ -16,6 +16,7 @@ menu.title.color:                    #8D929A
 menu.title.colorTo:                  #73787E
 menu.title.textColor:                #000000
 menu.title.justify:                  center
+menu.title.alpha:                    255
 
 menu.frame.font:                     Hack-12
 menu.frame:                           Raised Solid
@@ -23,11 +24,13 @@ menu.frame.color:                    #4C4C4C
 menu.frame.textColor:                #D7E0EE
 menu.frame.justify:                  right
 menu.frame.disableColor:             #FFFFFF
+menu.frame.alpha:                    255
 
 menu.hilite:                          Sunken Solid
 menu.hilite.color:                   #73787E
 menu.hilite.colorTo:                 #FFFFFF
 menu.hilite.textColor:               #D7E0EE
+menu.hilite.alpha:                   255
 
 menu.clock.font:                     Hack-12
 menu.clock.textColor:                #D7E0EE
@@ -44,21 +47,22 @@ menu.bullet.position:                 right
 
 menu.icon:                            true
 menu.icon.position:                   right
+menu.icon.alpha:                      255
 
+window.title.font:                   Hack-14
 window.title.focus:                  Raised Bevel1 Gradient Vertical
 window.title.focus.color:            #4C4C4C
 window.title.focus.colorTo:          #414141
-
 window.title.unfocus:                Raised Bevel1 Gradient Vertical
 window.title.unfocus.color:          #4C4C4C
 window.title.unfocus.colorTo:        #414141
+window.title.alpha:                  255
 
 window.label.focus:                  Sunken Bevel1 Gradient Vertical
 window.label.focus.color:            #AAB0B9
 window.label.focus.colorTo:          #73787E
 window.label.focus.textColor:        #000000
 window.label.focus.justify:          center
-
 window.label.unfocus:                Flat Gradient Vertical
 window.label.unfocus.color:          #4C4C4C
 window.label.unfocus.colorTo:        #414141
@@ -68,32 +72,47 @@ window.button.focus:                 Flat Gradient Vertical
 window.button.focus.color:           #4C4C4C
 window.button.focus.colorTo:         #414141
 window.button.focus.picColor:        #D8E0EE
-
 window.button.unfocus:               Flat Gradient Vertical
 window.button.unfocus.color:         #4C4C4C
 window.button.unfocus.colorTo:       #414141
 window.button.unfocus.picColor:       #686868
-
 window.button.pressed:               Sunken Bevel1 Gradient Diagonal
 window.button.pressed.color:         #484848
 window.button.pressed.colorTo:       #73787E
+window.button.alpha:                 255
 
 window.handle.focus:                 Raised Bevel1 Solid Vertical
 window.handle.focus.color:           #8A8F96
-
 window.handle.unfocus:               Raised Bevel1 Solid Horizontal
 window.handle.unfocus.color:         #4C4C4C
 window.handle.unfocus.colorTo:       #FFFFFF
+window.handle.alpha:                 255
 
 window.grip.focus:                   Raised Bevel1 Solid Vertical
 window.grip.focus.color:             #AAB0B9
-
 window.grip.unfocus:                 Raised Bevel1 Solid Horizontal
 window.grip.unfocus.color:           #4C4C4C
 window.grip.unfocus.colorTo:         #FFFFFF
+window.grip.alpha:                   255
 
 window.frame.focusColor:             #73787E
 window.frame.unfocusColor:           #62666B
+window.frame.alpha:                  255
+
+window.dialog.font:                  Hack-12
+window.dialog.bgcolor:               #4C4C4C
+window.dialog.inputColor:            #73787E
+window.dialog.inputTextColor:        #D7E0EE
+window.dialog.textColor:             #D7E0EE
+window.dialog.accentColor:           #AAB0B9
+window.dialog.borderColor:           #4C4C4C
+window.dialog.borderColor.focus:     #8D929A
+window.dialog.buttonColor:           #73787E
+window.dialog.buttonColorTo:         #8D929A
+window.dialog.buttonTextColor:       #000000
+window.dialog.buttonFocusColor:      #AAB0B9
+window.dialog.borderWidth:           1
+window.dialog.alpha:                 255
 
 window.justify:                      center
 

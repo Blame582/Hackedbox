@@ -1,15 +1,15 @@
 #Title:     cthulhain
 #By:        cthulhain (http://lordzork.com/blackbox/)
-#Email:     [cthulhain@lordzork.com]
+#Email:     [[cthulhain@lordzork.com](mailto:cthulhain@lordzork.com)]
 #Comment:   no comment
-#Updated:   09/2026 for Hackedbox 0.8.8+
+#Updated:   09/2026 for Hackedbox 0.9.0
 
 root.background:                /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode:            center
+root.background.mode:           center
 # Background folder for automatic image rotation
-#root.background.folder:         ~/.hackedbox/backgrounds
+#root.background.folder:        ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer:          0
+#root.background.timer:         0
 
 menu.title.font:                Hack-14
 menu.title:                     raised gradient crossdiagonal
@@ -17,6 +17,7 @@ menu.title.color:               #151A22
 menu.title.colorTo:             #7A8290
 menu.title.textColor:           #FFFFFF
 menu.title.justify:             center
+menu.title.alpha:               255
 
 menu.frame.font:                Hack-12
 menu.frame:                     sunken gradient crossdiagonal
@@ -24,11 +25,13 @@ menu.frame.color:               #0F1319
 menu.frame.colorTo:             #666666
 menu.frame.textColor:           #CCCCCC
 menu.frame.justify:             right
+menu.frame.alpha:               255
 
 menu.hilite:                    sunken gradient crossdiagonal
 menu.hilite.color:              #151A22
 menu.hilite.colorTo:            #7A8290
 menu.hilite.textColor:          #FFFFFF
+menu.hilite.alpha:              255
 
 menu.clock.font:                Hack-12
 menu.clock.textColor:           #5A6A7A
@@ -36,7 +39,7 @@ menu.clock.format:              %I:%M:%S %p
 menu.clock.justify:             center
 
 menu.date.font:                 Hack-12
-menu.date.textColor:            #5A6A7A
+menu.date.textColor:             #5A6A7A
 menu.date.format:               %m/%d/%Y
 menu.date.justify:              center
 
@@ -45,53 +48,69 @@ menu.bullet.position:           right
 
 menu.icon:                      true
 menu.icon.position:             left
+menu.icon.alpha:                255
 
 window.title.focus:             raised gradient diagonal
 window.title.focus.color:       #666666
 window.title.focus.colorTo:     #0F1319
-
 window.title.unfocus:           raised gradient diagonal
 window.title.unfocus.color:     #666666
 window.title.unfocus.colorTo:   #0F1319
+window.title.alpha:             255
+window.title.font:              Hack-14
 
 window.label.focus:             sunken gradient crossdiagonal
 window.label.focus.color:       #151A22
 window.label.focus.colorTo:     #7A8290
 window.label.focus.textColor:   #E6E6E6
-
 window.label.unfocus:           parentrelative
 window.label.unfocus.textColor: #808080
 
 window.button.focus:            parentrelative
 window.button.focus.picColor:   #CCCCCC
-
 window.button.pressed:          flat gradient vertical
 window.button.pressed.color:    #0F1319
 window.button.pressed.colorTo:  #7A8290
-
 window.button.unfocus:          parentrelative
 window.button.unfocus.picColor: #727272
+window.button.alpha:            255
 
-window.handle.focus:            raised gradient diagonal
-window.handle.focus.color:      #808080
-window.handle.focus.colorTo:    #0F1319
+window.handle.focus:             raised gradient diagonal
+window.handle.focus.color:       #808080
+window.handle.focus.colorTo:     #0F1319
+window.handle.unfocus:           raised gradient diagonal
+window.handle.unfocus.color:     #808080
+window.handle.unfocus.colorTo:   #0F1319
+window.handle.alpha:             255
 
-window.handle.unfocus:          raised gradient diagonal
-window.handle.unfocus.color:    #808080
-window.handle.unfocus.colorTo:  #0F1319
+window.grip.focus:               raised gradient diagonal
+window.grip.focus.color:         #7A8290
+window.grip.focus.colorTo:       #151A22
+window.grip.unfocus:             raised gradient diagonal
+window.grip.unfocus.color:       #808080
+window.grip.unfocus.colorTo:     #0F1319
+window.grip.alpha:               255
 
-window.grip.focus:              raised gradient diagonal
-window.grip.focus.color:        #7A8290
-window.grip.focus.colorTo:      #151A22
+window.frame.focusColor:         #858585
+window.frame.unfocusColor:       #5E6166
+window.frame.alpha:              255
 
-window.grip.unfocus:            raised gradient diagonal
-window.grip.unfocus.color:      #808080
-window.grip.unfocus.colorTo:    #0F1319
+window.justify:                  right
 
-window.frame.focusColor:        #858585
-window.frame.unfocusColor:      #5E6166
-
-window.justify:                 right
+window.dialog.font:              Hack-12
+window.dialog.bgcolor:           #0F1319
+window.dialog.inputColor:        #151A22
+window.dialog.inputTextColor:    #E6E6E6
+window.dialog.textColor:         #CCCCCC
+window.dialog.accentColor:       #7A8290
+window.dialog.borderColor:       #666666
+window.dialog.borderColor.focus: #FFFFFF
+window.dialog.buttonColor:       #151A22
+window.dialog.buttonColorTo:     #0F1319
+window.dialog.buttonTextColor:   #CCCCCC
+window.dialog.buttonFocusColor:  #7A8290
+window.dialog.borderWidth:       1
+window.dialog.alpha:             255
 
 borderColor:                    #202020
 
@@ -99,4 +118,3 @@ borderWidth:                    1
 bevelWidth:                     2
 handleWidth:                    4
 frameWidth:                     0
-::

@@ -633,11 +633,14 @@ TIMEDCACHE
 DEBUG
 SHAPE
 XRENDER_LIB
-IMLIB2_LIBS
-IMLIB2_CFLAGS
+RSVG_LIBS
+RSVG_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
+WEBP_LIBS
+JPEG_LIBS
+PNG_LIBS
 X_EXTRA_LIBS
 X_LIBS
 X_PRE_LIBS
@@ -767,8 +770,8 @@ CPP
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
-IMLIB2_CFLAGS
-IMLIB2_LIBS'
+RSVG_CFLAGS
+RSVG_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1432,9 +1435,8 @@ Some influential environment variables:
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
-  IMLIB2_CFLAGS
-              C compiler flags for IMLIB2, overriding pkg-config
-  IMLIB2_LIBS linker flags for IMLIB2, overriding pkg-config
+  RSVG_CFLAGS C compiler flags for RSVG, overriding pkg-config
+  RSVG_LIBS   linker flags for RSVG, overriding pkg-config
 
 Use these variables to override the choices made by 'configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -5510,7 +5512,7 @@ fi
 done
 
 if test x$regex_cmd = "x"; then
-  as_fn_error $? "sed is required to build the default menu file." "$LINENO" 5
+as_fn_error $? "sed is required to build the default menu file." "$LINENO" 5
 fi
 
 
@@ -5788,7 +5790,7 @@ then :
 
 printf '%s\n' "#define HAVE_BASENAME 1" >>confdefs.h
 
-    LIBS="$LIBS -lgen"
+LIBS="$LIBS -lgen"
 
 
 fi
@@ -6837,6 +6839,270 @@ test x$x_includes = "x" && x_includes="/usr/include"
 test x$x_libraries = "x" && x_libraries="/usr/lib"
 
 
+       for ac_header in png.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "png.h" "ac_cv_header_png_h" "$ac_includes_default"
+if test "x$ac_cv_header_png_h" = xyes
+then :
+  printf '%s\n' "#define HAVE_PNG_H 1" >>confdefs.h
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libpng and png.h." "$LINENO" 5
+ ;;
+esac
+fi
+
+done
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for png_create_read_struct in -lpng16" >&5
+printf %s "checking for png_create_read_struct in -lpng16... " >&6; }
+if test ${ac_cv_lib_png16_png_create_read_struct+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpng16  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char png_create_read_struct (void);
+int
+main (void)
+{
+return png_create_read_struct ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_png16_png_create_read_struct=yes
+else case e in #(
+  e) ac_cv_lib_png16_png_create_read_struct=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_png16_png_create_read_struct" >&5
+printf '%s\n' "$ac_cv_lib_png16_png_create_read_struct" >&6; }
+if test "x$ac_cv_lib_png16_png_create_read_struct" = xyes
+then :
+  PNG_LIBS="-lpng16"
+else case e in #(
+  e)
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for png_create_read_struct in -lpng" >&5
+printf %s "checking for png_create_read_struct in -lpng... " >&6; }
+if test ${ac_cv_lib_png_png_create_read_struct+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpng  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char png_create_read_struct (void);
+int
+main (void)
+{
+return png_create_read_struct ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_png_png_create_read_struct=yes
+else case e in #(
+  e) ac_cv_lib_png_png_create_read_struct=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_png_png_create_read_struct" >&5
+printf '%s\n' "$ac_cv_lib_png_png_create_read_struct" >&6; }
+if test "x$ac_cv_lib_png_png_create_read_struct" = xyes
+then :
+  PNG_LIBS="-lpng"
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libpng." "$LINENO" 5
+ ;;
+esac
+fi
+
+
+ ;;
+esac
+fi
+
+
+
+
+       for ac_header in jpeglib.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "jpeglib.h" "ac_cv_header_jpeglib_h" "$ac_includes_default"
+if test "x$ac_cv_header_jpeglib_h" = xyes
+then :
+  printf '%s\n' "#define HAVE_JPEGLIB_H 1" >>confdefs.h
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libjpeg and jpeglib.h." "$LINENO" 5
+ ;;
+esac
+fi
+
+done
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for jpeg_std_error in -ljpeg" >&5
+printf %s "checking for jpeg_std_error in -ljpeg... " >&6; }
+if test ${ac_cv_lib_jpeg_jpeg_std_error+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-ljpeg  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char jpeg_std_error (void);
+int
+main (void)
+{
+return jpeg_std_error ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_jpeg_jpeg_std_error=yes
+else case e in #(
+  e) ac_cv_lib_jpeg_jpeg_std_error=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jpeg_jpeg_std_error" >&5
+printf '%s\n' "$ac_cv_lib_jpeg_jpeg_std_error" >&6; }
+if test "x$ac_cv_lib_jpeg_jpeg_std_error" = xyes
+then :
+  JPEG_LIBS="-ljpeg"
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libjpeg." "$LINENO" 5
+ ;;
+esac
+fi
+
+
+
+
+       for ac_header in webp/decode.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "webp/decode.h" "ac_cv_header_webp_decode_h" "$ac_includes_default"
+if test "x$ac_cv_header_webp_decode_h" = xyes
+then :
+  printf '%s\n' "#define HAVE_WEBP_DECODE_H 1" >>confdefs.h
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libwebp and webp/decode.h." "$LINENO" 5
+ ;;
+esac
+fi
+
+done
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for WebPGetInfo in -lwebp" >&5
+printf %s "checking for WebPGetInfo in -lwebp... " >&6; }
+if test ${ac_cv_lib_webp_WebPGetInfo+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lwebp  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char WebPGetInfo (void);
+int
+main (void)
+{
+return WebPGetInfo ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_webp_WebPGetInfo=yes
+else case e in #(
+  e) ac_cv_lib_webp_WebPGetInfo=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_webp_WebPGetInfo" >&5
+printf '%s\n' "$ac_cv_lib_webp_WebPGetInfo" >&6; }
+if test "x$ac_cv_lib_webp_WebPGetInfo" = xyes
+then :
+  WEBP_LIBS="-lwebp"
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libwebp." "$LINENO" 5
+ ;;
+esac
+fi
+
+
+
+
+
 
 
 
@@ -6970,19 +7236,19 @@ printf '%s\n' "no" >&6; }
 fi
 
 pkg_failed=no
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for imlib2" >&5
-printf %s "checking for imlib2... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for librsvg-2.0" >&5
+printf %s "checking for librsvg-2.0... " >&6; }
 
-if test -n "$IMLIB2_CFLAGS"; then
-    pkg_cv_IMLIB2_CFLAGS="$IMLIB2_CFLAGS"
+if test -n "$RSVG_CFLAGS"; then
+    pkg_cv_RSVG_CFLAGS="$RSVG_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"imlib2\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "imlib2") 2>&5
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"librsvg-2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "librsvg-2.0") 2>&5
   ac_status=$?
   printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_IMLIB2_CFLAGS=`$PKG_CONFIG --cflags "imlib2" 2>/dev/null`
+  pkg_cv_RSVG_CFLAGS=`$PKG_CONFIG --cflags "librsvg-2.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -6990,16 +7256,16 @@ fi
  else
     pkg_failed=untried
 fi
-if test -n "$IMLIB2_LIBS"; then
-    pkg_cv_IMLIB2_LIBS="$IMLIB2_LIBS"
+if test -n "$RSVG_LIBS"; then
+    pkg_cv_RSVG_LIBS="$RSVG_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"imlib2\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "imlib2") 2>&5
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"librsvg-2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "librsvg-2.0") 2>&5
   ac_status=$?
   printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_IMLIB2_LIBS=`$PKG_CONFIG --libs "imlib2" 2>/dev/null`
+  pkg_cv_RSVG_LIBS=`$PKG_CONFIG --libs "librsvg-2.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -7020,27 +7286,30 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-                IMLIB2_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "imlib2" 2>&1`
+                RSVG_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "librsvg-2.0" 2>&1`
         else
-                IMLIB2_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "imlib2" 2>&1`
+                RSVG_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "librsvg-2.0" 2>&1`
         fi
         # Put the nasty error message in config.log where it belongs
-        echo "$IMLIB2_PKG_ERRORS" >&5
+        echo "$RSVG_PKG_ERRORS" >&5
 
-        as_fn_error $? "Hackedbox requires imlib2." "$LINENO" 5
+        as_fn_error $? "Hackedbox requires librsvg-2.0." "$LINENO" 5
 
 elif test $pkg_failed = untried; then
         { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
-        as_fn_error $? "Hackedbox requires imlib2." "$LINENO" 5
+        as_fn_error $? "Hackedbox requires librsvg-2.0." "$LINENO" 5
 
 else
-        IMLIB2_CFLAGS=$pkg_cv_IMLIB2_CFLAGS
-        IMLIB2_LIBS=$pkg_cv_IMLIB2_LIBS
+        RSVG_CFLAGS=$pkg_cv_RSVG_CFLAGS
+        RSVG_LIBS=$pkg_cv_RSVG_LIBS
         { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
 fi
+
+
+
 
 CFLAGS="$CFLAGS $X_CFLAGS"
 CXXFLAGS="$CXXFLAGS $X_CFLAGS"
@@ -7052,50 +7321,55 @@ printf %s "checking for GCC... " >&6; }
 
 if test x$GCC = "xyes"; then
 
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
-  CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
+CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
 
 else
 
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no, trying other compilers" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no, trying other compilers" >&5
 printf '%s\n' "no, trying other compilers" >&6; }
 
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for MIPSpro" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for MIPSpro" >&5
 printf %s "checking for MIPSpro... " >&6; }
 
-  mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
+mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
 
-  if test "x$mips_pro_ver" = "x"; then
+if test "x$mips_pro_ver" = "x"; then
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
-  else
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes, version $mips_pro_ver." >&5
+else
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes, version $mips_pro_ver." >&5
 printf '%s\n' "yes, version $mips_pro_ver." >&6; }
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for -LANG:std in CXXFLAGS" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for -LANG:std in CXXFLAGS" >&5
 printf %s "checking for -LANG:std in CXXFLAGS... " >&6; }
 
-    lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
+lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
 
-    if test "x$lang_std_not_set" = "x"; then
+if test "x$lang_std_not_set" = "x"; then
 
-      { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: not set, setting." >&5
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: not set, setting." >&5
 printf '%s\n' "not set, setting." >&6; }
 
-      CXXFLAGS="${CXXFLAGS} -LANG:std"
+  CXXFLAGS="${CXXFLAGS} -LANG:std"
 
-    else
+else
 
-      { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: already set." >&5
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: already set." >&5
 printf '%s\n' "already set." >&6; }
 
-    fi
-  fi
+fi
+
+
+fi
 fi
 
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
@@ -7219,7 +7493,7 @@ if test "x$ac_cv_header_X11_extensions_Xrender_h" = xyes
 then :
   printf '%s\n' "#define HAVE_X11_EXTENSIONS_XRENDER_H 1" >>confdefs.h
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XRenderFindVisualFormat in -lXrender" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XRenderFindVisualFormat in -lXrender" >&5
 printf %s "checking for XRenderFindVisualFormat in -lXrender... " >&6; }
 if test ${ac_cv_lib_Xrender_XRenderFindVisualFormat+y}
 then :
@@ -7265,26 +7539,26 @@ printf '%s\n' "$ac_cv_lib_Xrender_XRenderFindVisualFormat" >&6; }
 if test "x$ac_cv_lib_Xrender_XRenderFindVisualFormat" = xyes
 then :
 
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
 printf '%s\n' "#define HAVE_XRENDER 1" >>confdefs.h
 
-        XRENDER_LIB="-lXrender"
+XRENDER_LIB="-lXrender"
 
 else case e in #(
   e)
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
-     ;;
+ ;;
 esac
 fi
 
 
 else case e in #(
   e)
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
  ;;
@@ -7317,10 +7591,10 @@ fi
 
 if test x$enableval = "xyes"; then
 
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XShapeCombineShape in -lXext" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XShapeCombineShape in -lXext" >&5
 printf %s "checking for XShapeCombineShape in -lXext... " >&6; }
 if test ${ac_cv_lib_Xext_XShapeCombineShape+y}
 then :
@@ -7366,12 +7640,14 @@ printf '%s\n' "$ac_cv_lib_Xext_XShapeCombineShape" >&6; }
 if test "x$ac_cv_lib_Xext_XShapeCombineShape" = xyes
 then :
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for X11/extensions/shape.h
-    " >&5
+" >&5
 printf %s "checking for X11/extensions/shape.h
-    ... " >&6; }
+... " >&6; }
 
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+
 
 
 #include <X11/Xlib.h>
@@ -7394,17 +7670,17 @@ _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
 
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-        SHAPE="-DSHAPE"
-        Xext_lib="-lXext"
+SHAPE="-DSHAPE"
+Xext_lib="-lXext"
 
 else case e in #(
   e)
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
-     ;;
+ ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -7415,7 +7691,7 @@ fi
 
 else
 
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
 fi
@@ -7437,30 +7713,34 @@ if test ${enable_debug+y}
 then :
   enableval=$enable_debug; if test x$enableval = "xyes"; then
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
-    if test x$GCC = "xyes"; then
+if test x$GCC = "xyes"; then
 
-      DEBUG="-DDEBUG -fno-inline -g"
+  DEBUG="-DDEBUG -fno-inline -g"
 
-    else
+else
 
-      DEBUG="-DDEBUG"
+  DEBUG="-DDEBUG"
 
-    fi
+fi
 
-  else
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+else
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
-    DEBUG="-DNDEBUG"
+DEBUG="-DNDEBUG"
 
-  fi
+
+fi
 else case e in #(
   e) { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
-  DEBUG="-DNDEBUG"
+DEBUG="-DNDEBUG"
  ;;
 esac
 fi
@@ -7481,20 +7761,24 @@ if test ${enable_timed_cache+y}
 then :
   enableval=$enable_timed_cache; if test x$enableval = "xyes"; then
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-    TIMEDCACHE="-DTIMEDCACHE"
+TIMEDCACHE="-DTIMEDCACHE"
 
-  else
 
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+else
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
-  fi
+
+fi
 else case e in #(
   e) { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-  TIMEDCACHE="-DTIMEDCACHE"
+TIMEDCACHE="-DTIMEDCACHE"
  ;;
 esac
 fi
@@ -9006,3 +9290,4 @@ printf '%s\n' "Building with '$LIBS' for linker flags." >&6; }
 printf '%s\n' "" >&6; }
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ***************************************************" >&5
 printf '%s\n' "***************************************************" >&6; }
+

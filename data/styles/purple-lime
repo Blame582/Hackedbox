@@ -1,9 +1,9 @@
 #Name: Purple Lime
 #Author: Blame
 #Date: (9/2026)
-#Made for hackedbox-0.8.8+
+#Made for hackedbox-0.9.0+
 
-root.background:                    ~/.hackedbox/backgrounds/purpleLime.jpg
+root.background:                     ~/.hackedbox/backgrounds/purpleLime.jpg
 root.background.mode:                center
 # Background folder for automatic image rotation
 #root.background.folder:             ~/.hackedbox/backgrounds
@@ -11,19 +11,21 @@ root.background.mode:                center
 #root.background.timer:              0
 
 menu.title.font:                     Hack-14
-menu.title:                           flat crossdiagonal gradient
+menu.title:                          flat crossdiagonal gradient
 menu.title.color:                    #8066CC
 menu.title.colorTo:                  #443366
 menu.title.textColor:                #FFFFFF
 menu.title.justify:                  center
+menu.title.alpha:                    255
 
 menu.frame.font:                     Hack-12
-menu.frame:                           flat crossdiagonal gradient
+menu.frame:                          flat crossdiagonal gradient
 menu.frame.color:                    #666666
 menu.frame.colorTo:                  #333333
 menu.frame.textColor:                #D9D9D9
 menu.frame.disableColor:             #444444
 menu.frame.justify:                  center
+menu.frame.alpha:                    255
 
 menu.clock.font:                     Hack-14
 menu.clock.textColor:                #D9D9D9
@@ -40,22 +42,28 @@ menu.bullet:                          triangle
 
 menu.icon:                            true
 menu.icon.position:                   left
+menu.icon.alpha:                      255
 
 menu.hilite:                          flat crossdiagonal gradient
 menu.hilite.color:                   #99FF00
 menu.hilite.colorTo:                 #66AA00
 menu.hilite.textColor:               #000000
+menu.hilite.alpha:                   255
 
+window.title.font:                   Hack-14
 window.title.focus:                  flat diagonal gradient
 window.title.focus.color:            #8066CC
 window.title.focus.colorTo:          #554477
+
 window.title.unfocus:                flat solid
 window.title.unfocus.color:          #4D4D4D
+window.title.alpha:                  255
 
 window.label.focus:                  flat crossdiagonal gradient
 window.label.focus.color:            #666666
 window.label.focus.colorTo:          #333333
 window.label.focus.textColor:        #FFFFFF
+
 window.label.unfocus:                flat crossdiagonal gradient
 window.label.unfocus.color:          #4D4D4D
 window.label.unfocus.colorTo:        #333333
@@ -65,30 +73,53 @@ window.button.focus:                 flat diagonal gradient
 window.button.focus.color:           #554477
 window.button.focus.colorTo:         #7755AA
 window.button.focus.picColor:        #444444
+
 window.button.unfocus:               flat solid
 window.button.unfocus.color:         #4D4D4D
 window.button.unfocus.picColor:      #333333
+
 window.button.pressed:               flat crossdiagonal gradient
 window.button.pressed.color:         #666666
 window.button.pressed.colorTo:       #333333
+window.button.alpha:                 255
 
 window.handle.focus:                 flat crossdiagonal gradient
 window.handle.focus.color:           #8066CC
 window.handle.focus.colorTo:         #443366
+
 window.handle.unfocus:               flat solid
 window.handle.unfocus.color:         #4D4D4D
+window.handle.alpha:                 255
 
 window.grip.focus:                   flat crossdiagonal gradient
 window.grip.focus.color:             #666666
 window.grip.focus.colorTo:           #333333
+
 window.grip.unfocus:                 flat crossdiagonal gradient
 window.grip.unfocus.color:           #4D4D4D
 window.grip.unfocus.colorTo:         #333333
+window.grip.alpha:                   255
 
 window.frame.focusColor:             #8066CC
 window.frame.unfocusColor:           #4D4D4D
+window.frame.alpha:                  255
 
 window.justify:                      center
+
+window.dialog.font:                  Hack-12
+window.dialog.bgcolor:               #333333
+window.dialog.inputColor:            #554477
+window.dialog.inputTextColor:        #FFFFFF
+window.dialog.textColor:             #D9D9D9
+window.dialog.accentColor:           #99FF00
+window.dialog.borderColor:           #1A1A1A
+window.dialog.borderColor.focus:     #8066CC
+window.dialog.buttonColor:           #554477
+window.dialog.buttonColorTo:         #7755AA
+window.dialog.buttonTextColor:       #FFFFFF
+window.dialog.buttonFocusColor:      #99FF00
+window.dialog.borderWidth:           2
+window.dialog.alpha:                 255
 
 borderColor:                         #1A1A1A
 

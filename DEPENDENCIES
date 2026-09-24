@@ -11,9 +11,6 @@ X11:
 - libXrender
 - libXft
 
-Graphics:
-- Imlib2
-
 Font support:
 - Fontconfig
 - FreeType

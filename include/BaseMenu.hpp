@@ -162,24 +162,29 @@ public:
   inline const char *getLabel(void) const
     { return menu.label.c_str(); }
 
-  int insert(HbBasemenuItem *item, int pos);
+int insert(HbBasemenuItem *item, int pos);
 
-  int insert(const std::string& label,
-             int function = 0,
-             const std::string& exec = "",
-             int pos = -1);
+int insert(const std::string& label,
+           int function = 0,
+           const std::string& exec = "",
+           int pos = -1);
 
-  int insert(const std::string& label,
-             int function,
-             const std::string& exec,
-             const std::string& icon,
-             int pos = -1);
+int insert(const std::string& label,
+           int function,
+           const std::string& exec,
+           const std::string& icon,
+           int pos = -1);
 
-  int insert(const std::string& label,
-             HbBasemenu *submenu,
-             int pos = -1);
+int insert(const std::string& label,
+           HbBasemenu *submenu,
+           int pos = -1);
 
-  int remove(int index);
+int insert(const std::string& label,
+           HbBasemenu *submenu,
+           const std::string& icon,
+           int pos = -1);
+
+int remove(int index);
 
   void changeItemLabel(unsigned int index,
                        const std::string& label);
@@ -294,13 +299,15 @@ public:
     enabled(1),
     selected(0) {}
 
-  HbBasemenuItem(const std::string& lp,
-                 HbBasemenu *mp):
-    sub(mp),
-    l(lp),
-    f(0),
-    enabled(1),
-    selected(0) {}
+HbBasemenuItem(const std::string& lp,
+               HbBasemenu *mp,
+               const std::string& ip = ""):
+  sub(mp),
+  l(lp),
+  i(ip),
+  f(0),
+  enabled(1),
+  selected(0) {}
 
   inline const char *exec(void) const
     { return e.c_str(); }

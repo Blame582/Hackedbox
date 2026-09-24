@@ -1,7 +1,7 @@
 #Name: NYZClone
 #Author: miklos
 #Date: March 3, 2002
-#updated: (09/2026) for hackedbox-0.8.8+
+#updated: (09/2026) for hackedbox-0.9.0+
 
 root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode:                center
@@ -15,6 +15,7 @@ menu.title:                           Raised Bevel1 Solid
 menu.title.color:                    #506C90
 menu.title.textColor:                #FFFFFF
 menu.title.justify:                  center
+menu.title.alpha:                    255
 
 menu.frame.font:                     Hack-12
 menu.frame:                           Raised Bevel1 Solid
@@ -22,10 +23,12 @@ menu.frame.color:                    #C8C8C8
 menu.frame.textColor:                #000000
 menu.frame.justify:                  center
 menu.frame.disableColor:             #FFFFFF
+menu.frame.alpha:                    255
 
 menu.hilite:                          Flat Solid
 menu.hilite.color:                   #506890
 menu.hilite.textColor:               #FFFFFF
+menu.hilite.alpha:                   255
 
 menu.clock.font:                     Hack-12
 menu.clock.textColor:                #000000
@@ -42,12 +45,15 @@ menu.bullet.position:                 right
 
 menu.icon:                            true
 menu.icon.position:                   left
+menu.icon.alpha:                      255
 
+window.title.font:                   Hack-14
 window.title.focus:                  Raised Bevel1 Solid
 window.title.focus.color:            #506890
 
 window.title.unfocus:                Raised Bevel1 Solid
 window.title.unfocus.color:          #C8C8C8
+window.title.alpha:                  255
 
 window.label.focus:                  Flat Solid
 window.label.focus.color:            #506890
@@ -69,23 +75,42 @@ window.button.unfocus.picColor:      #787C78
 window.button.pressed:               Sunken Bevel1 Gradient Diagonal
 window.button.pressed.color:         #506890
 window.button.pressed.colorTo:       #A0A0A0
+window.button.alpha:                 255
 
 window.handle.focus:                 Raised Bevel1 Solid
 window.handle.focus.color:           #506890
 
 window.handle.unfocus:               Raised Bevel1 Solid
 window.handle.unfocus.color:         #C8C8C8
+window.handle.alpha:                 255
 
 window.grip.focus:                   Raised Bevel1 Solid
 window.grip.focus.color:             #506890
 
 window.grip.unfocus:                 Raised Bevel1 Solid
 window.grip.unfocus.color:           #C8C8C8
+window.grip.alpha:                   255
 
 window.frame.focusColor:             #FFFFFF
 window.frame.unfocusColor:           #202428
+window.frame.alpha:                  255
 
 window.justify:                      center
+
+window.dialog.font:                  Hack-12
+window.dialog.bgcolor:               #C8C8C8
+window.dialog.inputColor:            #506890
+window.dialog.inputTextColor:        #FFFFFF
+window.dialog.textColor:             #000000
+window.dialog.accentColor:           #506C90
+window.dialog.borderColor:           #202428
+window.dialog.borderColor.focus:     #506890
+window.dialog.buttonColor:           #506890
+window.dialog.buttonColorTo:         #C8C8C8
+window.dialog.buttonTextColor:       #FFFFFF
+window.dialog.buttonFocusColor:      #506C90
+window.dialog.borderWidth:           1
+window.dialog.alpha:                 255
 
 handleWidth:                         5
 frameWidth:                          0

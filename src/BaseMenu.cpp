@@ -935,7 +935,6 @@ int HbBasemenu::insert(const string& label,
   return insert(item, pos);
 }
 
-
 int HbBasemenu::insert(const string& label,
                        int function,
                        const string& exec,
@@ -956,6 +955,21 @@ int HbBasemenu::insert(const string& label,
                        int pos) {
   HbBasemenuItem *item =
     new HbBasemenuItem(label, submenu);
+
+  submenu->parent = this;
+
+  return insert(item, pos);
+}
+
+
+int HbBasemenu::insert(const string& label,
+                       HbBasemenu *submenu,
+                       const string& icon,
+                       int pos) {
+  HbBasemenuItem *item =
+    new HbBasemenuItem(label,
+                       submenu,
+                       icon);
 
   submenu->parent = this;
 
@@ -2320,7 +2334,8 @@ void HbBasemenu::drawItem(int index,
    *
    * The menu still uses the direct filename supplied by the
    * menu entry. No desktop-file or icon-theme lookup is done.
-   */
+   */  
+   
   if (style->icon &&
       item->icon() &&
       *item->icon()) {

@@ -1,7 +1,7 @@
 #Name: trisb
 #Author: miklos
 #Date: March 25, 2002
-#updated: (09/2026) for hackedbox-0.8.8+
+#updated: (09/2026) for hackedbox-0.9.0+
 
 root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode:                center
@@ -17,6 +17,7 @@ menu.frame.colorTo:                  #B4B4B4
 menu.frame.textColor:                #343434
 menu.frame.justify:                  right
 menu.frame.disableColor:             #FFFFFF
+menu.frame.alpha:                    255
 
 menu.title.font:                     Hack-14
 menu.title:                           flat gradient vertical
@@ -24,11 +25,13 @@ menu.title.color:                    #8E8E8E
 menu.title.colorTo:                  #5F5F5F
 menu.title.textColor:                #C8C8C8
 menu.title.justify:                  center
+menu.title.alpha:                    255
 
 menu.hilite:                          flat gradient vertical
 menu.hilite.color:                   #3B90DC
 menu.hilite.colorTo:                 #2C5F8C
 menu.hilite.textColor:               #8EFDFF
+menu.hilite.alpha:                   255
 
 menu.clock.font:                     Hack-12
 menu.clock.textColor:                #343434
@@ -45,29 +48,17 @@ menu.bullet.position:                 right
 
 menu.icon:                            true
 menu.icon.position:                   right
+menu.icon.alpha:                      255
 
-window.button.focus:                 flat gradient vertical
-window.button.focus.color:           #3B90DC
-window.button.focus.colorTo:         #2C5F8C
-window.button.focus.picColor:        #8EFDFF
-window.button.unfocus:               flat gradient vertical
-window.button.unfocus.color:         #8E8E8E
-window.button.unfocus.colorTo:       #5F5F5F
-window.button.unfocus.picColor:      #AAAAAA
+window.title.font:                   Hack-14
+window.title.focus:                  flat gradient vertical
+window.title.focus.color:            #3B90DC
+window.title.focus.colorTo:          #2C5F8C
 
-window.grip.focus:                   flat solid vertical
-window.grip.focus.color:             #3B90DC
-window.grip.focus.colorTo:           #2C5F8C
-window.grip.unfocus:                 flat gradient vertical
-window.grip.unfocus.color:           #8E8E8E
-window.grip.unfocus.colorTo:         #5F5F5F
-
-window.handle.focus:                 flat gradient vertical
-window.handle.focus.color:           #3B90DC
-window.handle.focus.colorTo:         #2C5F8C
-window.handle.unfocus:               flat gradient vertical
-window.handle.unfocus.color:         #7A7A7A
-window.handle.unfocus.colorTo:       #555555
+window.title.unfocus:                flat gradient vertical
+window.title.unfocus.color:          #8E8E8E
+window.title.unfocus.colorTo:        #5F5F5F
+window.title.alpha:                  255
 
 window.label.focus:                  flat gradient vertical
 window.label.focus.color:            #3B90DC
@@ -75,25 +66,63 @@ window.label.focus.colorTo:          #2C5F8C
 window.label.focus.textColor:        #8EFDFF
 window.label.focus.justify:          center
 
-window.justify:                      center
-
 window.label.unfocus:                flat gradient vertical
 window.label.unfocus.color:          #8E8E8E
 window.label.unfocus.colorTo:        #5F5F5F
 window.label.unfocus.textColor:      #AAAAAA
 
-window.title.focus:                  flat gradient vertical
-window.title.focus.color:            #3B90DC
-window.title.focus.colorTo:          #2C5F8C
-window.title.unfocus:                flat gradient vertical
-window.title.unfocus.color:          #8E8E8E
-window.title.unfocus.colorTo:        #5F5F5F
+window.button.focus:                 flat gradient vertical
+window.button.focus.color:           #3B90DC
+window.button.focus.colorTo:         #2C5F8C
+window.button.focus.picColor:        #8EFDFF
+
+window.button.unfocus:               flat gradient vertical
+window.button.unfocus.color:         #8E8E8E
+window.button.unfocus.colorTo:       #5F5F5F
+window.button.unfocus.picColor:      #AAAAAA
 
 window.button.pressed:               sunken bevel1 solid vertical
 window.button.pressed.color:         #3B90DC
+window.button.alpha:                 255
+
+window.grip.focus:                   flat solid vertical
+window.grip.focus.color:             #3B90DC
+window.grip.focus.colorTo:           #2C5F8C
+
+window.grip.unfocus:                 flat gradient vertical
+window.grip.unfocus.color:           #8E8E8E
+window.grip.unfocus.colorTo:         #5F5F5F
+window.grip.alpha:                   255
+
+window.handle.focus:                 flat gradient vertical
+window.handle.focus.color:           #3B90DC
+window.handle.focus.colorTo:         #2C5F8C
+
+window.handle.unfocus:               flat gradient vertical
+window.handle.unfocus.color:         #7A7A7A
+window.handle.unfocus.colorTo:       #555555
+window.handle.alpha:                 255
 
 window.frame.focusColor:             #343434
 window.frame.unfocusColor:           #000000
+window.frame.alpha:                  255
+
+window.justify:                      center
+
+window.dialog.font:                  Hack-12
+window.dialog.bgcolor:               #5F5F5F
+window.dialog.inputColor:            #3B90DC
+window.dialog.inputTextColor:        #FFFFFF
+window.dialog.textColor:             #C8C8C8
+window.dialog.accentColor:           #8EFDFF
+window.dialog.borderColor:           #121212
+window.dialog.borderColor.focus:     #3B90DC
+window.dialog.buttonColor:           #3B90DC
+window.dialog.buttonColorTo:         #2C5F8C
+window.dialog.buttonTextColor:       #FFFFFF
+window.dialog.buttonFocusColor:      #8EFDFF
+window.dialog.borderWidth:           1
+window.dialog.alpha:                 255
 
 handleWidth:                         3
 frameWidth:                          0

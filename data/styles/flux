@@ -1,5 +1,5 @@
 #name: Flux
-#updated: 09/2026 for hackedbox-0.8.8+
+#updated: 09/2026 for hackedbox-0.9.0
 
 root.background:                /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode:            center
@@ -14,6 +14,7 @@ menu.title.color:               #888877
 menu.title.colorTo:             #FFFFDD
 menu.title.textColor:           #22221C
 menu.title.justify:             right
+menu.title.alpha:               255
 
 menu.frame.font:                Hack-14
 menu.frame:                     flat solid
@@ -21,10 +22,12 @@ menu.frame.color:               #666654
 menu.frame.textColor:           #D9D9D9
 menu.frame.disableColor:        #444438
 menu.frame.justify:             center
+menu.frame.alpha:               255
 
 menu.hilite:                    flat solid
 menu.hilite.color:              #444438
 menu.hilite.textColor:          #FFFFFF
+menu.hilite.alpha:              255
 
 menu.clock.font:                Hack-18
 menu.clock.textColor:           #D9D9D9
@@ -41,18 +44,19 @@ menu.bullet.position:           right
 
 menu.icon:                      true
 menu.icon.position:             left
+menu.icon.alpha:                255
 
+window.title.font:              Hack-18
 window.title.focus:             flat solid
 window.title.focus.color:       #666654
-
 window.title.unfocus:           flat solid
 window.title.unfocus.color:     #444438
+window.title.alpha:             255
 
 window.label.focus:             flat crossdiagonal gradient
 window.label.focus.color:       #888877
 window.label.focus.colorTo:     #FFFFDD
 window.label.focus.textColor:   #22221C
-
 window.label.unfocus:           flat solid
 window.label.unfocus.color:     #444438
 window.label.unfocus.textColor: #22221C
@@ -60,26 +64,42 @@ window.label.unfocus.textColor: #22221C
 window.button.focus:            flat solid
 window.button.focus.color:      #666654
 window.button.focus.picColor:   #22221C
-
 window.button.unfocus:          flat solid
 window.button.unfocus.color:    #444438
 window.button.unfocus.picColor: #22221C
+window.button.alpha:            255
 
 window.handle.focus:            flat crossdiagonal gradient
 window.handle.focus.color:      #888877
 window.handle.focus.colorTo:    #FFFFDD
-
 window.handle.unfocus:          flat solid
 window.handle.unfocus.color:    #444438
+window.handle.alpha:            255
 
 window.grip.focus:              flat solid
 window.grip.focus.color:        #888877
-
 window.grip.unfocus:            flat solid
 window.grip.unfocus.color:      #444438
+window.grip.alpha:              255
 
 window.frame.focusColor:        #FFFFDD
 window.frame.unfocusColor:      #666654
+window.frame.alpha:             255
+
+window.dialog.font:             Hack-14
+window.dialog.bgcolor:          #444438
+window.dialog.inputColor:       #666654
+window.dialog.inputTextColor:   #D9D9D9
+window.dialog.textColor:        #D9D9D9
+window.dialog.accentColor:      #888877
+window.dialog.borderColor:      #22221C
+window.dialog.borderColor.focus:#FFFFDD
+window.dialog.buttonColor:      #666654
+window.dialog.buttonColorTo:    #888877
+window.dialog.buttonTextColor:  #22221C
+window.dialog.buttonFocusColor: #FFFFDD
+window.dialog.borderWidth:      2
+window.dialog.alpha:            255
 
 window.justify:                 right
 

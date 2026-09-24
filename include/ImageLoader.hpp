@@ -1,5 +1,5 @@
 // ImageLoader.hpp for Hackedbox - an X Window Manager
-// Copyright (c) 2026 Kevin Day [blame582@gmail.com](mailto:blame582@gmail.com)
+// Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -67,6 +67,12 @@ std::string &error
 );
 
 static bool loadWebP(
+const std::string &filename,
+HbImageData &image,
+std::string &error
+);
+
+static bool loadSVG(
 const std::string &filename,
 HbImageData &image,
 std::string &error

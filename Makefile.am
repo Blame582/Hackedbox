@@ -27,14 +27,15 @@ DEFAULT_MENU = ~/.@PACKAGE@/menu
 DEFAULT_STYLE = $(pkgdatadir)/styles/Default
 
 AM_CPPFLAGS = \
-	@SHAPE@ \
-	@DEBUG@ \
-	@TIMEDCACHE@ \
-	-I$(top_srcdir)/include \
-	-I$(srcdir)/include \
-	-I/usr/include/freetype2 \
-	-DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
-	-DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
+        @SHAPE@ \
+        @DEBUG@ \
+        @TIMEDCACHE@ \
+        $(RSVG_CFLAGS) \
+        -I$(top_srcdir)/include \
+        -I$(srcdir)/include \
+        -I/usr/include/freetype2 \
+        -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
+        -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
 
 bin_PROGRAMS = hackedbox hbsetbg
 
@@ -55,6 +56,7 @@ hackedbox_SOURCES = \
 	src/MenuManager.cpp \
 	src/Netizen.cpp \
 	src/Screen.cpp \
+	src/StyleEngine.cpp \
 	src/Texture.cpp \
 	src/Timer.cpp \
 	src/Util.cpp \
@@ -68,6 +70,7 @@ hackedbox_LDADD = \
 	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
 	$(WEBP_LIBS) \
+	$(RSVG_LIBS) \
 	-lX11 \
 	-lXft \
 	-lXext \
@@ -89,6 +92,7 @@ hbsetbg_LDADD = \
 	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
 	$(WEBP_LIBS) \
+	$(RSVG_LIBS) \
 	-lX11 \
 	-lXft \
 	-lXext

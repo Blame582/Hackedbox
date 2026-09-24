@@ -24,8 +24,6 @@
 #define   __Screen_hpp
 
 
-#include <X11/Xresource.h>
-
 #include <sys/time.h>
 
 #include <list>
@@ -42,55 +40,9 @@
 #include "WorkspaceMenu.hpp"
 #include "Hackedbox.hpp"
 #include "Font.hpp"
+#include "StyleEngine.hpp"
 
 class Slit; // forward reference
-
-enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
-
-struct WindowStyle {
-  HbColor l_text_focus, l_text_unfocus, b_pic_focus,
-    b_pic_unfocus;
-
-  HbTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
-    h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
-
-  XFontSet fontset;
-  XFontSetExtents *fontset_extents;
-  HbFont *font;
-
-  TextJustify justify; 
-
-  int doJustify(const char *text, int &start_pos, unsigned int max_length,
-                unsigned int modifier, bool multibyte) const;
-};
-
-
-struct MenuStyle {
-  HbColor t_text, f_text, h_text, d_text;
-  HbColor clock_text, date_text;
-  
-  HbTexture title, frame, hilite, sel;
-
-  XFontSet t_fontset, f_fontset;
-  XFontSet clock_fontset, date_fontset;
-  
-  XFontSetExtents *t_fontset_extents, *f_fontset_extents;
-  XFontSetExtents *clock_fontset_extents, *date_fontset_extents;
-  
-  HbFont *t_font, *f_font;
-  HbFont *clock_font, *date_font;
-
-  TextJustify t_justify, f_justify;
-  TextJustify clock_justify, date_justify;
-  
-  std::string clock_format, date_format;
-  
-  int bullet, bullet_pos;
-
-  bool icon;
-  int icon_pos;
-};
-
 
 struct Strut {
   unsigned int top, bottom, left, right;
@@ -108,6 +60,7 @@ private:
 
   Hackedbox *hackedbox;
   HbImageControl *image_control;
+  StyleEngine *style_engine;
   Configmenu *configmenu;
   Iconmenu *iconmenu;
   MenuManager *rootmenu;
@@ -138,23 +91,12 @@ private:
   WorkspaceList workspacesList;
 
   struct screen_resource {
-    WindowStyle wstyle;
-    MenuStyle mstyle;
-
     bool sloppy_focus, auto_raise, auto_edge_balance, image_dither,
          ordered_dither, opaque_move, full_max, focus_new, focus_last,
          click_raise, allow_scroll_lock;
 
-    HbColor border_color;
-    XrmDatabase stylerc;
-
-	std::string backgroundFolder;
-	int backgroundTimer;
-
     unsigned int workspaces;
     int placement_policy, edge_snap_threshold, row_direction, col_direction;
-
-    unsigned int handle_width, bevel_width, frame_width, border_width;
 
 #ifdef    HAVE_STRFTIME
     std::string strftime_format;
@@ -169,22 +111,6 @@ private:
   HbScreen& operator=(const HbScreen&);
 
   bool parseMenuFile(FILE *file, MenuManager *menu);
-
-  HbTexture readDatabaseTexture(const std::string &rname,
-                               const std::string &rclass,
-                               const std::string &default_color);
-
-  HbColor readDatabaseColor(const std::string &rname,
-                           const std::string &rclass,
-                           const std::string &default_color);
-
-  XFontSet readDatabaseFontSet(const std::string &rname,
-                               const std::string &rclass);
-
-  HbFont *readDatabaseFont(const std::string &rname,
-                           const std::string &rclass);
-
-  XFontSet createFontSet(const std::string &fontname);
 
   void InitMenu(void);
   void LoadStyle(void);
@@ -277,7 +203,7 @@ public:
   { return hackedbox; }
 
   inline HbColor *getBorderColor(void)
-  { return &resource.border_color; }
+  { return style_engine->getBorderColor(); }
 
   inline HbImageControl *getImageControl(void)
   { return image_control; }
@@ -294,16 +220,16 @@ public:
   { return workspacemenu; }
 
   inline unsigned int getHandleWidth(void) const
-  { return resource.handle_width; }
+  { return style_engine->getHandleWidth(); }
 
   inline unsigned int getBevelWidth(void) const
-  { return resource.bevel_width; }
+  { return style_engine->getBevelWidth(); }
 
   inline unsigned int getFrameWidth(void) const
-  { return resource.frame_width; }
+  { return style_engine->getFrameWidth(); }
 
   inline unsigned int getBorderWidth(void) const
-  { return resource.border_width; }
+  { return style_engine->getBorderWidth(); }
 
   inline unsigned int getCurrentWorkspaceID(void) const
   { return current_workspace->getID(); }
@@ -401,10 +327,10 @@ public:
   */
 
   inline WindowStyle *getWindowStyle(void)
-  { return &resource.wstyle; }
+  { return style_engine->getWindowStyle(); }
 
   inline MenuStyle *getMenuStyle(void)
-  { return &resource.mstyle; }
+  { return style_engine->getMenuStyle(); }
 
   HackedboxWindow *getIcon(unsigned int index);
 

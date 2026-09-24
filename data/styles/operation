@@ -1,6 +1,6 @@
 #Name: Operation
 #Author: Unknown
-#updated: (09/2026) for hackedbox-0.8.8+
+#updated: (09/2026) for hackedbox-0.9.0+
 
 root.background:                    /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode:                center
@@ -15,6 +15,7 @@ menu.title.color:                    #6699CC
 menu.title.colorTo:                  #334866
 menu.title.textColor:                #FFFFFF
 menu.title.justify:                  right
+menu.title.alpha:                    255
 
 menu.frame.font:                     Hack-12
 menu.frame:                           flat crossdiagonal gradient
@@ -23,11 +24,13 @@ menu.frame.colorTo:                  #CCCCCC
 menu.frame.textColor:                #333333
 menu.frame.disableColor:             #666666
 menu.frame.justify:                  center
+menu.frame.alpha:                    255
 
 menu.hilite:                          flat crossdiagonal gradient
 menu.hilite.color:                   #6699CC
 menu.hilite.colorTo:                 #334866
 menu.hilite.textColor:               #FFFFFF
+menu.hilite.alpha:                   255
 
 menu.clock.font:                     Hack-12
 menu.clock.textColor:                #333333
@@ -44,7 +47,9 @@ menu.bullet.position:                 right
 
 menu.icon:                            true
 menu.icon.position:                   left
+menu.icon.alpha:                      255
 
+window.title.font:                   Hack-14
 window.title.focus:                  flat crossdiagonal gradient
 window.title.focus.color:            #6699CC
 window.title.focus.colorTo:          #334866
@@ -52,6 +57,7 @@ window.title.focus.colorTo:          #334866
 window.title.unfocus:                flat diagonal gradient
 window.title.unfocus.color:          #808080
 window.title.unfocus.colorTo:        #333333
+window.title.alpha:                  255
 
 window.label.focus:                  parentrelative
 window.label.focus.textColor:        #FFFFFF
@@ -68,6 +74,7 @@ window.button.unfocus.picColor:      #999999
 window.button.pressed:               flat crossdiagonal gradient
 window.button.pressed.color:         #808080
 window.button.pressed.colorTo:       #CCCCCC
+window.button.alpha:                 255
 
 window.handle.focus:                 flat crossdiagonal gradient
 window.handle.focus.color:           #6699CC
@@ -76,15 +83,33 @@ window.handle.focus.colorTo:         #334866
 window.handle.unfocus:               flat diagonal gradient
 window.handle.unfocus.color:         #808080
 window.handle.unfocus.colorTo:       #333333
+window.handle.alpha:                 255
 
 window.grip.focus:                   parentrelative
 
 window.grip.unfocus:                 parentrelative
+window.grip.alpha:                   255
 
 window.frame.focusColor:             #6699CC
 window.frame.unfocusColor:           #808080
+window.frame.alpha:                  255
 
 window.justify:                      right
+
+window.dialog.font:                  Hack-12
+window.dialog.bgcolor:               #808080
+window.dialog.inputColor:            #6699CC
+window.dialog.inputTextColor:        #FFFFFF
+window.dialog.textColor:             #333333
+window.dialog.accentColor:           #6699CC
+window.dialog.borderColor:           #223344
+window.dialog.borderColor.focus:     #334866
+window.dialog.buttonColor:           #6699CC
+window.dialog.buttonColorTo:         #808080
+window.dialog.buttonTextColor:       #FFFFFF
+window.dialog.buttonFocusColor:      #334866
+window.dialog.borderWidth:           1
+window.dialog.alpha:                 255
 
 borderColor:                         #223344
 

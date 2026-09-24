@@ -1,103 +1,127 @@
 #Name: Artwiz
-#updated (09/2026) for hackedbox-0.8.8+
+#Updated (09/2026) for hackedbox-0.9.0
 
 root.background:                    ~/.hackedbox/backgrounds/default.jpg
-root.background.mode:                center
+root.background.mode:               center
 # Background folder for automatic image rotation
-#root.background.folder:             ~/.hackedbox/backgrounds
+#root.background.folder:            ~/.hackedbox/backgrounds
 # Background rotation timer in seconds (0 = disabled)
-#root.background.timer:              0
+#root.background.timer:             0
 
-menu.title.font:                     Hack-14
-menu.title:                          raised gradient diagonal
-menu.title.color:                    #5A5E62
-menu.title.colorTo:                  #14181C
-menu.title.textColor:                #FFFFFF
-menu.title.justify:                  center
+menu.title.font:                    Hack-14
+menu.title:                         raised gradient diagonal
+menu.title.color:                   #5A5E62
+menu.title.colorTo:                 #14181C
+menu.title.textColor:               #FFFFFF
+menu.title.justify:                 center
+menu.title.alpha:                   255
 
-menu.frame.font:                     Hack-12
-menu.frame:                           sunken gradient diagonal
-menu.frame.color:                     #0A141E
-menu.frame.colorTo:                   #46505A
-menu.frame.textColor:                 #5A6470
-menu.frame.justify:                   center
+menu.frame.font:                    Hack-12
+menu.frame:                          sunken gradient diagonal
+menu.frame.color:                   #0A141E
+menu.frame.colorTo:                 #46505A
+menu.frame.textColor:               #5A6470
+menu.frame.justify:                 center
+menu.frame.alpha:                   255
 
-menu.hilite:                          raised gradient diagonal
-menu.hilite.color:                    #5A5E62
-menu.hilite.colorTo:                  #14181C
-menu.hilite.textColor:                #FFFFFF
+menu.hilite:                         raised gradient diagonal
+menu.hilite.color:                  #5A5E62
+menu.hilite.colorTo:                #14181C
+menu.hilite.textColor:              #FFFFFF
+menu.hilite.alpha:                  255
 
-menu.clock.font:                      Hack-13
-menu.clock.textColor:                 #AEB8C2
-menu.clock.format:                    %I:%M:%S %p
-menu.clock.justify:                   center
+menu.clock.font:                    Hack-13
+menu.clock.textColor:               #AEB8C2
+menu.clock.format:                  %I:%M:%S %p
+menu.clock.justify:                 center
 
-menu.date.font:                       Hack-13
-menu.date.textColor:                  #AEB8C2
-menu.date.format:                     %m/%d/%Y
-menu.date.justify:                    center
+menu.date.font:                     Hack-13
+menu.date.textColor:                #AEB8C2
+menu.date.format:                   %m/%d/%Y
+menu.date.justify:                  center
 
-menu.bullet:                           triangle
-menu.bullet.position:                  right
+menu.bullet:                         triangle
+menu.bullet.position:                right
 
-menu.icon:                             true
-menu.icon.position:                    right
+menu.icon:                           true
+menu.icon.position:                  right
+menu.icon.alpha:                     255
 
-window.title.focus:                    raised gradient vertical
-window.title.focus.color:              #505458
-window.title.focus.colorTo:            #1E2226
+window.justify:                      center
 
-window.title.unfocus:                  raised vertical gradient
-window.title.unfocus.color:            #32363A
-window.title.unfocus.colorTo:          #000000
+window.title.focus:                  raised gradient vertical
+window.title.focus.color:            #505458
+window.title.focus.colorTo:          #1E2226
+window.title.unfocus:                raised vertical gradient
+window.title.unfocus.color:          #32363A
+window.title.unfocus.colorTo:        #000000
+window.title.alpha:                  255
+window.title.font:                   Hack-14
 
-window.label.focus:                    sunken diagonal gradient
-window.label.focus.color:              #0A141E
-window.label.focus.colorTo:            #46505A
-window.label.focus.textColor:          #FFFFFF
+window.label.focus:                  sunken diagonal gradient
+window.label.focus.color:            #0A141E
+window.label.focus.colorTo:          #46505A
+window.label.focus.textColor:        #FFFFFF
 
-window.label.unfocus:                  sunken gradient diagonal
-window.label.unfocus.color:            #000000
-window.label.unfocus.colorTo:          #28323C
-window.label.unfocus.textColor:        #3C4044
+window.label.unfocus:                sunken gradient diagonal
+window.label.unfocus.color:          #000000
+window.label.unfocus.colorTo:        #28323C
+window.label.unfocus.textColor:      #3C4044
 
-window.button.focus:                   raised gradient diagonal
-window.button.focus.color:             #5A5E62
-window.button.focus.colorTo:           #14181C
-window.button.focus.picColor:          #FFFFFF
+window.button.focus:                 raised gradient diagonal
+window.button.focus.color:           #5A5E62
+window.button.focus.colorTo:         #14181C
+window.button.focus.picColor:        #FFFFFF
 
-window.button.unfocus:                 raised gradient diagonal
-window.button.unfocus.color:           #32363A
-window.button.unfocus.colorTo:         #000000
-window.button.unfocus.picColor:        #464A4E
+window.button.unfocus:               raised gradient diagonal
+window.button.unfocus.color:         #32363A
+window.button.unfocus.colorTo:       #000000
+window.button.unfocus.picColor:      #464A4E
 
-window.button.pressed:                 sunken gradient diagonal
-window.button.pressed.color:           #142832
-window.button.pressed.colorTo:         #3C4650
+window.button.pressed:               sunken gradient diagonal
+window.button.pressed.color:         #142832
+window.button.pressed.colorTo:       #3C4650
+window.button.alpha:                 255
 
-window.frame.focusColor:               #282C30
-window.frame.unfocusColor:             #14181C
+window.frame.focusColor:             #282C30
+window.frame.unfocusColor:           #14181C
+window.frame.alpha:                  255
 
-window.handle.focus:                   raised gradient diagonal
-window.handle.focus.color:             #464A4E
-window.handle.focus.colorTo:           #282C30
+window.handle.focus:                 raised gradient diagonal
+window.handle.focus.color:           #464A4E
+window.handle.focus.colorTo:         #282C30
 
-window.handle.unfocus:                 raised gradient diagonal
-window.handle.unfocus.color:           #32363A
-window.handle.unfocus.colorTo:         #000000
+window.handle.unfocus:               raised gradient diagonal
+window.handle.unfocus.color:         #32363A
+window.handle.unfocus.colorTo:       #000000
+window.handle.alpha:                 255
 
-window.grip.focus:                     sunken diagonal gradient
-window.grip.focus.color:               #141E28
-window.grip.focus.colorTo:             #3C4650
+window.grip.focus:                   sunken diagonal gradient
+window.grip.focus.color:             #141E28
+window.grip.focus.colorTo:           #3C4650
 
-window.grip.unfocus:                   sunken gradient diagonal
-window.grip.unfocus.color:             #000000
-window.grip.unfocus.colorTo:           #1E2832
+window.grip.unfocus:                 sunken gradient diagonal
+window.grip.unfocus.color:           #000000
+window.grip.unfocus.colorTo:         #1E2832
+window.grip.alpha:                   255
 
-window.justify:                        center
+window.dialog.font:                  Hack-13
+window.dialog.bgcolor:               #14181C
+window.dialog.inputColor:             #0A141E
+window.dialog.inputTextColor:         #AEB8C2
+window.dialog.textColor:              #FFFFFF
+window.dialog.accentColor:            #00FF00
+window.dialog.borderColor:            #5A5E62
+window.dialog.borderColor.focus:      #00FF00
+window.dialog.buttonColor:            #32363A
+window.dialog.buttonColorTo:          #14181C
+window.dialog.buttonTextColor:        #FFFFFF
+window.dialog.buttonFocusColor:       #5A5E62
+window.dialog.borderWidth:            1
+window.dialog.alpha:                  255
 
-borderColor:                           #000000
+borderColor:                          #000000
 
-bevelWidth:                            2
-borderWidth:                           1
-handleWidth:                           5
+bevelWidth:                           2
+borderWidth:                          1
+handleWidth:                          5

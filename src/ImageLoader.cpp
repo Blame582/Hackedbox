@@ -24,6 +24,8 @@
 #include <png.h>
 #include <jpeglib.h>
 #include <webp/decode.h>
+#include <cairo/cairo.h>
+#include <librsvg/rsvg.h>
 
 #include <algorithm>
 #include <cctype>
@@ -132,6 +134,15 @@ error
 if (extension == ".webp")
 {
 return loadWebP(
+filename,
+image,
+error
+);
+}
+
+if (extension == ".svg")
+{
+return loadSVG(
 filename,
 image,
 error
@@ -846,6 +857,308 @@ return false;
 }
 
 WebPFree(decoded);
+
+return true;
+}
+
+bool HbImageLoader::loadSVG(
+const std::string &filename,
+HbImageData &image,
+std::string &error
+)
+{
+GError *svg_error = nullptr;
+
+RsvgHandle *handle =
+rsvg_handle_new_from_file(
+filename.c_str(),
+&svg_error
+);
+
+if (!handle)
+{
+if (svg_error)
+{
+error = svg_error->message;
+g_error_free(svg_error);
+}
+else
+{
+error =
+"librsvg failed to load SVG";
+}
+
+return false;
+}
+
+RsvgRectangle viewport;
+
+viewport.x = 0.0;
+viewport.y = 0.0;
+viewport.width = 0.0;
+viewport.height = 0.0;
+
+/*
+ * Obtain the SVG's intrinsic dimensions.
+ */
+RsvgRectangle ink_rect;
+RsvgRectangle logical_rect;
+
+if (!rsvg_handle_get_geometry_for_element(
+handle,
+nullptr,
+&ink_rect,
+&logical_rect,
+&svg_error
+))
+{
+if (svg_error)
+{
+error = svg_error->message;
+g_error_free(svg_error);
+}
+
+g_object_unref(handle);
+
+if (error.empty())
+{
+error =
+"unable to determine SVG dimensions";
+}
+
+return false;
+}
+
+if (logical_rect.width <= 0.0 ||
+logical_rect.height <= 0.0)
+{
+g_object_unref(handle);
+
+error =
+"SVG has invalid dimensions";
+
+return false;
+}
+
+/*
+ * Menu icons are ultimately rendered through the same RGBA
+ * image path as PNG/JPEG/WebP. Render the SVG at its intrinsic
+ * dimensions.
+ */
+const unsigned int width =
+static_cast<unsigned int>(
+logical_rect.width + 0.5
+);
+
+const unsigned int height =
+static_cast<unsigned int>(
+logical_rect.height + 0.5
+);
+
+if (width == 0 ||
+height == 0)
+{
+g_object_unref(handle);
+
+error =
+"SVG has invalid dimensions";
+
+return false;
+}
+
+cairo_surface_t *surface =
+cairo_image_surface_create(
+CAIRO_FORMAT_ARGB32,
+static_cast<int>(width),
+static_cast<int>(height)
+);
+
+if (!surface)
+{
+g_object_unref(handle);
+
+error =
+"unable to create Cairo surface";
+
+return false;
+}
+
+cairo_status_t status =
+cairo_surface_status(surface);
+
+if (status != CAIRO_STATUS_SUCCESS)
+{
+cairo_surface_destroy(surface);
+g_object_unref(handle);
+
+error =
+"unable to initialize Cairo SVG surface";
+
+return false;
+}
+
+cairo_t *cr =
+cairo_create(surface);
+
+if (!cr)
+{
+cairo_surface_destroy(surface);
+g_object_unref(handle);
+
+error =
+"unable to create Cairo context";
+
+return false;
+}
+
+viewport.width =
+static_cast<double>(width);
+
+viewport.height =
+static_cast<double>(height);
+
+if (!rsvg_handle_render_document(
+handle,
+cr,
+&viewport,
+&svg_error
+))
+{
+if (svg_error)
+{
+error = svg_error->message;
+g_error_free(svg_error);
+}
+else
+{
+error =
+"librsvg failed while rendering SVG";
+}
+
+cairo_destroy(cr);
+cairo_surface_destroy(surface);
+g_object_unref(handle);
+
+return false;
+}
+
+cairo_surface_flush(surface);
+
+const unsigned char *source =
+cairo_image_surface_get_data(surface);
+
+const int source_stride =
+cairo_image_surface_get_stride(surface);
+
+try
+{
+image.width = width;
+image.height = height;
+image.stride = width * 4;
+
+image.pixels.resize(
+static_cast<size_t>(image.stride) *
+static_cast<size_t>(image.height)
+);
+
+for (unsigned int y = 0;
+y < image.height;
+++y)
+{
+const unsigned char *src =
+source +
+static_cast<size_t>(y) *
+static_cast<size_t>(source_stride);
+
+unsigned char *dst =
+image.pixels.data() +
+static_cast<size_t>(y) *
+static_cast<size_t>(image.stride);
+
+for (unsigned int x = 0;
+x < image.width;
+++x)
+{
+/*
+ * Cairo ARGB32 is stored as native-endian
+ * premultiplied ARGB. On the little-endian
+ * systems Hackedbox targets, the byte order is
+ * BGRA. Convert to straight RGBA.
+ */
+const unsigned char blue =
+src[static_cast<size_t>(x) * 4];
+
+const unsigned char green =
+src[static_cast<size_t>(x) * 4 + 1];
+
+const unsigned char red =
+src[static_cast<size_t>(x) * 4 + 2];
+
+const unsigned char alpha =
+src[static_cast<size_t>(x) * 4 + 3];
+
+unsigned char *pixel =
+dst +
+static_cast<size_t>(x) * 4;
+
+if (alpha == 0)
+{
+pixel[0] = 0;
+pixel[1] = 0;
+pixel[2] = 0;
+pixel[3] = 0;
+}
+else
+{
+pixel[0] =
+static_cast<unsigned char>(
+(std::min(
+static_cast<unsigned int>(red) * 255U,
+static_cast<unsigned int>(alpha) * 255U
+)) /
+static_cast<unsigned int>(alpha)
+);
+
+pixel[1] =
+static_cast<unsigned char>(
+(std::min(
+static_cast<unsigned int>(green) * 255U,
+static_cast<unsigned int>(alpha) * 255U
+)) /
+static_cast<unsigned int>(alpha)
+);
+
+pixel[2] =
+static_cast<unsigned char>(
+(std::min(
+static_cast<unsigned int>(blue) * 255U,
+static_cast<unsigned int>(alpha) * 255U
+)) /
+static_cast<unsigned int>(alpha)
+);
+
+pixel[3] = alpha;
+}
+}
+}
+}
+catch (...)
+{
+cairo_destroy(cr);
+cairo_surface_destroy(surface);
+g_object_unref(handle);
+
+image = HbImageData();
+
+error =
+"unable to allocate memory for SVG";
+
+return false;
+}
+
+cairo_destroy(cr);
+cairo_surface_destroy(surface);
+g_object_unref(handle);
 
 return true;
 }
