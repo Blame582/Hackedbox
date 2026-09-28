@@ -35,6 +35,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <cerrno>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "Util.hpp"
 
@@ -145,37 +148,98 @@ std::string expandTilde(const std::string &path) {
          path.substr(path.find('/'));
 }
 
-
-void hbexec(
-  const std::string &command,
-  const std::string &displayString
+bool hbexec(
+    const std::string &command,
+    const std::string &displayString
 ) {
-  if (!fork()) {
-    setsid();
+    int execPipe[2];
 
-    const int result =
-      putenv(
-        const_cast<char *>(displayString.c_str())
-      );
+    if (pipe(execPipe) == -1)
+        return false;
 
-    assert(result != -1);
+    const int flags =
+        fcntl(execPipe[1], F_GETFD);
 
-    std::string cmd = "exec ";
-    cmd += command;
+    if (flags == -1 ||
+        fcntl(
+            execPipe[1],
+            F_SETFD,
+            flags | FD_CLOEXEC
+        ) == -1) {
 
-    const int exitCode =
-      execl(
-        "/bin/sh",
-        "/bin/sh",
-        "-c",
-        cmd.c_str(),
-        static_cast<char *>(nullptr)
-      );
+        close(execPipe[0]);
+        close(execPipe[1]);
 
-    std::exit(exitCode);
-  }
+        return false;
+    }
+
+    const pid_t pid = fork();
+
+    if (pid == -1) {
+        close(execPipe[0]);
+        close(execPipe[1]);
+
+        return false;
+    }
+
+    if (pid == 0) {
+        close(execPipe[0]);
+
+        setsid();
+
+        if (putenv(
+                const_cast<char *>(
+                    displayString.c_str()
+                )) == -1) {
+
+            const int error = errno;
+
+            write(
+                execPipe[1],
+                &error,
+                sizeof(error)
+            );
+
+            _exit(127);
+        }
+
+        std::string cmd = "exec ";
+        cmd += command;
+
+        execl(
+            "/bin/sh",
+            "/bin/sh",
+            "-c",
+            cmd.c_str(),
+            static_cast<char *>(nullptr)
+        );
+
+        const int error = errno;
+
+        write(
+            execPipe[1],
+            &error,
+            sizeof(error)
+        );
+
+        _exit(127);
+    }
+
+    close(execPipe[1]);
+
+    int error = 0;
+
+    const ssize_t bytes =
+        read(
+            execPipe[0],
+            &error,
+            sizeof(error)
+        );
+
+    close(execPipe[0]);
+
+    return bytes == 0;
 }
-
 
 #ifndef HAVE_BASENAME
 

@@ -1,4 +1,4 @@
-// Font.hpp for Hackedbox - an X Window manager
+// KeyManager.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day (blame582@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,39 +19,57 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef HFONT_HH
-#define HFONT_HH
+#ifndef KEYMANAGER_HPP
+#define KEYMANAGER_HPP
 
 #include <X11/Xlib.h>
-#include <X11/Xft/Xft.h>
+#include <X11/keysym.h>
 
 #include <string>
+#include <vector>
 
-class HbFont {
+class KeyManager
+{
 public:
-  HbFont();
-  ~HbFont();
+    KeyManager(Display *display, Window root);
 
-  bool load(Display *display, int screen, const std::string &name);
+    void load(const std::string &filename);
+    void reconfigure();
+    void clear();
 
-  bool isXft() const;
-
-  XFontStruct *xfont() const;
-  XftFont *xftfont() const;
-
-  int ascent() const;
-  int descent() const;
-  int height() const;
-
-  HbFont(const HbFont &) = delete;
-  HbFont &operator=(const HbFont &) = delete;
+    bool handleEvent(const XKeyEvent &event);
 
 private:
-  Display *display;
-  int screen;
+    struct KeyBinding {
+        KeySym keysym;
+        KeyCode keycode;
+        unsigned int modifiers;
+        std::string command;
+    };
 
-  XFontStruct *x_font;
-  XftFont *xft_font;
+    Display *display;
+    Window root;
+
+    std::string filename;
+    std::vector<KeyBinding> bindings;
+
+    void parseLine(const std::string &line);
+
+    void addBinding(const std::string &keyString,
+                    const std::string &command);
+
+    bool parseBinding(const std::string &keyString,
+                      KeyBinding &binding);
+
+    bool parseModifier(const std::string &name,
+                       unsigned int &modifiers);
+
+    KeySym parseKey(const std::string &name);
+
+    void grabBinding(const KeyBinding &binding);
+    void ungrabAll();
+
+    void execute(const std::string &command);
 };
 
-#endif // HFONT_HH
+#endif

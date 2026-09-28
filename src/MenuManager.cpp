@@ -30,6 +30,7 @@
 #include "Screen.hpp"
 #include "Util.hpp"
 #include "ConfigMenu.hpp"
+#include "Runbox.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -106,27 +107,32 @@ void MenuManager::itemSelected(int button,
 
   switch (item->function()) {
 
-  case HbScreen::Execute:
+case HbScreen::Execute:
     if (item->exec()) {
-      std::string command = item->exec();
+        std::string command = item->exec();
 
-      const char *menuFile =
-        getScreen()->getHackedbox()->getMenuFilename();
+        if (command == "@runbox@") {
+            RunBox::show(getScreen());
+            break;
+        }
 
-      const char *styleFile =
-        getScreen()->getHackedbox()->getStyleFilename();
+        const char *menuFile =
+            getScreen()->getHackedbox()->getMenuFilename();
 
-      std::string::size_type pos;
+        const char *styleFile =
+            getScreen()->getHackedbox()->getStyleFilename();
 
-      pos = command.find("$menu");
-      if (pos != std::string::npos)
-        command.replace(pos, 5, menuFile);
+        std::string::size_type pos;
 
-      pos = command.find("$style");
-      if (pos != std::string::npos)
-        command.replace(pos, 6, styleFile);
+        pos = command.find("$menu");
+        if (pos != std::string::npos)
+            command.replace(pos, 5, menuFile);
 
-      hbexec(command, getScreen()->displayString());
+        pos = command.find("$style");
+        if (pos != std::string::npos)
+            command.replace(pos, 6, styleFile);
+
+        hbexec(command, getScreen()->displayString());
     }
     break;
 
@@ -262,15 +268,11 @@ bool MenuManager::parseFile(FILE *file,
         continue;
       }
 
-      if (strcmp(label, "Run") == 0) {
-
-      } else {
-
         menu->insert(label,
                      HbScreen::Execute,
                      command,
                      icon);
-      }
+      
 
       break;
 

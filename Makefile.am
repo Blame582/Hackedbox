@@ -40,31 +40,33 @@ AM_CPPFLAGS = \
 bin_PROGRAMS = hackedbox hbsetbg
 
 hackedbox_SOURCES = \
-	src/BaseDisplay.cpp \
-	src/BaseMenu.cpp \
-	src/ClientMenu.cpp \
-	src/Clock.cpp \
-	src/Color.cpp \
-	src/ConfigMenu.cpp \
-	src/Font.cpp \
-	src/GCCache.cpp \
-	src/Hackedbox.cpp \
-	src/IconMenu.cpp \
-	src/Image.cpp \
-	src/ImageControl.cpp \
-	src/ImageLoader.cpp \
-	src/MenuManager.cpp \
-	src/Netizen.cpp \
-	src/Screen.cpp \
-	src/StyleEngine.cpp \
-	src/Texture.cpp \
-	src/Timer.cpp \
-	src/Util.cpp \
-	src/Window.cpp \
-	src/WindowMenu.cpp \
-	src/Workspace.cpp \
-	src/WorkspaceMenu.cpp \
-	src/main.cpp
+src/BaseDisplay.cpp \
+src/BaseMenu.cpp \
+src/ClientMenu.cpp \
+src/Clock.cpp \
+src/Color.cpp \
+src/ConfigMenu.cpp \
+src/Font.cpp \
+src/GCCache.cpp \
+src/Hackedbox.cpp \
+src/IconMenu.cpp \
+src/Image.cpp \
+src/ImageControl.cpp \
+src/ImageLoader.cpp \
+src/KeyManager.cpp \
+src/MenuManager.cpp \
+src/Netizen.cpp \
+src/Runbox.cpp \
+src/Screen.cpp \
+src/StyleEngine.cpp \
+src/Texture.cpp \
+src/Timer.cpp \
+src/Util.cpp \
+src/Window.cpp \
+src/WindowMenu.cpp \
+src/Workspace.cpp \
+src/WorkspaceMenu.cpp \
+src/main.cpp
 
 hackedbox_LDADD = \
 	$(PNG_LIBS) \

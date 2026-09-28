@@ -1,7 +1,6 @@
--- README.menu for HackedBox 0.8.x --
+-- README.menu for HackedBox 0.9.x --
 
 HackedBox Menu Configuration
-============================
 
 HackedBox menus are plain text files that define the commands, submenus,
 styles, workspaces, and other functions available from the root menu.
@@ -11,511 +10,553 @@ of the active menu is specified by the session.menuFile resource.
 
 The default menu installed with HackedBox is located under:
 
-    /usr/share/hackedbox/menu
+/usr/share/hackedbox/menu
 
 User-defined menus are normally kept in:
 
-    ~/.hackedbox/
-
-
+~/.hackedbox/
 Menu Syntax
------------
+
 A menu entry normally consists of up to three fields:
 
-    [tag] (label) {command}
+[tag] (label) {command}
 
-Some entries, including [exec], may also have an optional icon field:
+Some entries may also have an optional icon field:
 
-    [tag] (label) {command} </path/to/icon>
+[tag] (label) {command} </path/to/icon>
 
-The fields used depend on the tag. Some tags use only a label, while others
-use the label as a filename or use the command field for additional data.
+The fields used depend on the tag. Some tags use only a label, some use the
+label as a filename or directory, and some use the command field for
+additional data.
 
+Icons are enclosed in '<' and '>' and may be used by menu entries that
+support icons.
 
+For example:
+
+[exec] (Terminal) {xterm} </usr/share/icons/Papirus-Dark/24x24/apps/terminal.svg>
+
+[submenu] (Configuration) </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
 Menu Tags
----------
 
 [begin] (label)
 
-    Starts the root menu. The label is used as the menu title.
+Starts the root menu. The label is used as the menu title.
 
-    Example:
+Example:
 
-        [begin] (HackedBox)
+    [begin] (HackedBox)
 
-    A menu file must contain a [begin] entry. If HackedBox cannot find
-    a valid [begin] entry, the default menu is used.
-
+A menu file must contain a [begin] entry. If HackedBox cannot find
+a valid [begin] entry, the default menu is used.
 
 [end]
 
-    Ends the current menu or submenu.
+Ends the current menu or submenu.
 
-    Example:
+Example:
 
-        [end]
-
+    [end]
 
 [exec] (label) {command} </path/to/icon>
 
-    Adds an entry that executes the specified command when selected.
+Adds an entry that executes the specified command when selected.
 
-    Normal commands can be used:
+Normal commands can be used:
 
-        [exec] (Terminal) {xterm} 
-        [exec] (File Manager) {fileman}
-        [exec] (Web Browser) {firefox}
+    [exec] (Terminal) {xterm}
+    [exec] (File Manager) {fileman}
+    [exec] (Web Browser) {firefox}
 
-    HackedBox also provides special handling for the built-in RunBox.
+HackedBox also provides special handling for the built-in RunBox.
 
-    The built-in RunBox launcher is opened with:
+The built-in RunBox launcher is opened with:
 
-        [exec] (Run) {@launcher@}
+    [exec] (Run) {@launcher@}
 
-    The command @launcher@ is recognized by HackedBox and opens the
-    built-in RunBox instead of being passed to the shell.
+The command @launcher@ is recognized by HackedBox and opens the
+built-in RunBox instead of being passed to the shell.
 
-    Special menu variables may also be used in [exec] commands:
+Special menu variables may also be used in [exec] commands:
 
-        [exec] (Menu File) {hackedpad $menu}
-        [exec] (RC File) {hackedpad ~/.hackedbox/hackedbox.rc}
-        [exec] (Keys File) {hackedpad ~/.hackedbox/keybinds.rc}
-        [exec] (Style File) {hackedpad $style}
+    [exec] (Menu File) {cudatext $menu}
+    [exec] (RC File) {cudatext ~/.hackedbox/hackedbox.rc}
+    [exec] (Keys File) {cudatext ~/.hackedbox/keys}
+    [exec] (Style File) {cudatext $style}
 
-    [exec] entries may optionally specify an icon after the command field.
+[exec] entries may optionally specify an icon after the command field.
 
-    Example:
+Example:
 
-        [exec] (Cudatext) {cudatext}</usr/src/cudatext/cudatext-512.png>
+    [exec] (Cudatext) {cudatext} </usr/src/cudatext/cudatext-512.png>
 
-    The icon pathname is enclosed in '<' and '>'.
+The icon pathname is enclosed in '<' and '>'.
 
-    Hackedbox loads the icon using Imlib2 and displays it in the menu
-    item when the menu is drawn.
+The icon is optional. An [exec] entry without an icon remains valid:
 
-    The icon is optional. An [exec] entry without an icon remains valid:
+    [exec] (Terminal) {xterm}
 
-        [exec] (Terminal) {qterminal}
+The icon pathname may be absolute or may refer to any pathname that
+can be opened by the HackedBox process.
 
-    The icon pathname may be absolute or may refer to any pathname that
-    can be opened by the Hackedbox process.
-
-    Hackedbox scales the icon proportionally to fit the menu's icon area.
+HackedBox scales the icon proportionally to fit the menu's icon area.
 
 [exit] (label)
 
-    Adds an entry that exits HackedBox.
+Adds an entry that exits HackedBox.
 
-    Example:
+Example:
 
-        [exit] (Exit HackedBox)
+    [exit] (Exit HackedBox)
 
-    Open windows are reparented to the root window before HackedBox exits.
-
+Open windows are reparented to the root window before HackedBox exits.
 
 [include] (filename)
 
-    Includes another menu file at the current location.
+Includes another menu file at the current location.
 
-    The filename may be an absolute path or may begin with ~/ to refer
-    to the user's home directory.
+The filename must be enclosed in parentheses. Curly braces {}
+are not used for [include].
 
-    Example:
+The filename may be an absolute path or may begin with ~/ to refer
+to the user's home directory. Paths are not resolved relative to
+the directory containing the current menu file.
 
-        [include] (~/.hackedbox/menus/applications)
+Example:
 
-    The included file is parsed as part of the current menu.
+    [include] (~/.hackedbox/menus/applications)
 
+The included file is parsed as part of the current menu at the
+location of the [include] entry.
+
+If the filename is missing, cannot be opened, or is not a regular
+file, an error is reported and the include is skipped.
 
 [nop] (label)
 
-    Adds a non-operational menu item.
+Adds a non-operational menu item.
 
-    A [nop] entry can be used as a separator or section heading.
+A [nop] entry can be used as a separator or section heading.
 
-    The label is optional.
+The label is optional.
 
-    Examples:
+Examples:
 
-        [nop]
-        [nop] (Applications)
-
+    [nop]
+    [nop] (Applications)
 
 [style] (label) {filename}
 
-    Adds an entry that loads a style file.
+Adds an entry that loads a style file.
 
-    The filename may be an absolute path or may begin with ~/.
+The filename may be an absolute path or may begin with ~/.
 
-    Example:
+Example:
 
-        [style] (Default) {/usr/share/hackedbox/styles/Default}
+    [style] (Default) {/usr/share/hackedbox/styles/Default}
 
-    Selecting the entry loads that style.
+Selecting the entry loads that style.
 
+[submenu] (label) {title} <icon>
 
-[submenu] (label) {title}
+Creates a submenu.
 
-    Creates a submenu.
+The label is the name displayed in the parent menu.
 
-    The label is the name displayed in the parent menu.
+The optional command field specifies the submenu title. If no title
+is supplied, the label is used as the submenu title.
 
-    The optional command field specifies the submenu title. If no title
-    is supplied, the label is used as the submenu title.
+An optional icon may be specified after the label or title.
 
-    Example:
+Example:
 
-        [submenu] (Configuration) {HackedBox Configuration}
-            [exec] (Menu File) {hackedpad $menu}
-            [exec] (RC File) {hackedpad ~/.hackedbox/hackedbox.rc}
-            [exec] (Keys File) {hackedpad ~/.hackedbox/keybinds.rc}
-        [end]
+    [submenu] (Edit Config Files) </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
+        [exec] (menu) {cudatext $menu} </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
+        [exec] (rc) {cudatext ~/.hackedbox/hackedbox.rc} </usr/share/icons/Papirus-Dark/24x24/actions/edit.svg>
+        [exec] (keys) {cudatext ~/.hackedbox/keys} </usr/share/icons/Papirus-Dark/24x24/devices/input-keyboard.svg>
+        [exec] (Style) {cudatext $style} </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
+    [end]
 
-    Submenus may contain any other supported menu entries, including
-    additional submenus.
+A separate submenu title may be specified with the command field:
 
+    [submenu] (Configuration) {HackedBox Configuration}
+        [exec] (Menu File) {cudatext $menu}
+    [end]
+
+Submenus may contain any other supported menu entries, including
+additional submenus.
 
 [config] (label)
 
-    Adds the HackedBox configuration menu.
+Adds the HackedBox configuration menu.
 
-    Example:
+Example:
 
-        [config] (Configuration)
+    [config] (Configuration)
 
-    The configuration menu provides access to options stored in the
-    HackedBox configuration.
-
+The configuration menu provides access to options stored in the
+HackedBox configuration.
 
 [reconfig] (label)
 
-    Reloads the current HackedBox configuration.
+Reloads the current HackedBox configuration.
 
-    Example:
+Example:
 
-        [reconfig] (Reconfigure)
+    [reconfig] (Reconfigure)
 
-    This reloads the menu and style configuration without requiring
-    HackedBox to be completely restarted.
-
+This reloads the menu and style configuration without requiring
+HackedBox to be completely restarted.
 
 [restart] (label) {command}
 
-    Restarts HackedBox.
+Restarts HackedBox.
 
-    If a command is supplied, HackedBox restarts using that command.
+If a command is supplied, HackedBox restarts using that command.
 
-    Example:
+Examples:
 
-        [restart] (Restart HackedBox)
-        [restart] (Restart Other WM) {otherwm}
+    [restart] (Restart HackedBox)
+    [restart] (Restart Other WM) {otherwm}
 
-    If no command is supplied, HackedBox restarts itself.
-
+If no command is supplied, HackedBox restarts itself.
 
 [workspaces] (label)
 
-    Adds the HackedBox workspace menu to the current menu.
+Adds the HackedBox workspace menu to the current menu.
 
-    Example:
+Example:
 
-        [workspaces] (Workspaces)
+    [workspaces] (Workspaces)
 
+[clock]
+
+Adds the HackedBox clock item to the current menu.
+
+The clock format is controlled by the current menu/style configuration.
+
+Example:
+
+    [clock]
+
+[date]
+
+Adds the HackedBox date item to the current menu.
+
+The date format is controlled by the current menu/style configuration.
+
+Example:
+
+    [date]
 
 [stylesdir] (directory)
 
-    Scans a directory for style files and adds the discovered files to
-    the current menu.
+Scans a directory for style files and adds the discovered files to
+the current menu.
 
-    The directory may be an absolute path or may begin with ~/.
+The directory may be an absolute path or may begin with ~/.
 
-    Example:
+Example:
 
-        [submenu] (Styles) {Choose a style...}
-            [nop] ( *** User Styles *** )
-            [stylesdir] (~/.hackedbox/styles)
-        [end]
+    [submenu] (Styles) {Choose a style...}
+        [nop] ( *** User Styles *** )
+        [stylesdir] (~/.hackedbox/styles)
+    [end]
 
-    HackedBox scans the directory when the menu is parsed. Regular files
-    found in the directory are added as style entries automatically.
+HackedBox scans the directory when the menu is parsed. Regular files
+found in the directory are added as style entries automatically.
 
-    The files are sorted alphabetically before they are added to the menu.
+The files are sorted alphabetically before they are added to the menu.
 
-    Files ending in '~' are ignored.
+Files ending in '~' are ignored.
 
-    Each discovered filename becomes the menu label and the complete
-    pathname becomes the style file loaded when that entry is selected.
+Each discovered filename becomes the menu label and the complete
+pathname becomes the style file loaded when that entry is selected.
 
-    For example, if the directory contains:
+For example, if the directory contains:
 
-        ~/.hackedbox/styles/Default
-        ~/.hackedbox/styles/BlueNight
-        ~/.hackedbox/styles/Dark
+    ~/.hackedbox/styles/Default
+    ~/.hackedbox/styles/BlueNight
+    ~/.hackedbox/styles/Dark
 
-    The resulting menu contains entries equivalent to:
+The resulting menu contains entries equivalent to:
 
-        [style] (BlueNight) {~/.hackedbox/styles/BlueNight}
-        [style] (Dark)     {~/.hackedbox/styles/Dark}
-        [style] (Default) {~/.hackedbox/styles/Default}
+    [style] (BlueNight) {~/.hackedbox/styles/BlueNight}
+    [style] (Dark) {~/.hackedbox/styles/Dark}
+    [style] (Default) {~/.hackedbox/styles/Default}
 
-    This makes [stylesdir] useful for user-managed style collections.
-    Adding or removing a style file changes the generated style menu the
-    next time the menu is parsed or HackedBox is reconfigured.
+This makes [stylesdir] useful for user-managed style collections.
 
+Adding or removing a style file changes the generated style menu the
+next time the menu is parsed or HackedBox is reconfigured.
 
+[stylesmenu] (label) {directory}
+
+Creates a submenu populated from a style directory.
+
+The label becomes the submenu name. The directory is supplied in
+the command field.
+
+The directory may be an absolute path or may begin with ~/.
+
+Example:
+
+    [stylesmenu] (User Styles) {~/.hackedbox/styles}
+
+HackedBox scans the directory and adds regular files as style entries.
+
+The files are sorted alphabetically before they are added to the menu.
+
+Files ending in '~' are ignored.
+
+Unlike [stylesdir], [stylesmenu] creates a separate submenu for the
+discovered styles.
 Special Variables
------------------
 
 HackedBox provides variables that can be used inside command fields.
 
-
 $menu
 
-    Expands to the path of the currently active menu file.
+Expands to the path of the currently active menu file.
 
-    Example:
+The value comes from HackedBox's current menu configuration,
+specifically the session.menuFile resource.
 
-        [exec] (Menu File) {hackedpad $menu}
+Example:
 
-    This allows a menu entry to open the menu currently being used by
-    HackedBox without hard-coding its pathname.
+    [exec] (Menu File) {cudatext $menu}
 
+This allows a menu entry to open the menu currently being used by
+HackedBox without hard-coding its pathname.
 
 $style
 
-    Expands to the path of the currently active style file.
+Expands to the path of the currently active style file.
 
-    Example:
+The value comes from HackedBox's current style configuration.
 
-        [exec] (Style File) {hackedpad $style}
+Example:
 
-    This allows a menu entry to open the style currently being used by
-    HackedBox.
+    [exec] (Style File) {cudatext $style}
 
+This allows a menu entry to open the style currently being used by
+HackedBox without hard-coding its pathname.
 
 @launcher@
 
-    Opens the built-in HackedBox RunBox launcher.
+Opens the built-in HackedBox RunBox launcher.
 
-    Example:
+Example:
 
-        [exec] (Run) {@launcher@}
+    [exec] (Run) {@launcher@}
 
-    @launcher@ is a HackedBox menu command and is not executed as an
-    external program.
-
-
+@launcher@ is a HackedBox menu command and is not executed as an
+external program.
 Comments
---------
 
 Comments may be placed on any line by making '#' the first character.
 
 Example:
 
-    # Applications
-    [exec] (Terminal) {xterm}
+# Applications
+[exec] (Terminal) {xterm}
 
 Comments must begin with '#' at the start of the line.
 
-
 Escaping
---------
 
-The menu parser uses brackets, parentheses, and braces to identify the
-different fields.
+The menu parser uses brackets, parentheses, braces, and angle brackets
+to identify the different fields.
 
 Characters that conflict with the menu syntax may be escaped with a
 backslash where supported by the parser.
 
 For example:
 
-    [exec] (My \(Terminal\)) {xterm}
+[exec] (My \(Terminal\)) {xterm}
 
 A literal backslash is written as:
 
-    \\
+\\
 
 Avoid unnecessary escaping in normal commands.
 
-
 Menu File Location
-------------------
 
 The active menu file is selected using the session.menuFile resource.
 
 Example:
 
-    session.menuFile: ~/.hackedbox/menu
+session.menuFile: ~/.hackedbox/menu
 
 An absolute path may also be used:
 
-    session.menuFile: /home/user/.hackedbox/menu
+session.menuFile: /home/user/.hackedbox/menu
 
 The menu file can therefore be changed without modifying the HackedBox
 executable.
 
 User configuration files are normally stored in:
 
-    ~/.hackedbox/
+~/.hackedbox/
 
 System-wide HackedBox data is normally installed under:
 
-    /usr/share/hackedbox/
+/usr/share/hackedbox/
 
 Do not assume that the system-installed menu is the active menu. A user
 may replace it with a custom menu simply by changing session.menuFile.
 
-
 Creating a Basic Menu
----------------------
 
 A minimal working menu consists of a [begin] and [end] entry:
 
-    [begin] (HackedBox)
+[begin] (HackedBox)
 
-        [exec] (Terminal) {xterm}
-        [exit] (Exit HackedBox)
+    [exec] (Terminal) {xterm}
+    [exit] (Exit HackedBox)
 
-    [end]
-
+[end]
 
 A more useful menu might look like:
 
-    [begin] (HackedBox)
+[begin] (HackedBox)
 
-        [exec] (Run) {@launcher@}
+    [exec] (Run) {@launcher@}
 
-        [nop]
+    [nop]
 
-        [exec] (Terminal) {xterm}
-        [exec] (File Manager) {fileman}
-        [exec] (Web Browser) {firefox}
+    [exec] (Terminal) {xterm}
+    [exec] (File Manager) {fileman}
+    [exec] (Web Browser) {firefox}
 
-        [submenu] (Configuration) {HackedBox Configuration}
-            [exec] (Menu File) {hackedpad $menu}
-            [exec] (RC File) {hackedpad ~/.hackedbox/hackedbox.rc}
-            [exec] (Keys File) {hackedpad ~/.hackedbox/keybinds.rc}
-            [exec] (Style File) {hackedpad $style}
-        [end]
-
-        [submenu] (Styles) {Choose a style...}
-            [nop] ( *** User Styles *** )
-            [stylesdir] (~/.hackedbox/styles)
-        [end]
-
-        [nop]
-
-        [workspaces] (Workspaces)
-
-        [reconfig] (Reconfigure)
-        [restart] (Restart HackedBox)
-        [exit] (Exit HackedBox)
-
+    [submenu] (Configuration) {HackedBox Configuration}
+        [exec] (Menu File) {cudatext $menu}
+        [exec] (RC File) {cudatext ~/.hackedbox/hackedbox.rc}
+        [exec] (Keys File) {cudatext ~/.hackedbox/keys}
+        [exec] (Style File) {cudatext $style}
     [end]
 
+    [submenu] (Styles) {Choose a style...}
+        [nop] ( *** User Styles *** )
+        [stylesdir] (~/.hackedbox/styles)
+    [end]
 
+    [nop]
+
+    [workspaces] (Workspaces)
+
+    [clock]
+    [date]
+
+    [reconfig] (Reconfigure)
+    [restart] (Restart HackedBox)
+    [exit] (Exit HackedBox)
+
+[end]
 Styles
-------
 
 Styles can be added individually using the [style] tag.
 
 Example:
 
-    [submenu] (Styles) {HackedBox Styles}
-        [style] (Default) {/usr/share/hackedbox/styles/Default}
-        [style] (Default) {~/.hackedbox/styles/Default}
-    [end]
+[submenu] (Styles) {HackedBox Styles}
+    [style] (Default) {/usr/share/hackedbox/styles/Default}
+    [style] (Default) {~/.hackedbox/styles/Default}
+[end]
 
 For directories containing multiple user styles, [stylesdir] can be used
 instead:
 
-    [submenu] (Styles) {Choose a style...}
-        [nop] ( *** User Styles *** )
-        [stylesdir] (~/.hackedbox/styles)
-    [end]
+[submenu] (Styles) {Choose a style...}
+    [nop] ( *** User Styles *** )
+    [stylesdir] (~/.hackedbox/styles)
+[end]
 
 [style] creates one explicitly named style entry.
 
 [stylesdir] scans a directory and creates the style entries automatically.
 
+[stylesmenu] creates a submenu and populates it from a style directory.
+
 Style configuration is documented separately in README.style.
 
-Default Entries:    
-    
-    [submenu] (Styles) {Choose a style...}
-        [nop] ( *** User Styles *** )
-        [stylesdir] (~/.hackedbox/styles)
-        [nop] ( *** System Styles *** )
-        [stylesdir] (/usr/share/hackedbox/styles)
-    [end]
+Default Entries:
 
+[submenu] (Styles) {Choose a style...}
+    [nop] ( *** User Styles *** )
+    [stylesdir] (~/.hackedbox/styles)
+    [nop] ( *** System Styles *** )
+    [stylesdir] (/usr/share/hackedbox/styles)
+[end]
 Reconfiguring After Changes
----------------------------
 
 The [reconfig] menu entry can be used while developing or modifying a
 menu or style.
 
 Example:
 
-    [reconfig] (Reconfigure)
+[reconfig] (Reconfigure)
 
 Selecting this entry causes HackedBox to reload its current configuration.
 
 This is useful when testing menu and style changes without completely
 restarting the window manager.
 
-
 Menu Includes
--------------
 
 Large menus can be split into multiple files using [include].
 
 For example, the main menu may contain:
 
-    [begin] (HackedBox)
+[begin] (HackedBox)
 
-        [include] (~/.hackedbox/menus/applications)
-        [include] (~/.hackedbox/menus/system)
+    [include] (~/.hackedbox/menus/applications)
+    [include] (~/.hackedbox/menus/system)
 
-        [exit] (Exit HackedBox)
+    [exit] (Exit HackedBox)
 
-    [end]
+[end]
 
 The included files are parsed at the location of the [include] entry.
 
+The filename is placed in parentheses. The {command} syntax used by
+[exec] is not used by [include].
+
+Included paths may be absolute or may begin with ~/.
+
+Paths are not resolved relative to the directory containing the current
+menu file.
 
 Menu File and Style File Editing
---------------------------------
 
 A convenient configuration submenu can use HackedBox's special variables:
 
-    [submenu] (Configuration) {HackedBox Configuration}
+[submenu] (Edit Config Files) </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
+    [exec] (menu) {cudatext $menu} </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
+    [exec] (rc) {cudatext ~/.hackedbox/hackedbox.rc} </usr/share/icons/Papirus-Dark/24x24/actions/edit.svg>
+    [exec] (keys) {cudatext ~/.hackedbox/keys} </usr/share/icons/Papirus-Dark/24x24/devices/input-keyboard.svg>
+    [exec] (Style) {cudatext $style} </usr/share/icons/Papirus-Dark/24x24/actions/configure.svg>
+[end]
 
-        [exec] (Menu File) {hackedpad $menu}
-        [exec] (RC File) {hackedpad ~/.hackedbox/hackedbox.rc}
-        [exec] (Keys File) {hackedpad ~/.hackedbox/keybinds.rc}
-        [exec] (Style File) {hackedpad $style}
+$menu refers to the path of the currently active menu as maintained by
+HackedBox's menu configuration.
 
-    [end]
+$style refers to the path of the currently active style as maintained by
+HackedBox's style configuration.
 
-$menu refers to the currently active menu file.
-
-$style refers to the currently active style file.
-
-These variables prevent the menu from needing hard-coded paths to the
-currently active configuration files.
-
+These variables allow configuration entries to follow the active menu
+and style without hard-coded paths.
 
 Notes on User Configuration
-----------------------------
 
 HackedBox maintains configuration information in:
 
-    ~/.hackedbox/
+~/.hackedbox/
 
 The menu file is selected through:
 
-    session.menuFile
+session.menuFile
 
 Other configuration files, including key bindings and the main HackedBox
 configuration, are stored separately.
@@ -525,20 +566,20 @@ modified, or replaced without rebuilding HackedBox.
 
 After modifying a menu, use [reconfig] to reload it.
 
-
 Supported Menu Tags Summary
----------------------------
-
-    [begin]       Start a menu
-    [end]         End a menu or submenu
-    [exec]        Execute a command or open the built-in RunBox
-    [exit]        Exit HackedBox
-    [include]     Include another menu file
-    [nop]         Non-operational menu item
-    [style]       Load a specific style
-    [stylesdir]   Generate a menu from a style directory
-    [submenu]     Create a submenu
-    [config]      Add the configuration menu
-    [reconfig]    Reload configuration
-    [restart]     Restart HackedBox
-    [workspaces]  Add the workspace menu
+[begin]       Start a menu
+[end]          End a menu or submenu
+[exec]         Execute a command
+[exit]         Exit HackedBox
+[include]      Include another menu file
+[nop]          Non-operational menu item
+[style]        Load a specific style
+[stylesdir]    Generate style entries from a directory
+[stylesmenu]   Create a submenu from a style directory
+[submenu]      Create a submenu
+[config]       Add the configuration menu
+[reconfig]     Reload configuration
+[restart]      Restart HackedBox
+[workspaces]   Add the workspace menu
+[clock]        Add the clock Line
+[date]         Add the date Line

@@ -185,10 +185,23 @@ const std::string& path)
 std::map<std::string, std::string> values;
 
 
+std::fprintf(
+    stderr,
+    "HbSudo: opening style file '%s'\n",
+    path.c_str()
+);
+
 std::ifstream file(path);
 
-if (!file)
+if (!file) {
+    std::fprintf(
+        stderr,
+        "HbSudo: FAILED to open style file '%s'\n",
+        path.c_str()
+    );
+
     return values;
+}
 
 std::string line;
 
@@ -212,6 +225,12 @@ while (std::getline(file, line)) {
     if (!key.empty())
         values[key] = value;
 }
+
+std::fprintf(
+    stderr,
+    "HbSudo: loaded %zu style values\n",
+    values.size()
+);
 
 return values;
 
@@ -237,13 +256,25 @@ static std::string get_style_file()
 std::string rc_path = get_hackedbox_rc();
 
 
+std::fprintf(
+    stderr,
+    "HbSudo: hackedbox.rc = '%s'\n",
+    rc_path.c_str()
+);
+
 if (rc_path.empty())
     return std::string();
 
 std::ifstream file(rc_path);
 
-if (!file)
+if (!file) {
+    std::fprintf(
+        stderr,
+        "HbSudo: FAILED to open hackedbox.rc\n"
+    );
+
     return std::string();
+}
 
 std::string line;
 
@@ -264,8 +295,22 @@ while (std::getline(file, line)) {
     if (key != "session.styleFile")
         continue;
 
-    return trim(line.substr(colon + 1));
+    std::string path =
+        trim(line.substr(colon + 1));
+
+    std::fprintf(
+        stderr,
+        "HbSudo: session.styleFile = '%s'\n",
+        path.c_str()
+    );
+
+    return path;
 }
+
+std::fprintf(
+    stderr,
+    "HbSudo: session.styleFile not found\n"
+);
 
 return std::string();
 
@@ -277,8 +322,14 @@ static void load_dialog_style(DialogStyle& style)
 std::string style_path = get_style_file();
 
 
-if (style_path.empty())
+if (style_path.empty()) {
+    std::fprintf(
+        stderr,
+        "HbSudo: no style path, using compiled defaults\n"
+    );
+
     return;
+}
 
 std::map<std::string, std::string> values =
     read_style_file(style_path);
@@ -295,80 +346,250 @@ auto find_value =
 
 if (const std::string* value =
         find_value("window.dialog.font")) {
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.font = '%s'\n",
+        value->c_str()
+    );
+
     if (!value->empty())
         style.font = *value;
 }
 
 if (const std::string* value =
         find_value("window.dialog.bgcolor")) {
-    parse_color(*value, style.background);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.bgcolor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.background))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.bgcolor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.inputColor")) {
-    parse_color(*value, style.input);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.inputColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.input))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.inputColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.inputTextColor")) {
-    parse_color(*value, style.input_text);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.inputTextColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.input_text))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.inputTextColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.textColor")) {
-    parse_color(*value, style.text);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.textColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.text))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.textColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.accentColor")) {
-    parse_color(*value, style.accent);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.accentColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.accent))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.accentColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.borderColor")) {
-    parse_color(*value, style.border);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.borderColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.border))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.borderColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.borderColor.focus")) {
-    parse_color(*value, style.focus_border);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.borderColor.focus = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.focus_border))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.borderColor.focus\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.buttonColor")) {
-    parse_color(*value, style.button);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.buttonColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.button))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.buttonColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.buttonColorTo")) {
-    parse_color(*value, style.button_to);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.buttonColorTo = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.button_to))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.buttonColorTo\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.buttonTextColor")) {
-    parse_color(*value, style.button_text);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.buttonTextColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.button_text))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.buttonTextColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.buttonFocusColor")) {
-    parse_color(*value, style.button_focus);
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.buttonFocusColor = '%s'\n",
+        value->c_str()
+    );
+
+    if (!parse_color(*value, style.button_focus))
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.buttonFocusColor\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.borderWidth")) {
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.borderWidth = '%s'\n",
+        value->c_str()
+    );
+
     unsigned int number = 0;
 
     if (parse_unsigned(*value, number))
         style.border_width = number;
+    else
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.borderWidth\n"
+        );
 }
 
 if (const std::string* value =
         find_value("window.dialog.alpha")) {
+    std::fprintf(
+        stderr,
+        "HbSudo: window.dialog.alpha = '%s'\n",
+        value->c_str()
+    );
+
     unsigned int number = 0;
 
     if (parse_unsigned(*value, number))
         style.alpha = number;
+    else
+        std::fprintf(
+            stderr,
+            "HbSudo: failed to parse window.dialog.alpha\n"
+        );
 }
+
+std::fprintf(
+    stderr,
+    "HbSudo: final style font='%s' "
+    "background=#%06lX "
+    "input=#%06lX "
+    "input_text=#%06lX "
+    "text=#%06lX "
+    "accent=#%06lX "
+    "border=#%06lX "
+    "focus_border=#%06lX "
+    "button=#%06lX "
+    "button_to=#%06lX "
+    "button_text=#%06lX "
+    "button_focus=#%06lX "
+    "border_width=%u "
+    "alpha=%u\n",
+    style.font.c_str(),
+    style.background,
+    style.input,
+    style.input_text,
+    style.text,
+    style.accent,
+    style.border,
+    style.focus_border,
+    style.button,
+    style.button_to,
+    style.button_text,
+    style.button_focus,
+    style.border_width,
+    style.alpha
+);
 
 
 }

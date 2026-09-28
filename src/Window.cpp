@@ -1120,150 +1120,150 @@ void HackedboxWindow::getMWMHints(void) {
  * they are not.
  */
 bool HackedboxWindow::getHackedboxHints(void) {
-  int format;
-  Atom atom_return;
-  unsigned long num, len;
-  HackedboxHints *hackedbox_hint = 0;
+    int format;
+    Atom atom_return;
+    unsigned long num, len;
+    HackedboxHints *hackedbox_hint = 0;
 
-  int ret = XGetWindowProperty(hackedbox->getXDisplay(), client.window,
-                               hackedbox->getHackedboxHintsAtom(), 0,
-                               PropHackedboxHintsElements, False,
-                               hackedbox->getHackedboxHintsAtom(), &atom_return,
-                               &format, &num, &len,
-                               (unsigned char **) &hackedbox_hint);
-  if (ret != Success || ! hackedbox_hint || num != PropHackedboxHintsElements)
-    return False;
+    int ret = XGetWindowProperty(hackedbox->getXDisplay(), client.window,
+                                 hackedbox->getHackedboxHintsAtom(), 0,
+                                 PropHackedboxHintsElements, False,
+                                 hackedbox->getHackedboxHintsAtom(), &atom_return,
+                                 &format, &num, &len,
+                                 (unsigned char **) &hackedbox_hint);
+    if (ret != Success || ! hackedbox_hint || num != PropHackedboxHintsElements)
+        return False;
 
-  if (hackedbox_hint->flags & AttribShaded)
-    flags.shaded = (hackedbox_hint->attrib & AttribShaded);
+    if (hackedbox_hint->flags & AttribShaded)
+        flags.shaded = (hackedbox_hint->attrib & AttribShaded);
 
-  if ((hackedbox_hint->flags & AttribMaxHoriz) &&
-      (hackedbox_hint->flags & AttribMaxVert))
-    flags.maximized = (hackedbox_hint->attrib &
-                       (AttribMaxHoriz | AttribMaxVert)) ? 1 : 0;
-  else if (hackedbox_hint->flags & AttribMaxVert)
-    flags.maximized = (hackedbox_hint->attrib & AttribMaxVert) ? 2 : 0;
-  else if (hackedbox_hint->flags & AttribMaxHoriz)
-    flags.maximized = (hackedbox_hint->attrib & AttribMaxHoriz) ? 3 : 0;
+    if ((hackedbox_hint->flags & AttribMaxHoriz) &&
+        (hackedbox_hint->flags & AttribMaxVert))
+        flags.maximized = (hackedbox_hint->attrib &
+                           (AttribMaxHoriz | AttribMaxVert)) ? 1 : 0;
+    else if (hackedbox_hint->flags & AttribMaxVert)
+        flags.maximized = (hackedbox_hint->attrib & AttribMaxVert) ? 2 : 0;
+    else if (hackedbox_hint->flags & AttribMaxHoriz)
+        flags.maximized = (hackedbox_hint->attrib & AttribMaxHoriz) ? 3 : 0;
 
-  if (hackedbox_hint->flags & AttribOmnipresent)
-    flags.stuck = (hackedbox_hint->attrib & AttribOmnipresent);
+    if (hackedbox_hint->flags & AttribOmnipresent)
+        flags.stuck = (hackedbox_hint->attrib & AttribOmnipresent);
 
-  if (hackedbox_hint->flags & AttribWorkspace)
-    hackedbox_attrib.workspace = hackedbox_hint->workspace;
+    if (hackedbox_hint->flags & AttribWorkspace)
+        hackedbox_attrib.workspace = hackedbox_hint->workspace;
 
-  // if (hackedbox_hint->flags & AttribStack)
-  //   don't yet have always on top/bottom for hackedbox yet... working
-  //   on that
+    // if (hackedbox_hint->flags & AttribStack)
+    //   don't yet have always on top/bottom for hackedbox yet... working
+    //   on that
 
-  if (hackedbox_hint->flags & AttribDecoration) {
-    switch (hackedbox_hint->decoration) {
-    case DecorNone:
-      decorations = 0;
+    if (hackedbox_hint->flags & AttribDecoration) {
+        switch (hackedbox_hint->decoration) {
+        case DecorNone:
+            decorations = 0;
 
-      break;
+            break;
 
-    case DecorTiny:
-      decorations |= Decor_Titlebar | Decor_Iconify;
-      decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
-      functions &= ~(Func_Resize | Func_Maximize);
+        case DecorTiny:
+            decorations |= Decor_Titlebar | Decor_Iconify;
+            decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
+            functions &= ~(Func_Resize | Func_Maximize);
 
-      break;
+            break;
 
-    case DecorTool:
-      decorations |= Decor_Titlebar;
-      decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
-      functions &= ~(Func_Resize | Func_Maximize | Func_Iconify);
+        case DecorTool:
+            decorations |= Decor_Titlebar;
+            decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
+            functions &= ~(Func_Resize | Func_Maximize | Func_Iconify);
 
-      break;
+            break;
 
-    case DecorNormal:
-    default:
-      decorations |= Decor_Titlebar | Decor_Border | Decor_Handle |
-                     Decor_Iconify | Decor_Maximize;
-      break;
+        case DecorNormal:
+        default:
+            decorations |= Decor_Titlebar | Decor_Border | Decor_Handle |
+                           Decor_Iconify | Decor_Maximize;
+            break;
+        }
+
+        reconfigure();
     }
-
-    reconfigure();
-  }
-  XFree(hackedbox_hint);
-  return True;
+    XFree(hackedbox_hint);
+    return True;
 }
 
 
 void HackedboxWindow::getTransientInfo(void) {
-  if (client.transient_for &&
-      client.transient_for != (HackedboxWindow *) ~0ul) {
-    // reset transient_for in preparation of looking for a new owner
-    client.transient_for->client.transientList.remove(this);
-  }
-
-  // we have no transient_for until we find a new one
-  client.transient_for = (HackedboxWindow *) 0;
-
-  Window trans_for;
-  if (!XGetTransientForHint(hackedbox->getXDisplay(), client.window,
-                            &trans_for)) {
-    // transient_for hint not set
-    return;
-  }
-
-  if (trans_for == client.window) {
-    // wierd client... treat this window as a normal window
-    return;
-  }
-
-  if (trans_for == None || trans_for == screen->getRootWindow()) {
-    // this is an undocumented interpretation of the ICCCM. a transient
-    // associated with None/Root/itself is assumed to be a modal root
-    // transient.  we don't support the concept of a global transient,
-    // so we just associate this transient with nothing, and perhaps
-    // we will add support later for global modality.
-    client.transient_for = (HackedboxWindow *) ~0ul;
-    flags.modal = True;
-    return;
-  }
-
-  client.transient_for = hackedbox->searchWindow(trans_for);
-  if (! client.transient_for &&
-      client.window_group && trans_for == client.window_group) {
-    // no direct transient_for, perhaps this is a group transient?
-    HbWindowGroup *group = hackedbox->searchGroup(client.window_group);
-    if (group) client.transient_for = group->find(screen);
-  }
-
-  if (! client.transient_for || client.transient_for == this) {
-    // no transient_for found, or we have a wierd client that wants to be
-    // a transient for itself, so we treat this window as a normal window
-    client.transient_for = (HackedboxWindow*) 0;
-    return;
-  }
-
-  // Check for a circular transient state: this can lock up Hackedbox
-  // when it tries to find the non-transient window for a transient.
-  HackedboxWindow *w = this;
-  while(w->client.transient_for &&
-        w->client.transient_for != (HackedboxWindow *) ~0ul) {
-    if(w->client.transient_for == this) {
-      client.transient_for = (HackedboxWindow*) 0;
-      break;
+    if (client.transient_for &&
+        client.transient_for != (HackedboxWindow *) ~0ul) {
+        // reset transient_for in preparation of looking for a new owner
+        client.transient_for->client.transientList.remove(this);
     }
-    w = w->client.transient_for;
-  }
 
-  if (client.transient_for) {
-    // register ourselves with our new transient_for
-    client.transient_for->client.transientList.push_back(this);
-    flags.stuck = client.transient_for->flags.stuck;
-  }
+    // we have no transient_for until we find a new one
+    client.transient_for = (HackedboxWindow *) 0;
+
+    Window trans_for;
+    if (!XGetTransientForHint(hackedbox->getXDisplay(), client.window,
+                              &trans_for)) {
+        // transient_for hint not set
+        return;
+    }
+
+    if (trans_for == client.window) {
+        // wierd client... treat this window as a normal window
+        return;
+    }
+
+    if (trans_for == None || trans_for == screen->getRootWindow()) {
+        // this is an undocumented interpretation of the ICCCM. a transient
+        // associated with None/Root/itself is assumed to be a modal root
+        // transient.  we don't support the concept of a global transient,
+        // so we just associate this transient with nothing, and perhaps
+        // we will add support later for global modality.
+        client.transient_for = (HackedboxWindow *) ~0ul;
+        flags.modal = True;
+        return;
+    }
+
+    client.transient_for = hackedbox->searchWindow(trans_for);
+    if (! client.transient_for &&
+        client.window_group && trans_for == client.window_group) {
+        // no direct transient_for, perhaps this is a group transient?
+        HbWindowGroup *group = hackedbox->searchGroup(client.window_group);
+        if (group) client.transient_for = group->find(screen);
+    }
+
+    if (! client.transient_for || client.transient_for == this) {
+        // no transient_for found, or we have a wierd client that wants to be
+        // a transient for itself, so we treat this window as a normal window
+        client.transient_for = (HackedboxWindow*) 0;
+        return;
+    }
+
+    // Check for a circular transient state: this can lock up Hackedbox
+    // when it tries to find the non-transient window for a transient.
+    HackedboxWindow *w = this;
+    while(w->client.transient_for &&
+           w->client.transient_for != (HackedboxWindow *) ~0ul) {
+        if(w->client.transient_for == this) {
+            client.transient_for = (HackedboxWindow*) 0;
+            break;
+        }
+        w = w->client.transient_for;
+    }
+
+    if (client.transient_for) {
+        // register ourselves with our new transient_for
+        client.transient_for->client.transientList.push_back(this);
+        flags.stuck = client.transient_for->flags.stuck;
+    }
 }
 
 
 HackedboxWindow *HackedboxWindow::getTransientFor(void) const {
-  if (client.transient_for &&
-      client.transient_for != (HackedboxWindow*) ~0ul)
-    return client.transient_for;
-  return 0;
+    if (client.transient_for &&
+        client.transient_for != (HackedboxWindow*) ~0ul)
+        return client.transient_for;
+    return 0;
 }
 
 
@@ -1274,791 +1274,791 @@ HackedboxWindow *HackedboxWindow::getTransientFor(void) const {
  * move.
  */
 void HackedboxWindow::configure(int dx, int dy,
-                               unsigned int dw, unsigned int dh) {
-  bool send_event = ((frame.rect.x() != dx || frame.rect.y() != dy) &&
-                     ! flags.moving);
+                                unsigned int dw, unsigned int dh) {
+    bool send_event = ((frame.rect.x() != dx || frame.rect.y() != dy) &&
+                       ! flags.moving);
 
-  if (dw != frame.rect.width() || dh != frame.rect.height()) {
-    frame.rect.setRect(dx, dy, dw, dh);
-    frame.inside_w = frame.rect.width() - (frame.border_w * 2);
-    frame.inside_h = frame.rect.height() - (frame.border_w * 2);
+    if (dw != frame.rect.width() || dh != frame.rect.height()) {
+        frame.rect.setRect(dx, dy, dw, dh);
+        frame.inside_w = frame.rect.width() - (frame.border_w * 2);
+        frame.inside_h = frame.rect.height() - (frame.border_w * 2);
 
-    if (frame.rect.right() <= 0 || frame.rect.bottom() <= 0)
-      frame.rect.setPos(0, 0);
+        if (frame.rect.right() <= 0 || frame.rect.bottom() <= 0)
+            frame.rect.setPos(0, 0);
 
-    client.rect.setCoords(frame.rect.left() + frame.margin.left,
-                          frame.rect.top() + frame.margin.top,
-                          frame.rect.right() - frame.margin.right,
-                          frame.rect.bottom() - frame.margin.bottom);
+        client.rect.setCoords(frame.rect.left() + frame.margin.left,
+                              frame.rect.top() + frame.margin.top,
+                              frame.rect.right() - frame.margin.right,
+                              frame.rect.bottom() - frame.margin.bottom);
 
 #ifdef    SHAPE
-    if (hackedbox->hasShapeExtensions() && flags.shaped) {
-      configureShape();
-    }
+        if (hackedbox->hasShapeExtensions() && flags.shaped) {
+            configureShape();
+        }
 #endif // SHAPE
 
-    positionWindows();
-    decorate();
-    redrawWindowFrame();
-  } else {
-    frame.rect.setPos(dx, dy);
+        positionWindows();
+        decorate();
+        redrawWindowFrame();
+    } else {
+        frame.rect.setPos(dx, dy);
 
-    XMoveWindow(hackedbox->getXDisplay(), frame.window,
-                frame.rect.x(), frame.rect.y());
-    /*
+        XMoveWindow(hackedbox->getXDisplay(), frame.window,
+                    frame.rect.x(), frame.rect.y());
+        /*
       we may have been called just after an opaque window move, so even though
       the old coords match the new ones no ConfigureNotify has been sent yet.
       There are likely other times when this will be relevant as well.
     */
-    if (! flags.moving) send_event = True;
-  }
+        if (! flags.moving) send_event = True;
+    }
 
-  if (send_event) {
-    // if moving, the update and event will occur when the move finishes
-    client.rect.setPos(frame.rect.left() + frame.margin.left,
-                       frame.rect.top() + frame.margin.top);
+    if (send_event) {
+        // if moving, the update and event will occur when the move finishes
+        client.rect.setPos(frame.rect.left() + frame.margin.left,
+                           frame.rect.top() + frame.margin.top);
 
-    XEvent event;
-    event.type = ConfigureNotify;
+        XEvent event;
+        event.type = ConfigureNotify;
 
-    event.xconfigure.display = hackedbox->getXDisplay();
-    event.xconfigure.event = client.window;
-    event.xconfigure.window = client.window;
-    event.xconfigure.x = client.rect.x();
-    event.xconfigure.y = client.rect.y();
-    event.xconfigure.width = client.rect.width();
-    event.xconfigure.height = client.rect.height();
-    event.xconfigure.border_width = client.old_bw;
-    event.xconfigure.above = frame.window;
-    event.xconfigure.override_redirect = False;
+        event.xconfigure.display = hackedbox->getXDisplay();
+        event.xconfigure.event = client.window;
+        event.xconfigure.window = client.window;
+        event.xconfigure.x = client.rect.x();
+        event.xconfigure.y = client.rect.y();
+        event.xconfigure.width = client.rect.width();
+        event.xconfigure.height = client.rect.height();
+        event.xconfigure.border_width = client.old_bw;
+        event.xconfigure.above = frame.window;
+        event.xconfigure.override_redirect = False;
 
-    XSendEvent(hackedbox->getXDisplay(), client.window, False,
-               StructureNotifyMask, &event);
-    screen->updateNetizenConfigNotify(&event);
-    XFlush(hackedbox->getXDisplay());
-  }
+        XSendEvent(hackedbox->getXDisplay(), client.window, False,
+                   StructureNotifyMask, &event);
+        screen->updateNetizenConfigNotify(&event);
+        XFlush(hackedbox->getXDisplay());
+    }
 }
 
 
 #ifdef SHAPE
 void HackedboxWindow::configureShape(void) {
-  XShapeCombineShape(hackedbox->getXDisplay(), frame.window, ShapeBounding,
-                     frame.margin.left - frame.border_w,
-                     frame.margin.top - frame.border_w,
-                     client.window, ShapeBounding, ShapeSet);
+    XShapeCombineShape(hackedbox->getXDisplay(), frame.window, ShapeBounding,
+                       frame.margin.left - frame.border_w,
+                       frame.margin.top - frame.border_w,
+                       client.window, ShapeBounding, ShapeSet);
 
-  int num = 0;
-  XRectangle xrect[2];
+    int num = 0;
+    XRectangle xrect[2];
 
-  if (decorations & Decor_Titlebar) {
-    xrect[0].x = xrect[0].y = -frame.border_w;
-    xrect[0].width = frame.rect.width();
-    xrect[0].height = frame.title_h + (frame.border_w * 2);
-    ++num;
-  }
+    if (decorations & Decor_Titlebar) {
+        xrect[0].x = xrect[0].y = -frame.border_w;
+        xrect[0].width = frame.rect.width();
+        xrect[0].height = frame.title_h + (frame.border_w * 2);
+        ++num;
+    }
 
-  if (decorations & Decor_Handle) {
-    xrect[1].x = -frame.border_w;
-    xrect[1].y = frame.rect.height() - frame.margin.bottom +
-                 frame.mwm_border_w - frame.border_w;
-    xrect[1].width = frame.rect.width();
-    xrect[1].height = frame.handle_h + (frame.border_w * 2);
-    ++num;
-  }
+    if (decorations & Decor_Handle) {
+        xrect[1].x = -frame.border_w;
+        xrect[1].y = frame.rect.height() - frame.margin.bottom +
+                     frame.mwm_border_w - frame.border_w;
+        xrect[1].width = frame.rect.width();
+        xrect[1].height = frame.handle_h + (frame.border_w * 2);
+        ++num;
+    }
 
-  XShapeCombineRectangles(hackedbox->getXDisplay(), frame.window,
-                          ShapeBounding, 0, 0, xrect, num,
-                          ShapeUnion, Unsorted);
+    XShapeCombineRectangles(hackedbox->getXDisplay(), frame.window,
+                            ShapeBounding, 0, 0, xrect, num,
+                            ShapeUnion, Unsorted);
 }
 #endif // SHAPE
 
 
 bool HackedboxWindow::setInputFocus(void) {
-  if (flags.focused) return True;
+    if (flags.focused) return True;
 
-  // do not give focus to a window that is about to close
-  if (! validateClient()) return False;
+    // do not give focus to a window that is about to close
+    if (! validateClient()) return False;
 
-  assert(! flags.iconic &&
-         (flags.stuck ||  // window must be on the current workspace or sticky
-          hackedbox_attrib.workspace == screen->getCurrentWorkspaceID()));
+    assert(! flags.iconic &&
+           (flags.stuck ||  // window must be on the current workspace or sticky
+            hackedbox_attrib.workspace == screen->getCurrentWorkspaceID()));
 
-  if (! frame.rect.intersects(screen->getRect())) {
-    // client is outside the screen, move it to the center
-    configure((screen->getWidth() - frame.rect.width()) / 2,
-              (screen->getHeight() - frame.rect.height()) / 2,
-              frame.rect.width(), frame.rect.height());
-  }
+    if (! frame.rect.intersects(screen->getRect())) {
+        // client is outside the screen, move it to the center
+        configure((screen->getWidth() - frame.rect.width()) / 2,
+                  (screen->getHeight() - frame.rect.height()) / 2,
+                  frame.rect.width(), frame.rect.height());
+    }
 
-  if (client.transientList.size() > 0) {
-    // transfer focus to any modal transients
-    HackedboxWindowList::iterator it, end = client.transientList.end();
-    for (it = client.transientList.begin(); it != end; ++it)
-      if ((*it)->flags.modal) return (*it)->setInputFocus();
-  }
+    if (client.transientList.size() > 0) {
+        // transfer focus to any modal transients
+        HackedboxWindowList::iterator it, end = client.transientList.end();
+        for (it = client.transientList.begin(); it != end; ++it)
+            if ((*it)->flags.modal) return (*it)->setInputFocus();
+    }
 
-  bool ret = True;
-  switch (focus_mode) {
-  case F_Passive:
-  case F_LocallyActive:
-    XSetInputFocus(hackedbox->getXDisplay(), client.window,
-                   RevertToPointerRoot, CurrentTime);
-    hackedbox->setFocusedWindow(this);
-    break;
+    bool ret = True;
+    switch (focus_mode) {
+    case F_Passive:
+    case F_LocallyActive:
+        XSetInputFocus(hackedbox->getXDisplay(), client.window,
+                       RevertToPointerRoot, CurrentTime);
+        hackedbox->setFocusedWindow(this);
+        break;
 
-  case F_GloballyActive:
-  case F_NoInput:
-    /*
+    case F_GloballyActive:
+    case F_NoInput:
+        /*
      * we could set the focus to none, since the window doesn't accept focus,
      * but we shouldn't set focus to nothing since this would surely make
      * someone angry
      */
-    ret = False;
-    break;
-  }
+        ret = False;
+        break;
+    }
 
-  if (flags.send_focus_message) {
-    XEvent ce;
-    ce.xclient.type = ClientMessage;
-    ce.xclient.message_type = hackedbox->getWMProtocolsAtom();
-    ce.xclient.display = hackedbox->getXDisplay();
-    ce.xclient.window = client.window;
-    ce.xclient.format = 32;
-    ce.xclient.data.l[0] = hackedbox->getWMTakeFocusAtom();
-    ce.xclient.data.l[1] = hackedbox->getLastTime();
-    ce.xclient.data.l[2] = 0l;
-    ce.xclient.data.l[3] = 0l;
-    ce.xclient.data.l[4] = 0l;
-    XSendEvent(hackedbox->getXDisplay(), client.window, False,
-               NoEventMask, &ce);
-    XFlush(hackedbox->getXDisplay());
-  }
+    if (flags.send_focus_message) {
+        XEvent ce;
+        ce.xclient.type = ClientMessage;
+        ce.xclient.message_type = hackedbox->getWMProtocolsAtom();
+        ce.xclient.display = hackedbox->getXDisplay();
+        ce.xclient.window = client.window;
+        ce.xclient.format = 32;
+        ce.xclient.data.l[0] = hackedbox->getWMTakeFocusAtom();
+        ce.xclient.data.l[1] = hackedbox->getLastTime();
+        ce.xclient.data.l[2] = 0l;
+        ce.xclient.data.l[3] = 0l;
+        ce.xclient.data.l[4] = 0l;
+        XSendEvent(hackedbox->getXDisplay(), client.window, False,
+                   NoEventMask, &ce);
+        XFlush(hackedbox->getXDisplay());
+    }
 
-  return ret;
+    return ret;
 }
 
 void HackedboxWindow::iconify(void) {
-//  showIcon();
+    //  showIcon();
 
     // walk up to the topmost transient_for that is not iconified
-  if (isTransient() &&
-      client.transient_for != (HackedboxWindow *) ~0ul &&
-      ! client.transient_for->isIconic()) {
+    if (isTransient() &&
+        client.transient_for != (HackedboxWindow *) ~0ul &&
+        ! client.transient_for->isIconic()) {
 
-    client.transient_for->iconify();
-    return;
-  }
+        client.transient_for->iconify();
+        return;
+    }
 
-  if (flags.iconic) return;
-  
-  /*
+    if (flags.iconic) return;
+
+    /*
    * unmap the frame window first, so when all the transients are
    * unmapped, we don't get an enter event in sloppy focus mode
    */
-  XUnmapWindow(hackedbox->getXDisplay(), frame.window);
-  flags.visible = False;
-  flags.iconic = True;
+    XUnmapWindow(hackedbox->getXDisplay(), frame.window);
+    flags.visible = False;
+    flags.iconic = True;
 
-  if (windowmenu) windowmenu->hide();
+    if (windowmenu) windowmenu->hide();
 
-  setState(IconicState);
+    setState(IconicState);
 
-  // iconify all transients first
-  if (client.transientList.size() > 0) {
-    std::for_each(client.transientList.begin(), client.transientList.end(),
-                  std::mem_fn(&HackedboxWindow::iconify));
-  }
-  
-  /*
+    // iconify all transients first
+    if (client.transientList.size() > 0) {
+        std::for_each(client.transientList.begin(), client.transientList.end(),
+                      std::mem_fn(&HackedboxWindow::iconify));
+    }
+
+    /*
    * remove the window from the workspace and add it to the screen's
    * icons *AFTER* we have process all transients.  since we always
    * iconify transients, it's pointless to have focus reverted to one
    * of them (since they are above their transient_for) for a split
    * second
    */
-  screen->getWorkspace(hackedbox_attrib.workspace)->removeWindow(this);
-  screen->addIcon(this);
+    screen->getWorkspace(hackedbox_attrib.workspace)->removeWindow(this);
+    screen->addIcon(this);
 
-  /*
+    /*
    * we don't want this XUnmapWindow call to generate an UnmapNotify event, so
    * we need to clear the event mask on client.window for a split second.
    * HOWEVER, since X11 is asynchronous, the window could be destroyed in that
    * split second, leaving us with a ghost window... so, we need to do this
    * while the X server is grabbed
    */
-  unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
-                             StructureNotifyMask;
-  XGrabServer(hackedbox->getXDisplay());
-  XSelectInput(hackedbox->getXDisplay(), client.window,
-               event_mask & ~StructureNotifyMask);
-  XUnmapWindow(hackedbox->getXDisplay(), client.window);
-  XSelectInput(hackedbox->getXDisplay(), client.window, event_mask);
-  XUngrabServer(hackedbox->getXDisplay());
+    unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
+                               StructureNotifyMask;
+    XGrabServer(hackedbox->getXDisplay());
+    XSelectInput(hackedbox->getXDisplay(), client.window,
+                 event_mask & ~StructureNotifyMask);
+    XUnmapWindow(hackedbox->getXDisplay(), client.window);
+    XSelectInput(hackedbox->getXDisplay(), client.window, event_mask);
+    XUngrabServer(hackedbox->getXDisplay());
 }
 
 
 void HackedboxWindow::show(void) {
-  current_state = (flags.shaded) ? IconicState : NormalState;
-  setState(current_state);
+    current_state = (flags.shaded) ? IconicState : NormalState;
+    setState(current_state);
 
-  XMapWindow(hackedbox->getXDisplay(), client.window);
-  XMapSubwindows(hackedbox->getXDisplay(), frame.window);
-  XMapWindow(hackedbox->getXDisplay(), frame.window);
+    XMapWindow(hackedbox->getXDisplay(), client.window);
+    XMapSubwindows(hackedbox->getXDisplay(), frame.window);
+    XMapWindow(hackedbox->getXDisplay(), frame.window);
 
 #ifdef DEBUG
-  int real_x, real_y;
-  Window child;
-  XTranslateCoordinates(hackedbox->getXDisplay(), client.window,
-                        screen->getRootWindow(),
-                        0, 0, &real_x, &real_y, &child);
-  fprintf(stderr, "%s", "%s -- assumed: (%d, %d), real: (%d, %d)\n", getTitle(),
-          client.rect.left(), client.rect.top(), real_x, real_y);
-  assert(client.rect.left() == real_x && client.rect.top() == real_y);
+    int real_x, real_y;
+    Window child;
+    XTranslateCoordinates(hackedbox->getXDisplay(), client.window,
+                          screen->getRootWindow(),
+                          0, 0, &real_x, &real_y, &child);
+    fprintf(stderr, "%s", "%s -- assumed: (%d, %d), real: (%d, %d)\n", getTitle(),
+            client.rect.left(), client.rect.top(), real_x, real_y);
+    assert(client.rect.left() == real_x && client.rect.top() == real_y);
 #endif
 
-  flags.visible = True;
-  flags.iconic = False;
+    flags.visible = True;
+    flags.iconic = False;
 }
 
 
 void HackedboxWindow::deiconify(bool reassoc, bool raise) {
-  XUnmapWindow(hackedbox->getXDisplay(),icon.window);
-    
-  if (flags.iconic || reassoc)
-    screen->reassociateWindow(this, BSENTINEL, False);
-  else if (hackedbox_attrib.workspace != screen->getCurrentWorkspaceID())
-    return;
+    XUnmapWindow(hackedbox->getXDisplay(),icon.window);
 
-  show();
+    if (flags.iconic || reassoc)
+        screen->reassociateWindow(this, BSENTINEL, False);
+    else if (hackedbox_attrib.workspace != screen->getCurrentWorkspaceID())
+        return;
 
-  // reassociate and deiconify all transients
-  if (reassoc && client.transientList.size() > 0) {
-    HackedboxWindowList::iterator it, end = client.transientList.end();
-    for (it = client.transientList.begin(); it != end; ++it)
-      (*it)->deiconify(True, False);
-  }
+    show();
 
-  if (raise)
-    screen->getWorkspace(hackedbox_attrib.workspace)->raiseWindow(this);
+    // reassociate and deiconify all transients
+    if (reassoc && client.transientList.size() > 0) {
+        HackedboxWindowList::iterator it, end = client.transientList.end();
+        for (it = client.transientList.begin(); it != end; ++it)
+            (*it)->deiconify(True, False);
+    }
+
+    if (raise)
+        screen->getWorkspace(hackedbox_attrib.workspace)->raiseWindow(this);
 }
 
 
 void HackedboxWindow::close(void) {
-  XEvent ce;
-  ce.xclient.type = ClientMessage;
-  ce.xclient.message_type = hackedbox->getWMProtocolsAtom();
-  ce.xclient.display = hackedbox->getXDisplay();
-  ce.xclient.window = client.window;
-  ce.xclient.format = 32;
-  ce.xclient.data.l[0] = hackedbox->getWMDeleteAtom();
-  ce.xclient.data.l[1] = CurrentTime;
-  ce.xclient.data.l[2] = 0l;
-  ce.xclient.data.l[3] = 0l;
-  ce.xclient.data.l[4] = 0l;
-  XSendEvent(hackedbox->getXDisplay(), client.window, False, NoEventMask, &ce);
-  XFlush(hackedbox->getXDisplay());
+    XEvent ce;
+    ce.xclient.type = ClientMessage;
+    ce.xclient.message_type = hackedbox->getWMProtocolsAtom();
+    ce.xclient.display = hackedbox->getXDisplay();
+    ce.xclient.window = client.window;
+    ce.xclient.format = 32;
+    ce.xclient.data.l[0] = hackedbox->getWMDeleteAtom();
+    ce.xclient.data.l[1] = CurrentTime;
+    ce.xclient.data.l[2] = 0l;
+    ce.xclient.data.l[3] = 0l;
+    ce.xclient.data.l[4] = 0l;
+    XSendEvent(hackedbox->getXDisplay(), client.window, False, NoEventMask, &ce);
+    XFlush(hackedbox->getXDisplay());
 }
 
 
 void HackedboxWindow::withdraw(void) {
-  setState(current_state);
+    setState(current_state);
 
-  flags.visible = False;
-  flags.iconic = False;
+    flags.visible = False;
+    flags.iconic = False;
 
-  XUnmapWindow(hackedbox->getXDisplay(), frame.window);
+    XUnmapWindow(hackedbox->getXDisplay(), frame.window);
 
-  XGrabServer(hackedbox->getXDisplay());
+    XGrabServer(hackedbox->getXDisplay());
 
-  unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
-                             StructureNotifyMask;
-  XSelectInput(hackedbox->getXDisplay(), client.window,
-               event_mask & ~StructureNotifyMask);
-  XUnmapWindow(hackedbox->getXDisplay(), client.window);
-  XSelectInput(hackedbox->getXDisplay(), client.window, event_mask);
+    unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
+                               StructureNotifyMask;
+    XSelectInput(hackedbox->getXDisplay(), client.window,
+                 event_mask & ~StructureNotifyMask);
+    XUnmapWindow(hackedbox->getXDisplay(), client.window);
+    XSelectInput(hackedbox->getXDisplay(), client.window, event_mask);
 
-  XUngrabServer(hackedbox->getXDisplay());
+    XUngrabServer(hackedbox->getXDisplay());
 
-  if (windowmenu) windowmenu->hide();
+    if (windowmenu) windowmenu->hide();
 }
 
 
 void HackedboxWindow::maximize(unsigned int button) {
-  // handle case where menu is open then the max button is used instead
-  if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
+    // handle case where menu is open then the max button is used instead
+    if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
 
-  if (flags.maximized) {
-    flags.maximized = 0;
+    if (flags.maximized) {
+        flags.maximized = 0;
 
-    hackedbox_attrib.flags &= ! (AttribMaxHoriz | AttribMaxVert);
-    hackedbox_attrib.attrib &= ! (AttribMaxHoriz | AttribMaxVert);
+        hackedbox_attrib.flags &= ! (AttribMaxHoriz | AttribMaxVert);
+        hackedbox_attrib.attrib &= ! (AttribMaxHoriz | AttribMaxVert);
 
-    /*
+        /*
       when a resize is begun, maximize(0) is called to clear any maximization
       flags currently set.  Otherwise it still thinks it is maximized.
       so we do not need to call configure() because resizing will handle it
     */
-    if (!flags.resizing)
-      configure(hackedbox_attrib.premax_x, hackedbox_attrib.premax_y,
-                hackedbox_attrib.premax_w, hackedbox_attrib.premax_h);
+        if (!flags.resizing)
+            configure(hackedbox_attrib.premax_x, hackedbox_attrib.premax_y,
+                      hackedbox_attrib.premax_w, hackedbox_attrib.premax_h);
 
-    hackedbox_attrib.premax_x = hackedbox_attrib.premax_y = 0;
-    hackedbox_attrib.premax_w = hackedbox_attrib.premax_h = 0;
+        hackedbox_attrib.premax_x = hackedbox_attrib.premax_y = 0;
+        hackedbox_attrib.premax_w = hackedbox_attrib.premax_h = 0;
 
+        redrawAllButtons(); // in case it is not called in configure()
+        setState(current_state);
+        return;
+    }
+
+    hackedbox_attrib.premax_x = frame.rect.x();
+    hackedbox_attrib.premax_y = frame.rect.y();
+    hackedbox_attrib.premax_w = frame.rect.width();
+    // use client.rect so that clients can be restored even if shaded
+    hackedbox_attrib.premax_h =
+        client.rect.height() + frame.margin.top + frame.margin.bottom;
+
+    const Rect &screen_area = screen->availableArea();
+    frame.changing = screen_area;
+
+    switch(button) {
+    case 1:
+        hackedbox_attrib.flags |= AttribMaxHoriz | AttribMaxVert;
+        hackedbox_attrib.attrib |= AttribMaxHoriz | AttribMaxVert;
+        break;
+
+    case 2:
+        hackedbox_attrib.flags |= AttribMaxVert;
+        hackedbox_attrib.attrib |= AttribMaxVert;
+
+        frame.changing.setX(hackedbox_attrib.premax_x);
+        frame.changing.setWidth(hackedbox_attrib.premax_w);
+        break;
+
+    case 3:
+        hackedbox_attrib.flags |= AttribMaxHoriz;
+        hackedbox_attrib.attrib |= AttribMaxHoriz;
+
+        frame.changing.setY(hackedbox_attrib.premax_y);
+        frame.changing.setHeight(hackedbox_attrib.premax_h);
+        break;
+    }
+
+    constrain(TopLeft);
+
+    if (flags.shaded) {
+        hackedbox_attrib.flags ^= AttribShaded;
+        hackedbox_attrib.attrib ^= AttribShaded;
+        flags.shaded = False;
+    }
+
+    flags.maximized = button;
+
+    configure(frame.changing.x(), frame.changing.y(),
+              frame.changing.width(), frame.changing.height());
     redrawAllButtons(); // in case it is not called in configure()
     setState(current_state);
-    return;
-  }
-
-  hackedbox_attrib.premax_x = frame.rect.x();
-  hackedbox_attrib.premax_y = frame.rect.y();
-  hackedbox_attrib.premax_w = frame.rect.width();
-  // use client.rect so that clients can be restored even if shaded
-  hackedbox_attrib.premax_h =
-    client.rect.height() + frame.margin.top + frame.margin.bottom;
-
-  const Rect &screen_area = screen->availableArea();
-  frame.changing = screen_area;
-
-  switch(button) {
-  case 1:
-    hackedbox_attrib.flags |= AttribMaxHoriz | AttribMaxVert;
-    hackedbox_attrib.attrib |= AttribMaxHoriz | AttribMaxVert;
-    break;
-
-  case 2:
-    hackedbox_attrib.flags |= AttribMaxVert;
-    hackedbox_attrib.attrib |= AttribMaxVert;
-
-    frame.changing.setX(hackedbox_attrib.premax_x);
-    frame.changing.setWidth(hackedbox_attrib.premax_w);
-    break;
-
-  case 3:
-    hackedbox_attrib.flags |= AttribMaxHoriz;
-    hackedbox_attrib.attrib |= AttribMaxHoriz;
-
-    frame.changing.setY(hackedbox_attrib.premax_y);
-    frame.changing.setHeight(hackedbox_attrib.premax_h);
-    break;
-  }
-
-  constrain(TopLeft);
-
-  if (flags.shaded) {
-    hackedbox_attrib.flags ^= AttribShaded;
-    hackedbox_attrib.attrib ^= AttribShaded;
-    flags.shaded = False;
-  }
-
-  flags.maximized = button;
-
-  configure(frame.changing.x(), frame.changing.y(),
-            frame.changing.width(), frame.changing.height());
-  redrawAllButtons(); // in case it is not called in configure()
-  setState(current_state);
 }
 
 
 // re-maximizes the window to take into account availableArea changes
 void HackedboxWindow::remaximize(void) {
-  if (flags.shaded) {
-    // we only update the window's attributes otherwise we lose the shade bit
-    switch(flags.maximized) {
-    case 1:
-      hackedbox_attrib.flags |= AttribMaxHoriz | AttribMaxVert;
-      hackedbox_attrib.attrib |= AttribMaxHoriz | AttribMaxVert;
-      break;
+    if (flags.shaded) {
+        // we only update the window's attributes otherwise we lose the shade bit
+        switch(flags.maximized) {
+        case 1:
+            hackedbox_attrib.flags |= AttribMaxHoriz | AttribMaxVert;
+            hackedbox_attrib.attrib |= AttribMaxHoriz | AttribMaxVert;
+            break;
 
-    case 2:
-      hackedbox_attrib.flags |= AttribMaxVert;
-      hackedbox_attrib.attrib |= AttribMaxVert;
-      break;
+        case 2:
+            hackedbox_attrib.flags |= AttribMaxVert;
+            hackedbox_attrib.attrib |= AttribMaxVert;
+            break;
 
-    case 3:
-      hackedbox_attrib.flags |= AttribMaxHoriz;
-      hackedbox_attrib.attrib |= AttribMaxHoriz;
-      break;
+        case 3:
+            hackedbox_attrib.flags |= AttribMaxHoriz;
+            hackedbox_attrib.attrib |= AttribMaxHoriz;
+            break;
+        }
+        return;
     }
-    return;
-  }
 
-  // save the original dimensions because maximize will wipe them out
-  int premax_x = hackedbox_attrib.premax_x,
-    premax_y = hackedbox_attrib.premax_y,
-    premax_w = hackedbox_attrib.premax_w,
-    premax_h = hackedbox_attrib.premax_h;
+    // save the original dimensions because maximize will wipe them out
+    int premax_x = hackedbox_attrib.premax_x,
+        premax_y = hackedbox_attrib.premax_y,
+        premax_w = hackedbox_attrib.premax_w,
+        premax_h = hackedbox_attrib.premax_h;
 
-  unsigned int button = flags.maximized;
-  flags.maximized = 0; // trick maximize() into working
-  maximize(button);
+    unsigned int button = flags.maximized;
+    flags.maximized = 0; // trick maximize() into working
+    maximize(button);
 
-  // restore saved values
-  hackedbox_attrib.premax_x = premax_x;
-  hackedbox_attrib.premax_y = premax_y;
-  hackedbox_attrib.premax_w = premax_w;
-  hackedbox_attrib.premax_h = premax_h;
+    // restore saved values
+    hackedbox_attrib.premax_x = premax_x;
+    hackedbox_attrib.premax_y = premax_y;
+    hackedbox_attrib.premax_w = premax_w;
+    hackedbox_attrib.premax_h = premax_h;
 }
 
 
 void HackedboxWindow::setWorkspace(unsigned int n) {
-  hackedbox_attrib.flags |= AttribWorkspace;
-  hackedbox_attrib.workspace = n;
+    hackedbox_attrib.flags |= AttribWorkspace;
+    hackedbox_attrib.workspace = n;
 }
 
 
 void HackedboxWindow::shade(void) {
-  if (flags.shaded) {
-    flags.shaded = False;
-    hackedbox_attrib.flags ^= AttribShaded;
-    hackedbox_attrib.attrib ^= AttribShaded;
+    if (flags.shaded) {
+        flags.shaded = False;
+        hackedbox_attrib.flags ^= AttribShaded;
+        hackedbox_attrib.attrib ^= AttribShaded;
 
-    if (flags.maximized) {
-      remaximize();
+        if (flags.maximized) {
+            remaximize();
+        } else {
+            XResizeWindow(hackedbox->getXDisplay(), frame.window,
+                          frame.inside_w, frame.inside_h);
+            // set the frame rect to the normal size
+            frame.rect.setHeight(client.rect.height() + frame.margin.top +
+                                 frame.margin.bottom);
+        }
+
+        setState(NormalState);
     } else {
-      XResizeWindow(hackedbox->getXDisplay(), frame.window,
-                    frame.inside_w, frame.inside_h);
-      // set the frame rect to the normal size
-      frame.rect.setHeight(client.rect.height() + frame.margin.top +
-                           frame.margin.bottom);
+        if (! (decorations & Decor_Titlebar))
+            return; // can't shade it without a titlebar!
+
+        XResizeWindow(hackedbox->getXDisplay(), frame.window,
+                      frame.inside_w, frame.title_h);
+        flags.shaded = True;
+        hackedbox_attrib.flags |= AttribShaded;
+        hackedbox_attrib.attrib |= AttribShaded;
+
+        setState(IconicState);
+
+        // set the frame rect to the shaded size
+        frame.rect.setHeight(frame.title_h + (frame.border_w * 2));
     }
-
-    setState(NormalState);
-  } else {
-    if (! (decorations & Decor_Titlebar))
-      return; // can't shade it without a titlebar!
-
-    XResizeWindow(hackedbox->getXDisplay(), frame.window,
-                  frame.inside_w, frame.title_h);
-    flags.shaded = True;
-    hackedbox_attrib.flags |= AttribShaded;
-    hackedbox_attrib.attrib |= AttribShaded;
-
-    setState(IconicState);
-
-    // set the frame rect to the shaded size
-    frame.rect.setHeight(frame.title_h + (frame.border_w * 2));
-  }
 }
 
 
 void HackedboxWindow::stick(void) {
-  if (flags.stuck) {
-    hackedbox_attrib.flags ^= AttribOmnipresent;
-    hackedbox_attrib.attrib ^= AttribOmnipresent;
+    if (flags.stuck) {
+        hackedbox_attrib.flags ^= AttribOmnipresent;
+        hackedbox_attrib.attrib ^= AttribOmnipresent;
 
-    flags.stuck = False;
+        flags.stuck = False;
 
-    if (! flags.iconic)
-      screen->reassociateWindow(this, BSENTINEL, True);
+        if (! flags.iconic)
+            screen->reassociateWindow(this, BSENTINEL, True);
 
-    setState(current_state);
-  } else {
-    flags.stuck = True;
+        setState(current_state);
+    } else {
+        flags.stuck = True;
 
-    hackedbox_attrib.flags |= AttribOmnipresent;
-    hackedbox_attrib.attrib |= AttribOmnipresent;
+        hackedbox_attrib.flags |= AttribOmnipresent;
+        hackedbox_attrib.attrib |= AttribOmnipresent;
 
-    setState(current_state);
-  }
+        setState(current_state);
+    }
 }
 
 
 void HackedboxWindow::redrawWindowFrame(void) const {
-  if (decorations & Decor_Titlebar) {
-    if (flags.focused) {
-      if (frame.ftitle)
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.title, frame.ftitle);
-      else
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.title, frame.ftitle_pixel);
-    } else {
-      if (frame.utitle)
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.title, frame.utitle);
-      else
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.title, frame.utitle_pixel);
+    if (decorations & Decor_Titlebar) {
+        if (flags.focused) {
+            if (frame.ftitle)
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.title, frame.ftitle);
+            else
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.title, frame.ftitle_pixel);
+        } else {
+            if (frame.utitle)
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.title, frame.utitle);
+            else
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.title, frame.utitle_pixel);
+        }
+        XClearWindow(hackedbox->getXDisplay(), frame.title);
+
+        redrawLabel();
+        redrawAllButtons();
     }
-    XClearWindow(hackedbox->getXDisplay(), frame.title);
 
-    redrawLabel();
-    redrawAllButtons();
-  }
+    if (decorations & Decor_Handle) {
+        if (flags.focused) {
+            if (frame.fhandle)
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.handle, frame.fhandle);
+            else
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.handle, frame.fhandle_pixel);
 
-  if (decorations & Decor_Handle) {
-    if (flags.focused) {
-      if (frame.fhandle)
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.handle, frame.fhandle);
-      else
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.handle, frame.fhandle_pixel);
+            if (frame.fgrip) {
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.left_grip, frame.fgrip);
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.right_grip, frame.fgrip);
+            } else {
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.left_grip, frame.fgrip_pixel);
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.right_grip, frame.fgrip_pixel);
+            }
+        } else {
+            if (frame.uhandle)
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.handle, frame.uhandle);
+            else
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.handle, frame.uhandle_pixel);
 
-      if (frame.fgrip) {
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.left_grip, frame.fgrip);
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.right_grip, frame.fgrip);
-      } else {
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.left_grip, frame.fgrip_pixel);
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.right_grip, frame.fgrip_pixel);
-      }
-    } else {
-      if (frame.uhandle)
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.handle, frame.uhandle);
-      else
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.handle, frame.uhandle_pixel);
-
-      if (frame.ugrip) {
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.left_grip, frame.ugrip);
-        XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
-                                   frame.right_grip, frame.ugrip);
-      } else {
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.left_grip, frame.ugrip_pixel);
-        XSetWindowBackground(hackedbox->getXDisplay(),
-                             frame.right_grip, frame.ugrip_pixel);
-      }
+            if (frame.ugrip) {
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.left_grip, frame.ugrip);
+                XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                           frame.right_grip, frame.ugrip);
+            } else {
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.left_grip, frame.ugrip_pixel);
+                XSetWindowBackground(hackedbox->getXDisplay(),
+                                     frame.right_grip, frame.ugrip_pixel);
+            }
+        }
+        XClearWindow(hackedbox->getXDisplay(), frame.handle);
+        XClearWindow(hackedbox->getXDisplay(), frame.left_grip);
+        XClearWindow(hackedbox->getXDisplay(), frame.right_grip);
     }
-    XClearWindow(hackedbox->getXDisplay(), frame.handle);
-    XClearWindow(hackedbox->getXDisplay(), frame.left_grip);
-    XClearWindow(hackedbox->getXDisplay(), frame.right_grip);
-  }
 
-  if (decorations & Decor_Border) {
-    if (flags.focused)
-      XSetWindowBorder(hackedbox->getXDisplay(),
-                       frame.plate, frame.fborder_pixel);
-    else
-      XSetWindowBorder(hackedbox->getXDisplay(),
-                       frame.plate, frame.uborder_pixel);
-  }
+    if (decorations & Decor_Border) {
+        if (flags.focused)
+            XSetWindowBorder(hackedbox->getXDisplay(),
+                             frame.plate, frame.fborder_pixel);
+        else
+            XSetWindowBorder(hackedbox->getXDisplay(),
+                             frame.plate, frame.uborder_pixel);
+    }
 }
 
 
 void HackedboxWindow::setFocusFlag(bool focus) {
-  // only focus a window if it is visible
-  if (focus && ! flags.visible)
-    return;
+    // only focus a window if it is visible
+    if (focus && ! flags.visible)
+        return;
 
-  flags.focused = focus;
+    flags.focused = focus;
 
-  redrawWindowFrame();
+    redrawWindowFrame();
 
-  if (flags.focused)
-    hackedbox->setFocusedWindow(this);
+    if (flags.focused)
+        hackedbox->setFocusedWindow(this);
 }
 
 
 void HackedboxWindow::installColormap(bool install) {
-  int i = 0, ncmap = 0;
-  Colormap *cmaps = XListInstalledColormaps(hackedbox->getXDisplay(),
-                                            client.window, &ncmap);
-  if (cmaps) {
-    XWindowAttributes wattrib;
-    if (XGetWindowAttributes(hackedbox->getXDisplay(),
-                             client.window, &wattrib)) {
-      if (install) {
-        // install the window's colormap
-        for (i = 0; i < ncmap; i++) {
-          if (*(cmaps + i) == wattrib.colormap)
-            // this window is using an installed color map... do not install
-            install = False;
+    int i = 0, ncmap = 0;
+    Colormap *cmaps = XListInstalledColormaps(hackedbox->getXDisplay(),
+                                              client.window, &ncmap);
+    if (cmaps) {
+        XWindowAttributes wattrib;
+        if (XGetWindowAttributes(hackedbox->getXDisplay(),
+                                 client.window, &wattrib)) {
+            if (install) {
+                // install the window's colormap
+                for (i = 0; i < ncmap; i++) {
+                    if (*(cmaps + i) == wattrib.colormap)
+                        // this window is using an installed color map... do not install
+                        install = False;
+                }
+                // otherwise, install the window's colormap
+                if (install)
+                    XInstallColormap(hackedbox->getXDisplay(), wattrib.colormap);
+            } else {
+                // uninstall the window's colormap
+                for (i = 0; i < ncmap; i++) {
+                    if (*(cmaps + i) == wattrib.colormap)
+                        // we found the colormap to uninstall
+                        XUninstallColormap(hackedbox->getXDisplay(), wattrib.colormap);
+                }
+            }
         }
-        // otherwise, install the window's colormap
-        if (install)
-          XInstallColormap(hackedbox->getXDisplay(), wattrib.colormap);
-      } else {
-        // uninstall the window's colormap
-        for (i = 0; i < ncmap; i++) {
-          if (*(cmaps + i) == wattrib.colormap)
-            // we found the colormap to uninstall
-            XUninstallColormap(hackedbox->getXDisplay(), wattrib.colormap);
-        }
-      }
-    }
 
-    XFree(cmaps);
-  }
+        XFree(cmaps);
+    }
 }
 
 
 void HackedboxWindow::setState(unsigned long new_state) {
-  current_state = new_state;
+    current_state = new_state;
 
-  unsigned long state[2];
-  state[0] = current_state;
-  state[1] = None;
-  XChangeProperty(hackedbox->getXDisplay(), client.window,
-                  hackedbox->getWMStateAtom(), hackedbox->getWMStateAtom(), 32,
-                  PropModeReplace, (unsigned char *) state, 2);
+    unsigned long state[2];
+    state[0] = current_state;
+    state[1] = None;
+    XChangeProperty(hackedbox->getXDisplay(), client.window,
+                    hackedbox->getWMStateAtom(), hackedbox->getWMStateAtom(), 32,
+                    PropModeReplace, (unsigned char *) state, 2);
 
-  XChangeProperty(hackedbox->getXDisplay(), client.window,
-                  hackedbox->getHackedboxAttributesAtom(),
-                  hackedbox->getHackedboxAttributesAtom(), 32, PropModeReplace,
-                  (unsigned char *) &hackedbox_attrib,
-                  PropHackedboxAttributesElements);
+    XChangeProperty(hackedbox->getXDisplay(), client.window,
+                    hackedbox->getHackedboxAttributesAtom(),
+                    hackedbox->getHackedboxAttributesAtom(), 32, PropModeReplace,
+                    (unsigned char *) &hackedbox_attrib,
+                    PropHackedboxAttributesElements);
 }
 
 
 bool HackedboxWindow::getState(void) {
-  current_state = 0;
+    current_state = 0;
 
-  Atom atom_return;
-  bool ret = False;
-  int foo;
-  unsigned long *state, ulfoo, nitems;
+    Atom atom_return;
+    bool ret = False;
+    int foo;
+    unsigned long *state, ulfoo, nitems;
 
-  if ((XGetWindowProperty(hackedbox->getXDisplay(), client.window,
-                          hackedbox->getWMStateAtom(),
-                          0l, 2l, False, hackedbox->getWMStateAtom(),
-                          &atom_return, &foo, &nitems, &ulfoo,
-                          (unsigned char **) &state) != Success) ||
-      (! state)) {
-    return False;
-  }
+    if ((XGetWindowProperty(hackedbox->getXDisplay(), client.window,
+                            hackedbox->getWMStateAtom(),
+                            0l, 2l, False, hackedbox->getWMStateAtom(),
+                            &atom_return, &foo, &nitems, &ulfoo,
+                            (unsigned char **) &state) != Success) ||
+        (! state)) {
+        return False;
+    }
 
-  if (nitems >= 1) {
-    current_state = static_cast<unsigned long>(state[0]);
+    if (nitems >= 1) {
+        current_state = static_cast<unsigned long>(state[0]);
 
-    ret = True;
-  }
+        ret = True;
+    }
 
-  XFree((void *) state);
+    XFree((void *) state);
 
-  return ret;
+    return ret;
 }
 
 
 void HackedboxWindow::restoreAttributes(void) {
-  Atom atom_return;
-  int foo;
-  unsigned long ulfoo, nitems;
+    Atom atom_return;
+    int foo;
+    unsigned long ulfoo, nitems;
 
-  HackedboxAttributes *net;
-  int ret = XGetWindowProperty(hackedbox->getXDisplay(), client.window,
-                               hackedbox->getHackedboxAttributesAtom(), 0l,
-                               PropHackedboxAttributesElements, False,
-                               hackedbox->getHackedboxAttributesAtom(),
-                               &atom_return, &foo, &nitems, &ulfoo,
-                               (unsigned char **) &net);
-  if (ret != Success || !net || nitems != PropHackedboxAttributesElements)
-    return;
+    HackedboxAttributes *net;
+    int ret = XGetWindowProperty(hackedbox->getXDisplay(), client.window,
+                                 hackedbox->getHackedboxAttributesAtom(), 0l,
+                                 PropHackedboxAttributesElements, False,
+                                 hackedbox->getHackedboxAttributesAtom(),
+                                 &atom_return, &foo, &nitems, &ulfoo,
+                                 (unsigned char **) &net);
+    if (ret != Success || !net || nitems != PropHackedboxAttributesElements)
+        return;
 
-  if (net->flags & AttribShaded && net->attrib & AttribShaded) {
-    flags.shaded = False;
-    unsigned long orig_state = current_state;
-    shade();
+    if (net->flags & AttribShaded && net->attrib & AttribShaded) {
+        flags.shaded = False;
+        unsigned long orig_state = current_state;
+        shade();
 
-    /*
+        /*
       At this point in the life of a window, current_state should only be set
       to IconicState if the window was an *icon*, not if it was shaded.
     */
-    if (orig_state != IconicState)
-      current_state = WithdrawnState;
-  }
-
-  if (net->workspace != screen->getCurrentWorkspaceID() &&
-      net->workspace < screen->getWorkspaceCount()) {
-    screen->reassociateWindow(this, net->workspace, True);
-
-    // set to WithdrawnState so it will be mapped on the new workspace
-    if (current_state == NormalState) current_state = WithdrawnState;
-  } else if (current_state == WithdrawnState) {
-    // the window is on this workspace and is Withdrawn, so it is waiting to
-    // be mapped
-    current_state = NormalState;
-  }
-
-  if (net->flags & AttribOmnipresent && net->attrib & AttribOmnipresent) {
-    flags.stuck = False;
-    stick();
-
-    // if the window was on another workspace, it was going to be hidden. this
-    // specifies that the window should be mapped since it is sticky.
-    if (current_state == WithdrawnState) current_state = NormalState;
-  }
-
-  if (net->flags & AttribMaxHoriz || net->flags & AttribMaxVert) {
-    hackedbox_attrib.premax_x = net->premax_x;
-    hackedbox_attrib.premax_y = net->premax_y;
-    hackedbox_attrib.premax_w = net->premax_w;
-    hackedbox_attrib.premax_h = net->premax_h;
-
-    flags.maximized = 0;
-
-    if (net->flags & AttribMaxHoriz && net->flags & AttribMaxVert &&
-        net->attrib & (AttribMaxHoriz | AttribMaxVert))
-      flags.maximized = 1;
-    else if (net->flags & AttribMaxVert && net->attrib & AttribMaxVert)
-        flags.maximized = 2;
-    else if (net->flags & AttribMaxHoriz && net->attrib & AttribMaxHoriz)
-        flags.maximized = 3;
-
-    if (flags.maximized) remaximize();
-  }
-
-  if (net->flags & AttribDecoration) {
-    switch (net->decoration) {
-    case DecorNone:
-      decorations = 0;
-
-      break;
-
-    default:
-    case DecorNormal:
-      decorations |= Decor_Titlebar | Decor_Handle | Decor_Border |
-        Decor_Iconify | Decor_Maximize;
-
-      break;
-
-    case DecorTiny:
-      decorations |= Decor_Titlebar | Decor_Iconify;
-      decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
-
-      break;
-
-    case DecorTool:
-      decorations |= Decor_Titlebar;
-      decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
-
-      break;
+        if (orig_state != IconicState)
+            current_state = WithdrawnState;
     }
 
-    // sanity check the new decor
-    if (! (functions & Func_Resize) || isTransient())
-      decorations &= ~(Decor_Maximize | Decor_Handle);
-    if (! (functions & Func_Maximize))
-      decorations &= ~Decor_Maximize;
+    if (net->workspace != screen->getCurrentWorkspaceID() &&
+        net->workspace < screen->getWorkspaceCount()) {
+        screen->reassociateWindow(this, net->workspace, True);
 
-    if (decorations & Decor_Titlebar) {
-      if (functions & Func_Close)   // close button is controlled by function
-        decorations |= Decor_Close; // not decor type
-    } else { 
-      if (flags.shaded) // we can not be shaded if we lack a titlebar
-        shade();
+        // set to WithdrawnState so it will be mapped on the new workspace
+        if (current_state == NormalState) current_state = WithdrawnState;
+    } else if (current_state == WithdrawnState) {
+        // the window is on this workspace and is Withdrawn, so it is waiting to
+        // be mapped
+        current_state = NormalState;
     }
 
-    if (flags.visible && frame.window) {
-      XMapSubwindows(hackedbox->getXDisplay(), frame.window);
-      XMapWindow(hackedbox->getXDisplay(), frame.window);
+    if (net->flags & AttribOmnipresent && net->attrib & AttribOmnipresent) {
+        flags.stuck = False;
+        stick();
+
+        // if the window was on another workspace, it was going to be hidden. this
+        // specifies that the window should be mapped since it is sticky.
+        if (current_state == WithdrawnState) current_state = NormalState;
     }
 
-    reconfigure();
-    setState(current_state);
-  }
+    if (net->flags & AttribMaxHoriz || net->flags & AttribMaxVert) {
+        hackedbox_attrib.premax_x = net->premax_x;
+        hackedbox_attrib.premax_y = net->premax_y;
+        hackedbox_attrib.premax_w = net->premax_w;
+        hackedbox_attrib.premax_h = net->premax_h;
 
-  // with the state set it will then be the map event's job to read the
-  // window's state and behave accordingly
+        flags.maximized = 0;
 
-  XFree((void *) net);
+        if (net->flags & AttribMaxHoriz && net->flags & AttribMaxVert &&
+            net->attrib & (AttribMaxHoriz | AttribMaxVert))
+            flags.maximized = 1;
+        else if (net->flags & AttribMaxVert && net->attrib & AttribMaxVert)
+            flags.maximized = 2;
+        else if (net->flags & AttribMaxHoriz && net->attrib & AttribMaxHoriz)
+            flags.maximized = 3;
+
+        if (flags.maximized) remaximize();
+    }
+
+    if (net->flags & AttribDecoration) {
+        switch (net->decoration) {
+        case DecorNone:
+            decorations = 0;
+
+            break;
+
+        default:
+        case DecorNormal:
+            decorations |= Decor_Titlebar | Decor_Handle | Decor_Border |
+                           Decor_Iconify | Decor_Maximize;
+
+            break;
+
+        case DecorTiny:
+            decorations |= Decor_Titlebar | Decor_Iconify;
+            decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
+
+            break;
+
+        case DecorTool:
+            decorations |= Decor_Titlebar;
+            decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
+
+            break;
+        }
+
+        // sanity check the new decor
+        if (! (functions & Func_Resize) || isTransient())
+            decorations &= ~(Decor_Maximize | Decor_Handle);
+        if (! (functions & Func_Maximize))
+            decorations &= ~Decor_Maximize;
+
+        if (decorations & Decor_Titlebar) {
+            if (functions & Func_Close)   // close button is controlled by function
+                decorations |= Decor_Close; // not decor type
+        } else {
+            if (flags.shaded) // we can not be shaded if we lack a titlebar
+                shade();
+        }
+
+        if (flags.visible && frame.window) {
+            XMapSubwindows(hackedbox->getXDisplay(), frame.window);
+            XMapWindow(hackedbox->getXDisplay(), frame.window);
+        }
+
+        reconfigure();
+        setState(current_state);
+    }
+
+    // with the state set it will then be the map event's job to read the
+    // window's state and behave accordingly
+
+    XFree((void *) net);
 }
 
 /*

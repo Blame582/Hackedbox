@@ -133,7 +133,8 @@ am_hackedbox_OBJECTS = src/BaseDisplay.$(OBJEXT) \
 	src/GCCache.$(OBJEXT) src/Hackedbox.$(OBJEXT) \
 	src/IconMenu.$(OBJEXT) src/Image.$(OBJEXT) \
 	src/ImageControl.$(OBJEXT) src/ImageLoader.$(OBJEXT) \
-	src/MenuManager.$(OBJEXT) src/Netizen.$(OBJEXT) \
+	src/KeyManager.$(OBJEXT) src/MenuManager.$(OBJEXT) \
+	src/Netizen.$(OBJEXT) src/Runbox.$(OBJEXT) \
 	src/Screen.$(OBJEXT) src/StyleEngine.$(OBJEXT) \
 	src/Texture.$(OBJEXT) src/Timer.$(OBJEXT) src/Util.$(OBJEXT) \
 	src/Window.$(OBJEXT) src/WindowMenu.$(OBJEXT) \
@@ -405,31 +406,33 @@ AM_CPPFLAGS = \
         -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
 
 hackedbox_SOURCES = \
-	src/BaseDisplay.cpp \
-	src/BaseMenu.cpp \
-	src/ClientMenu.cpp \
-	src/Clock.cpp \
-	src/Color.cpp \
-	src/ConfigMenu.cpp \
-	src/Font.cpp \
-	src/GCCache.cpp \
-	src/Hackedbox.cpp \
-	src/IconMenu.cpp \
-	src/Image.cpp \
-	src/ImageControl.cpp \
-	src/ImageLoader.cpp \
-	src/MenuManager.cpp \
-	src/Netizen.cpp \
-	src/Screen.cpp \
-	src/StyleEngine.cpp \
-	src/Texture.cpp \
-	src/Timer.cpp \
-	src/Util.cpp \
-	src/Window.cpp \
-	src/WindowMenu.cpp \
-	src/Workspace.cpp \
-	src/WorkspaceMenu.cpp \
-	src/main.cpp
+src/BaseDisplay.cpp \
+src/BaseMenu.cpp \
+src/ClientMenu.cpp \
+src/Clock.cpp \
+src/Color.cpp \
+src/ConfigMenu.cpp \
+src/Font.cpp \
+src/GCCache.cpp \
+src/Hackedbox.cpp \
+src/IconMenu.cpp \
+src/Image.cpp \
+src/ImageControl.cpp \
+src/ImageLoader.cpp \
+src/KeyManager.cpp \
+src/MenuManager.cpp \
+src/Netizen.cpp \
+src/Runbox.cpp \
+src/Screen.cpp \
+src/StyleEngine.cpp \
+src/Texture.cpp \
+src/Timer.cpp \
+src/Util.cpp \
+src/Window.cpp \
+src/WindowMenu.cpp \
+src/Workspace.cpp \
+src/WorkspaceMenu.cpp \
+src/main.cpp
 
 hackedbox_LDADD = \
 	$(PNG_LIBS) \
@@ -592,8 +595,10 @@ src/IconMenu.$(OBJEXT): src/$(am__dirstamp)
 src/Image.$(OBJEXT): src/$(am__dirstamp)
 src/ImageControl.$(OBJEXT): src/$(am__dirstamp)
 src/ImageLoader.$(OBJEXT): src/$(am__dirstamp)
+src/KeyManager.$(OBJEXT): src/$(am__dirstamp)
 src/MenuManager.$(OBJEXT): src/$(am__dirstamp)
 src/Netizen.$(OBJEXT): src/$(am__dirstamp)
+src/Runbox.$(OBJEXT): src/$(am__dirstamp)
 src/Screen.$(OBJEXT): src/$(am__dirstamp)
 src/StyleEngine.$(OBJEXT): src/$(am__dirstamp)
 src/Texture.$(OBJEXT): src/$(am__dirstamp)

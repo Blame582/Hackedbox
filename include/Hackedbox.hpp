@@ -84,6 +84,7 @@ class HbScreen;
 class HackedboxWindow;
 class HbWindowGroup;
 class HbBasemenu;
+class KeyManager;
 
 class Hackedbox : public BaseDisplay, public TimeoutHandler {
 private:
@@ -153,6 +154,9 @@ private:
   char **argv;
 
   std::filesystem::path rc_file;
+  std::filesystem::path key_file;
+
+  KeyManager *key_manager;
 
   Atom xa_wm_colormap_windows;
   Atom xa_wm_protocols;
@@ -203,7 +207,6 @@ private:
   Atom net_wm_moveresize;
   Atom net_properties;
   Atom net_wm_desktop;
-  Atom net_wm_window_type;
   Atom net_wm_state;
   Atom net_wm_strut;
   Atom net_wm_icon_geometry;
@@ -455,7 +458,7 @@ public:
   Atom getNETSupportingWMCheckAtom() const {
     return net_supporting_wm_check;
   }
-  
+
   Atom getNETWMNameAtom() const {
     return net_wm_name;
   }

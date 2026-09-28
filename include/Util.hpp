@@ -161,7 +161,7 @@ std::string expandTilde(
 );
 
 
-void hbexec(
+bool hbexec(
   const std::string &command,
   const std::string &displayString
 );
