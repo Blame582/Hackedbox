@@ -1,142 +1,125 @@
--- README for HackedBox 0.8.x --
+-- README for HackedBox 0.9.x --
 
-HackedBox is a lightweight X window manager derived from the
-original Blackbox window manager. The 0.8.x series modernizes the original
-codebase while retaining its lightweight design, traditional resource-based
-configuration, and minimal desktop dependencies.
+HackedBox is a lightweight X window manager derived from the original
+Blackbox window manager. The 0.9.x series continues development of the
+original codebase while retaining its lightweight design, traditional
+resource-based configuration, and minimal desktop dependencies.
 
 HackedBox is developed for Unix-like systems using the X11 protocol and is
 currently developed and tested with Xorg on Linux.
 
-
-Source Tree:
-------------
+## Source Tree:
 
 The HackedBox source tree is organized into the following directories:
 
-    data/       - Default styles, backgrounds, menus, and other installed
-                  data files.
+data/       - Default styles, backgrounds, menus, and other installed
+              data files.
 
-    doc/        - Documentation and manual pages.
+doc/        - Documentation and manual pages.
 
-    hbSettings  - Start of a built in settings handler.
+include/    - HackedBox window manager header files.
 
-    hbtk/       - The HackedBox Toolkit (HbTK), the native GUI toolkit being
-                  developed for HackedBox and related applications.
+src/        - HackedBox window manager source code.
 
-    include/    - The Hackedbox window manager header files.
-
-    src/        - The HackedBox window manager source code.
-
-
-
-Build Requirements:
--------------------
+## Build Requirements:
 
 See the DEPENDENCIES file for the complete list of required libraries,
 development headers, and build tools.
 
-The dependency list is maintained separately so that it can be kept
-up to date as the HackedBox source tree changes.
+The dependency list is maintained separately so it can be kept up to date
+as the HackedBox source tree changes.
 
+## Quick Start:
 
-Quick Start:
-------------
+The quickest way to build and install HackedBox is:
 
-The quickest way to build and install HackedBox is to run:
-
-    ./bootstrap
-    ./configure --prefix=/usr
-    make -j$(nproc)
-    sudo make install
+./bootstrap
+./configure --prefix=/usr
+make -j$(nproc)
+sudo make install
 
 For available configuration and build options, run:
 
-    ./configure --help
+./configure --help
 
 Additional information about the Autotools build system is available in
 the INSTALL file.
 
-
-Installation:
--------------
+## Installation:
 
 The default installation prefix is /usr when configured with:
 
-    ./configure --prefix=/usr
+./configure --prefix=/usr
 
 HackedBox installs the window manager and included utilities into the
 system binary directory and installs its data files under:
 
-    /usr/share/hackedbox/
+/usr/share/hackedbox/
 
 Installed data includes:
 
-    /usr/share/hackedbox/styles/
-    /usr/share/hackedbox/backgrounds/
-    /usr/share/hackedbox/menu
+/usr/share/hackedbox/styles/
+/usr/share/hackedbox/backgrounds/
+/usr/share/hackedbox/menu
 
-
-Configuration:
--------------
+## Configuration:
 
 HackedBox uses a traditional resource-based style system for configuring
 the appearance of the window manager.
 
 Styles control items such as:
 
-    - menu appearance
-    - window decorations
-    - fonts
-    - colors
-    - gradients
-    - borders
-    - button appearance
-    - handles and grips
-    - menu bullets
-    - background images
+- menu appearance
+- window decorations
+- fonts
+- colors
+- gradients
+- borders
+- button appearance
+- handles and grips
+- menu bullets
+- background images
 
 The installed styles are located in:
 
-    /usr/share/hackedbox/styles/
+/usr/share/hackedbox/styles/
 
 The Default style is installed as the initial style for new HackedBox
-installations. HackedBox also includes a collection of additional styles.
+installations. HackedBox also includes additional styles that can be used
+as examples or alternatives.
 
 User configuration and custom styles are stored under:
 
-    ~/.hackedbox/
+~/.hackedbox/
 
-
-Backgrounds:
------------
+## Backgrounds:
 
 HackedBox includes the hbsetbg utility for setting the X root background.
 
 Styles configure the background using:
 
-    root.background
-    root.background.mode
+root.background
+root.background.mode
 
 For example:
 
-    root.background: /usr/share/hackedbox/backgrounds/default.jpg
-    root.background.mode: center
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
 
 User backgrounds may be stored in:
 
-    ~/.hackedbox/backgrounds/
+~/.hackedbox/backgrounds/
 
-See the hbsetbg documentation for the available background modes and
-options.
+See the hbsetbg documentation for available background modes, options,
+and background rotation settings.
 
-The older rootCommand is no longer compatable with 0.8.8 and newer Hackedbox styles
+The older rootCommand resource is no longer compatible with HackedBox
+0.8.x and newer styles.
 
-Styles:
--------
+## Styles:
 
-The Default style is intended to provide the standard HackedBox appearance
-on a new installation.
+The Default style provides the standard HackedBox appearance for a new
+installation.
 
 Additional styles are provided as examples and alternatives. Users can
 copy an existing style and modify it to create their own appearance.
@@ -144,28 +127,24 @@ copy an existing style and modify it to create their own appearance.
 For information about the style resource format and available settings,
 see:
 
-    data/README.style
+data/README.style
 
-
-Menus:
-------
+## Menus:
 
 HackedBox uses a configurable menu system. The installed default menu is
 provided in:
 
-    /usr/share/hackedbox/menu
+/usr/share/hackedbox/menu
 
 Menu configuration and syntax are documented in:
 
-    data/README.menu
+data/README.menu
 
-
-Utilities:
----------
+## Utilities:
 
 HackedBox currently includes:
 
-    hbsetbg
+hbsetbg
 
 hbsetbg is the HackedBox background-setting utility. It supports multiple
 image placement modes and is designed to operate with multi-screen X
@@ -174,75 +153,76 @@ displays.
 The utility is built as part of HackedBox and does not require an external
 background-setting program.
 
+See:
 
-HbTK:
------
+doc/README.hbsetbg
 
-HbTK is the HackedBox Toolkit, a native C++ GUI toolkit being developed
-alongside HackedBox.
+## HbTK:
 
-HbTK provides the foundation for reusable GUI components and applications
-without requiring GTK, Qt, or another large external GUI toolkit.
+HbTK has been moved out of HackedBox and is now developed as an independent
+toolkit.
+
+HbTK is the HackedBox Toolkit, a native C++ GUI toolkit designed for
+building reusable GUI components and applications without requiring GTK,
+Qt, or another large external GUI toolkit.
+
+HbTK is maintained separately from the HackedBox window manager code and
+is intended to provide a reusable toolkit for HackedBox-related and other
+applications.
 
 The HbTK source is located in:
 
-    hbtk/
+hbtk/
 
-HbTK is an ongoing part of the HackedBox project and is being developed
-independently of the existing HackedBox window manager code where practical.
-
-
-Compatibility:
---------------
+## Compatibility:
 
 HackedBox is currently developed and tested on:
 
-    Linux x86_64 Xorg
-    
-The 0.8.x codebase is derived from an older Blackbox codebase that supported
-a number of additional platforms. Those historical platforms are not
-currently part of the primary HackedBox development or testing environment.
+Linux x86_64 Xorg
 
+The HackedBox codebase is derived from an older Blackbox codebase that
+supported a number of additional platforms. Those historical platforms
+are not currently part of the primary HackedBox development or testing
+environment.
 
-Documentation:
---------------
+## Documentation:
 
 Additional documentation is available throughout the source tree.
 
-    INSTALL
-        Build and installation information.
+INSTALL
+    Build and installation information.
 
-    DEPENDENCIES
-        Required libraries, development packages, and build tools.
+DEPENDENCIES
+    Required libraries, development packages, and build tools.
 
-    data/README
-        Information about the installed HackedBox data files.
+data/README
+    Information about the installed HackedBox data files.
 
-    data/README.menu
-        Menu configuration and syntax.
+data/README.menu
+    Menu configuration and syntax.
 
-    data/README.style
-        Style configuration and available resources.
+data/README.style
+    Style configuration and available resources.
 
-    doc/
-        HackedBox documentation and manual pages.
-    
-    doc/README.setup
-    	Updated set up and configuration pages.
+doc/
+    HackedBox documentation and manual pages.
 
+doc/README.setup
+    Updated setup and configuration pages.
 
-Reporting Problems:
--------------------
+doc/README.hbsetbg
+    Documentation for the HackedBox hbsetbg background utility,
+    including usage, options, and background configuration.
+
+## Reporting Problems:
 
 When reporting a build or runtime problem, include the HackedBox version,
 operating system, architecture, configure options, and any relevant error
 messages or build output.
 
-Kevin Day <blame582@gmail.com>
+Kevin Day [blame582@gmail.com](mailto:blame582@gmail.com)
 
-
-License:
---------
+## License:
 
 See the LICENSE file distributed with the HackedBox source tree for
 licensing information.

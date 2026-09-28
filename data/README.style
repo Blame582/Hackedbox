@@ -1,78 +1,23 @@
-README.style
-------------
-
-Hackedbox Styles
-================
-
-A Hackedbox style is an X resource file containing the visual configuration
-used by the window manager. Styles control the appearance of menus, window
-decorations, fonts, colors, textures, borders, and the root background.
-
-Styles are plain text files and can be created or modified with any text
-editor.
-
-
-Style Locations
-===============
-
-System-installed styles are located in:
-
-    /usr/share/hackedbox/styles/
-
-User styles may be placed in:
-
-    ~/.hackedbox/styles/
-
-A style may also be stored elsewhere on the filesystem. Hackedbox only
-requires read access to the file.
-
-
-Loading a Style
-===============
-
-The current style is selected through the Hackedbox menu or configuration.
-
-When a style is loaded, Hackedbox reads the X resources contained in the
-style file and applies the settings to the window manager.
-
-After changing a style file, Hackedbox can be reconfigured from the menu.
-The reconfigure operation causes Hackedbox to reload its configuration and
-style resources without restarting the window manager or rebuilding
-Hackedbox.
-
-This makes it possible to edit a style, save the changes, and use the
-Hackedbox menu's reconfigure command to apply the new appearance to the
-running session.
-
-A style change does not require rebuilding Hackedbox.
-
-If a resource appears to have no effect after reconfiguring, verify the
-resource name and value against the resources supported by the current
-Hackedbox build. Resources that are not used by the component being
-configured have no effect.## README.style
+## README.style
 
 # Hackedbox Styles
 
-A Hackedbox style is an X resource file containing the visual configuration
-used by the window manager. Styles control the appearance of menus, window
-decorations, fonts, colors, textures, borders, and the root background.
+A Hackedbox style is a plain text resource file containing the visual
+configuration used by the window manager. Styles control the appearance
+of menus, window decorations, fonts, colors, textures, borders, and the
+root background.
 
-Styles are plain text files and can be created or modified with any text
-editor.
+Styles can be created or modified with any text editor.
 
 # Style Locations
 
 System-installed styles are located in:
 
-```
 /usr/share/hackedbox/styles/
-```
 
 User styles may be placed in:
 
-```
 ~/.hackedbox/styles/
-```
 
 A style may also be stored elsewhere on the filesystem. Hackedbox only
 requires read access to the file.
@@ -81,34 +26,37 @@ requires read access to the file.
 
 The current style is selected through the Hackedbox menu or configuration.
 
-When a style is loaded, Hackedbox reads the X resources contained in the
+When a style is loaded, Hackedbox reads the resources contained in the
 style file and applies the settings to the window manager.
 
 Styles can be changed without rebuilding Hackedbox.
+
+After changing a style, use the Hackedbox reconfigure command to reload
+the configuration and style resources without restarting the window
+manager.
+
+If a resource appears to have no effect after reconfiguring, verify the
+resource name and value against the resources supported by the current
+Hackedbox build. Resources that are not used by the component being
+configured have no effect.
 
 # Style File Structure
 
 A style consists of resource keys and values:
 
-```
 resource.key: value
-```
 
 Resource names are separated by periods.
 
-Comments may begin with:
+Comments begin with:
 
-```
-#
-```
+!
 
 For example:
 
-```
-# Menu title
+! Menu title
 menu.title.font: Hack-14
-menu.title.textColor: #FFFFFF
-```
+menu.title.textColor: white
 
 Resources that are not specified retain their default values.
 
@@ -118,89 +66,32 @@ Fonts are assigned to individual style components.
 
 Examples:
 
-```
 menu.title.font: Hack-14
-menu.frame.font: Hack-12
+menu.frame.font: Hack-10
 menu.clock.font: Hack-13
 menu.date.font: Hack-13
-```
 
-Use a font name or alias supported by the X11 font system used by the
+Use a font name or alias supported by the X11/Xft font system used by the
 current Hackedbox build.
 
-Different components may use different families and sizes.
-
-# Root Background
-
-Hackedbox uses hbsetbg for root background handling.
-
-The current background resources are:
-
-```
-root.background
-root.background.mode
-```
-
-For example:
-
-```
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
-```
-
-Supported background modes depend on the hbsetbg implementation.
-
-User backgrounds may be stored under:
-
-```
-~/.hackedbox/backgrounds/
-```
-
-Background rotation can be configured with:
-
-```
-root.background.folder
-root.background.timer
-```
-
-For example:
-
-```
-root.background.folder: ~/.hackedbox/backgrounds
-root.background.timer: 60000
-```
-
-A timer value of 0 disables background rotation.
-
-The older:
-
-```
-rootCommand:
-```
-
-resource is retained for compatibility with older styles but is not used by
-the current root background system. New styles should use the
-root.background resources instead.
+Different components may use different font families and sizes.
 
 # Menus
 
-The Hackedbox menu system is divided into the title, frame, highlighted
-item, clock, and date components.
+The menu system is divided into the title, frame, highlighted item,
+clock, date, bullets, and icons.
 
 Menu title resources:
 
-```
 menu.title.font
 menu.title
 menu.title.color
 menu.title.colorTo
 menu.title.textColor
 menu.title.justify
-```
 
 Menu frame resources:
 
-```
 menu.frame.font
 menu.frame
 menu.frame.color
@@ -208,16 +99,13 @@ menu.frame.colorTo
 menu.frame.textColor
 menu.frame.disableColor
 menu.frame.justify
-```
 
 Menu highlight resources:
 
-```
 menu.hilite
 menu.hilite.color
 menu.hilite.colorTo
 menu.hilite.textColor
-```
 
 The title and frame can use different fonts, textures, colors, and text
 justification.
@@ -228,45 +116,35 @@ The menu clock is a separate menu item controlled by style resources.
 
 Clock resources:
 
-```
 menu.clock.font
 menu.clock.textColor
 menu.clock.format
 menu.clock.justify
-```
 
 For example:
 
-```
 menu.clock.font: Hack-13
-menu.clock.textColor: #AEB8C2
+menu.clock.textColor: rgb:AE/B8/C2
 menu.clock.format: %I:%M:%S %p
 menu.clock.justify: center
-```
 
 The clock format is passed to the standard C strftime() function.
 
 Common format sequences include:
 
-```
 %H    hour, 00-23
 %I    hour, 01-12
 %M    minute
 %S    second
 %p    AM or PM
-```
 
 For example:
 
-```
 menu.clock.format: %I:%M:%S %p
-```
 
 displays:
 
-```
 03:42:17 PM
-```
 
 # Menu Date
 
@@ -274,46 +152,36 @@ The menu date is a separate menu item controlled by style resources.
 
 Date resources:
 
-```
 menu.date.font
 menu.date.textColor
 menu.date.format
 menu.date.justify
-```
 
 For example:
 
-```
 menu.date.font: Hack-13
-menu.date.textColor: #AEB8C2
+menu.date.textColor: rgb:AE/B8/C2
 menu.date.format: %m/%d/%Y
 menu.date.justify: center
-```
 
 The date format is passed to the standard C strftime() function.
 
 Common format sequences include:
 
-```
 %m    month, 01-12
 %d    day of month, 01-31
 %Y    four-digit year
-```
 
 For example:
 
-```
 menu.date.format: %m/%d/%Y
-```
 
 displays:
 
-```
 09/19/2026
-```
 
-The clock and date fonts, colors, formats, and justification are independent
-of one another.
+The clock and date fonts, colors, formats, and justification are
+independent of one another.
 
 # Menu Justification
 
@@ -322,28 +190,22 @@ justification.
 
 Resources:
 
-```
 menu.title.justify
 menu.frame.justify
 menu.clock.justify
 menu.date.justify
-```
 
 Supported values are:
 
-```
 left
 center
 right
-```
 
 For example:
 
-```
 menu.frame.justify: center
 menu.clock.justify: center
 menu.date.justify: center
-```
 
 # Menu Bullets
 
@@ -351,33 +213,25 @@ Menu bullets are configured independently from menu icons.
 
 Resources:
 
-```
 menu.bullet
 menu.bullet.position
-```
 
 Supported bullet values are:
 
-```
 empty
 triangle
 diamond
 square
-```
 
 The bullet position can be:
 
-```
 left
 right
-```
 
 For example:
 
-```
 menu.bullet: triangle
 menu.bullet.position: right
-```
 
 The bullet setting is not a boolean value.
 
@@ -385,65 +239,48 @@ The bullet setting is not a boolean value.
 
 Menu item icons can be enabled or disabled with:
 
-```
 menu.icon
-```
 
 The icon resource is a boolean value.
 
 Supported values include:
 
-```
 true
 false
 on
 off
 yes
 no
-```
 
 For example:
 
-```
 menu.icon: true
-```
 
 or:
 
-```
 menu.icon: off
-```
 
 Icon placement is controlled independently with:
 
-```
 menu.icon.position
-```
 
 Supported positions are:
 
-```
 left
 right
-```
 
 For example:
 
-```
 menu.icon: true
 menu.icon.position: left
-```
 
 or:
 
-```
 menu.icon: true
 menu.icon.position: right
-```
 
 The icon setting controls whether menu icons are displayed. The position
-setting controls which side of the menu item is reserved for and displays
-the icon.
+setting controls which side of the menu item is reserved for the icon.
 
 Menu icons are associated with individual menu entries. A menu entry must
 have an icon assigned before an icon can be displayed.
@@ -452,114 +289,100 @@ have an icon assigned before an icon can be displayed.
 
 Textures determine how a component is drawn.
 
-Texture descriptions can specify:
+A texture description can specify:
 
-```
 raised
 sunken
 flat
-```
 
 along with:
 
-```
 solid
 gradient
-```
 
 Gradient direction can also be specified.
 
 Common gradient directions include:
 
-```
 vertical
 diagonal
 crossdiagonal
-```
 
 Examples:
 
-```
 menu.title: raised gradient diagonal
 menu.frame: sunken gradient diagonal
 menu.hilite: raised gradient diagonal
-```
 
 A solid texture uses its primary color:
 
-```
 menu.frame: flat solid
-menu.frame.color: #000000
-```
+menu.frame.color: black
 
 A gradient uses both:
 
-```
 color
 colorTo
-```
 
 For example:
 
-```
 menu.title: raised gradient diagonal
-menu.title.color: #5A5E62
-menu.title.colorTo: #14181C
-```
+menu.title.color: rgb:90/94/98
+menu.title.colorTo: rgb:20/24/28
 
 Texture keywords are not required to use uppercase characters.
 
+# Bevels
+
+Bevel settings determine how the three-dimensional edge shading is
+rendered.
+
+Bevel1 places the shading directly at the edge of the component.
+
+Bevel2 places the shading one pixel inward from the edge.
+
+The bevel width is controlled by:
+
+bevelWidth
+
+For example:
+
+bevelWidth: 2
+
 # Colors
 
-Colors may be specified using standard X color names or hexadecimal/X color
+Colors may be specified using standard X color names or X color
 specifications.
 
 Examples:
 
-```
 white
 black
-#FFFFFF
-#000000
-#5A5E62
-```
+green
+rgb:90/94/98
+rgb:08/FF/52
 
-Hackedbox styles may use six-digit hexadecimal RGB colors:
+Six-digit hexadecimal RGB colors may also be used where supported by the
+current Hackedbox color parser:
 
-```
-#RRGGBB
-```
-
-For example:
-
-```
 #5A5E62
 #0A141E
 #46505A
-```
 
 Gradient textures use:
 
-```
 color
 colorTo
-```
 
-Solid textures normally require only the primary:
-
-```
-color
-```
+Solid textures normally require only the primary color.
 
 Text colors are specified through the appropriate textColor resource.
 
 For example:
 
-```
-menu.frame.textColor: #5A6470
-menu.clock.textColor: #AEB8C2
-menu.date.textColor: #AEB8C2
-```
+menu.frame.textColor: rgb:5A/64/70
+menu.clock.textColor: rgb:AE/B8/C2
+menu.date.textColor: rgb:AE/B8/C2
 
 # Window Decorations
 
@@ -570,7 +393,6 @@ appearance and colors.
 
 Window title resources:
 
-```
 window.title.focus
 window.title.focus.color
 window.title.focus.colorTo
@@ -578,11 +400,9 @@ window.title.focus.colorTo
 window.title.unfocus
 window.title.unfocus.color
 window.title.unfocus.colorTo
-```
 
 Window label resources:
 
-```
 window.label.focus
 window.label.focus.color
 window.label.focus.colorTo
@@ -592,11 +412,9 @@ window.label.unfocus
 window.label.unfocus.color
 window.label.unfocus.colorTo
 window.label.unfocus.textColor
-```
 
 Window button resources:
 
-```
 window.button.focus
 window.button.focus.color
 window.button.focus.colorTo
@@ -610,18 +428,14 @@ window.button.unfocus.picColor
 window.button.pressed
 window.button.pressed.color
 window.button.pressed.colorTo
-```
 
 Window frame resources:
 
-```
 window.frame.focusColor
 window.frame.unfocusColor
-```
 
 Window handle resources:
 
-```
 window.handle.focus
 window.handle.focus.color
 window.handle.focus.colorTo
@@ -629,11 +443,9 @@ window.handle.focus.colorTo
 window.handle.unfocus
 window.handle.unfocus.color
 window.handle.unfocus.colorTo
-```
 
 Window grip resources:
 
-```
 window.grip.focus
 window.grip.focus.color
 window.grip.focus.colorTo
@@ -641,32 +453,25 @@ window.grip.focus.colorTo
 window.grip.unfocus
 window.grip.unfocus.color
 window.grip.unfocus.colorTo
-```
 
-Button pressed resources provide the appearance used while a window button
-is pressed.
+Button pressed resources provide the appearance used while a window
+button is pressed.
 
 # Window Layout and Justification
 
 Window title and label text layout is controlled by:
 
-```
 window.justify
-```
 
 Supported values are:
 
-```
 left
 center
 right
-```
 
 For example:
 
-```
 window.justify: center
-```
 
 Menu components have their own independent justification resources.
 
@@ -675,32 +480,74 @@ Menu components have their own independent justification resources.
 The following resources control the physical dimensions of window
 decorations:
 
-```
 borderWidth
 bevelWidth
 handleWidth
-```
 
 The border color is controlled by:
 
-```
 borderColor
-```
 
 For example:
 
-```
-borderColor: #000000
+borderColor: black
 borderWidth: 1
 bevelWidth: 2
 handleWidth: 5
-```
-
-Bevel width controls the size of the three-dimensional edge shading.
 
 Border width controls the width of the window border.
 
+Bevel width controls the size of the three-dimensional edge shading.
+
 Handle width controls the height of the window resize handle.
+
+# Root Background
+
+Hackedbox uses hbsetbg for root background handling.
+
+The current background resources are:
+
+root.background
+root.background.mode
+
+For example:
+
+root.background: /usr/share/hackedbox/backgrounds/default.jpg
+root.background.mode: center
+
+Supported background modes depend on the current hbsetbg
+implementation.
+
+User backgrounds may be stored under:
+
+~/.hackedbox/backgrounds/
+
+Background rotation can be configured with:
+
+root.background.folder
+root.background.timer
+
+For example:
+
+root.background.folder: ~/.hackedbox/backgrounds
+root.background.timer: 5
+
+The timer value is specified in minutes.
+
+A value of:
+
+root.background.timer: 0
+
+disables background rotation.
+
+The older:
+
+rootCommand:
+
+resource is retained for compatibility with older styles but is not used
+by the current root background system.
+
+New styles should use the root.background resources instead.
 
 # Pointers and Cursors
 
@@ -710,10 +557,8 @@ window decoration and menu texture system.
 Cursor themes and sizes can therefore be configured through X cursor
 resources, for example:
 
-```
 Xcursor.theme: breeze_cursors
 Xcursor.size: 26
-```
 
 These settings normally belong in the user's X resource configuration
 rather than in the Hackedbox style.
@@ -725,40 +570,29 @@ add only the resources that need to be changed.
 
 For example:
 
-```
-# My Hackedbox style
+! My Hackedbox style
 
 root.background: /usr/share/hackedbox/backgrounds/default.jpg
 root.background.mode: center
 
 menu.title.font: Hack-14
 menu.title: raised gradient diagonal
-menu.title.color: #5A5E62
-menu.title.colorTo: #14181C
-menu.title.textColor: #FFFFFF
+menu.title.color: rgb:90/94/98
+menu.title.colorTo: rgb:20/24/28
+menu.title.textColor: white
 menu.title.justify: center
 
-menu.frame.font: Hack-12
+menu.frame.font: Hack-10
 menu.frame: sunken gradient diagonal
-menu.frame.color: #0A141E
-menu.frame.colorTo: #46505A
-menu.frame.textColor: #5A6470
+menu.frame.color: rgb:10/20/30
+menu.frame.colorTo: rgb:70/80/90
+menu.frame.textColor: rgb:90/A0/B0
 menu.frame.justify: center
 
 menu.hilite: raised gradient diagonal
-menu.hilite.color: #5A5E62
-menu.hilite.colorTo: #14181C
-menu.hilite.textColor: #FFFFFF
-
-menu.clock.font: Hack-13
-menu.clock.textColor: #AEB8C2
-menu.clock.format: %I:%M:%S %p
-menu.clock.justify: center
-
-menu.date.font: Hack-13
-menu.date.textColor: #AEB8C2
-menu.date.format: %m/%d/%Y
-menu.date.justify: center
+menu.hilite.color: rgb:90/94/98
+menu.hilite.colorTo: rgb:20/24/28
+menu.hilite.textColor: white
 
 menu.bullet: triangle
 menu.bullet.position: right
@@ -768,11 +602,10 @@ menu.icon.position: left
 
 window.justify: center
 
-borderColor: #000000
+borderColor: black
 bevelWidth: 2
 borderWidth: 1
 handleWidth: 5
-```
 
 Resources that are not specified retain their default values.
 
@@ -783,62 +616,51 @@ an existing style and modifying every setting.
 
 Save the style in:
 
-```
 ~/.hackedbox/styles/
-```
 
 For example:
 
-```
 ~/.hackedbox/styles/MyStyle
-```
 
 The style can then be selected through the Hackedbox menu.
 
 System-wide styles installed by Hackedbox are normally located in:
 
-```
 /usr/share/hackedbox/styles/
-```
 
 # Reconfiguring
 
-After modifying a style, reload or reconfigure Hackedbox so that the new
-resources are read.
+After modifying a style, use the Hackedbox reconfigure command to reload
+the style resources.
 
-If a resource appears to have no effect, verify the resource name and value
-against the resources supported by the current Hackedbox build.
+A style change does not require rebuilding Hackedbox.
+
+If a resource appears to have no effect, verify the resource name and
+value against the resources supported by the current Hackedbox build.
 
 Resources that are not used by the component being configured have no
 effect.
-
-A style change does not require rebuilding Hackedbox.
 
 # Current Style Resource Summary
 
 Root background:
 
-```
 root.background
 root.background.mode
 root.background.folder
 root.background.timer
-```
 
 Menu title:
 
-```
 menu.title.font
 menu.title
 menu.title.color
 menu.title.colorTo
 menu.title.textColor
 menu.title.justify
-```
 
 Menu frame:
 
-```
 menu.frame.font
 menu.frame
 menu.frame.color
@@ -846,63 +668,49 @@ menu.frame.colorTo
 menu.frame.textColor
 menu.frame.disableColor
 menu.frame.justify
-```
 
 Menu highlight:
 
-```
 menu.hilite
 menu.hilite.color
 menu.hilite.colorTo
 menu.hilite.textColor
-```
 
 Menu clock:
 
-```
 menu.clock.font
 menu.clock.textColor
 menu.clock.format
 menu.clock.justify
-```
 
 Menu date:
 
-```
 menu.date.font
 menu.date.textColor
 menu.date.format
 menu.date.justify
-```
 
 Menu bullets:
 
-```
 menu.bullet
 menu.bullet.position
-```
 
 Menu icons:
 
-```
 menu.icon
 menu.icon.position
-```
 
 Window title:
 
-```
 window.title.focus
 window.title.focus.color
 window.title.focus.colorTo
 window.title.unfocus
 window.title.unfocus.color
 window.title.unfocus.colorTo
-```
 
 Window label:
 
-```
 window.label.focus
 window.label.focus.color
 window.label.focus.colorTo
@@ -911,11 +719,9 @@ window.label.unfocus
 window.label.unfocus.color
 window.label.unfocus.colorTo
 window.label.unfocus.textColor
-```
 
 Window buttons:
 
-```
 window.button.focus
 window.button.focus.color
 window.button.focus.colorTo
@@ -927,507 +733,14 @@ window.button.unfocus.picColor
 window.button.pressed
 window.button.pressed.color
 window.button.pressed.colorTo
-```
 
 Window frame:
 
-```
 window.frame.focusColor
 window.frame.unfocusColor
-```
 
 Window handle:
 
-```
 window.handle.focus
 window.handle.focus.color
-window.handle.focus.colorTo
-window.handle.unfocus
-window.handle.unfocus.color
-window.handle.unfocus.colorTo
-```
-
-Window grip:
-
-```
-window.grip.focus
-window.grip.focus.color
-window.grip.focus.colorTo
-window.grip.unfocus
-window.grip.unfocus.color
-window.grip.unfocus.colorTo
-```
-
-Window layout:
-
-```
-window.justify
-```
-
-Geometry and borders:
-
-```
-borderColor
-borderWidth
-bevelWidth
-handleWidth
-```
-
-# Complete Example
-
-The following example demonstrates the current major style resources:
-
-```
-# Example Hackedbox style
-
-root.background: /usr/share/hackedbox/backgrounds/default.jpg
-root.background.mode: center
-
-menu.title.font: Hack-14
-menu.title: raised gradient diagonal
-menu.title.color: #5A5E62
-menu.title.colorTo: #14181C
-menu.title.textColor: #FFFFFF
-menu.title.justify: center
-
-menu.frame.font: Hack-12
-menu.frame: sunken gradient diagonal
-menu.frame.color: #0A141E
-menu.frame.colorTo: #46505A
-menu.frame.textColor: #5A6470
-menu.frame.disableColor: #3C4044
-menu.frame.justify: center
-
-menu.hilite: raised gradient diagonal
-menu.hilite.color: #5A5E62
-menu.hilite.colorTo: #14181C
-menu.hilite.textColor: #FFFFFF
-
-menu.clock.font: Hack-13
-menu.clock.textColor: #AEB8C2
-menu.clock.format: %I:%M:%S %p
-menu.clock.justify: center
-
-menu.date.font: Hack-13
-menu.date.textColor: #AEB8C2
-menu.date.format: %m/%d/%Y
-menu.date.justify: center
-
-menu.bullet: triangle
-menu.bullet.position: right
-
-menu.icon: true
-menu.icon.position: left
-
-window.title.focus: raised gradient vertical
-window.title.focus.color: #505458
-window.title.focus.colorTo: #1E2226
-
-window.title.unfocus: raised gradient vertical
-window.title.unfocus.color: #32363A
-window.title.unfocus.colorTo: #000000
-
-window.label.focus: sunken diagonal gradient
-window.label.focus.color: #0A141E
-window.label.focus.colorTo: #46505A
-window.label.focus.textColor: #FFFFFF
-
-window.label.unfocus: sunken diagonal gradient
-window.label.unfocus.color: #000000
-window.label.unfocus.colorTo: #28323C
-window.label.unfocus.textColor: #3C4044
-
-window.button.focus: raised gradient diagonal
-window.button.focus.color: #5A5E62
-window.button.focus.colorTo: #14181C
-window.button.focus.picColor: #FFFFFF
-
-window.button.unfocus: raised gradient diagonal
-window.button.unfocus.color: #32363A
-window.button.unfocus.colorTo: #000000
-window.button.unfocus.picColor: #464A4E
-
-window.button.pressed: sunken gradient diagonal
-window.button.pressed.color: #142832
-window.button.pressed.colorTo: #3C4650
-
-window.frame.focusColor: #282C30
-window.frame.unfocusColor: #14181C
-
-window.handle.focus: raised gradient diagonal
-window.handle.focus.color: #464A4E
-window.handle.focus.colorTo: #282C30
-
-window.handle.unfocus: raised gradient diagonal
-window.handle.unfocus.color: #32363A
-window.handle.unfocus.colorTo: #000000
-
-window.grip.focus: sunken diagonal gradient
-window.grip.focus.color: #141E28
-window.grip.focus.colorTo: #3C4650
-
-window.grip.unfocus: sunken gradient diagonal
-window.grip.unfocus.color: #000000
-window.grip.unfocus.colorTo: #1E2832
-
-window.justify: center
-
-borderColor: #000000
-bevelWidth: 2
-borderWidth: 1
-handleWidth: 5
-```
-
-
-
-Style File Structure
-====================
-
-A style consists of resource keys and values:
-
-    resource.key: value
-
-Resource names are separated by periods. X resource wildcards may also be
-used where supported.
-
-Comments begin with:
-
-    !
-
-For example:
-
-    ! Menu title
-    menu.title.font: Hack-14
-    menu.title.textColor: white
-
-
-Fonts
-=====
-
-Fonts are assigned to individual style components.
-
-Examples:
-
-    menu.title.font: Hack-14
-    menu.frame.font: Hack-10
-
-Use a font name or alias supported by the X11/Xft font system used by the
-current Hackedbox build.
-
-Fonts do not have to be identical throughout the style. Different
-components may use different families and sizes.
-
-
-Menus
-=====
-
-The menu system is divided into the title, frame, and highlighted item.
-
-Typical resources include:
-
-    menu.title.font
-    menu.title
-    menu.title.color
-    menu.title.colorTo
-    menu.title.textColor
-    menu.title.justify
-
-    menu.frame.font
-    menu.frame
-    menu.frame.color
-    menu.frame.colorTo
-    menu.frame.textColor
-    menu.frame.justify
-
-    menu.hilite
-    menu.hilite.color
-    menu.hilite.colorTo
-    menu.hilite.textColor
-
-Menu bullets can be configured with:
-
-    menu.bullet
-    menu.bullet.position
-
-
-Textures
-========
-
-Textures determine how a component is drawn.
-
-The texture description can specify:
-
-    raised
-    sunken
-    flat
-
-along with:
-
-    solid
-    gradient
-
-and gradient direction where supported.
-
-Bevel settings determine how the edge shading is rendered.
-
-Bevel1 places the shading at the edge of the component.
-
-Bevel2 places the shading one pixel inward from the edge.
-
-Texture keywords are not required to use uppercase characters.
-
-
-Colors
-======
-
-Colors may be specified using standard X color names or X color
-specifications.
-
-Examples:
-
-    white
-    black
-    green
-    rgb:90/94/98
-    #08FF52
-
-Gradient textures use both:
-
-    color
-    colorTo
-
-Solid textures only require the primary color.
-
-
-Window Decorations
-==================
-
-Window decorations have separate focused and unfocused states.
-
-The title, label, buttons, frame, handle, and grip can each have their own
-appearance and colors.
-
-The relevant resources are grouped under the window namespace, for example:
-
-    window.title.focus
-    window.title.focus.color
-    window.title.focus.colorTo
-
-    window.title.unfocus
-    window.title.unfocus.color
-    window.title.unfocus.colorTo
-
-    window.label.focus
-    window.label.unfocus
-
-    window.button.focus
-    window.button.unfocus
-    window.button.pressed
-
-    window.frame.focusColor
-    window.frame.unfocusColor
-
-    window.handle.focus
-    window.handle.unfocus
-
-    window.grip.focus
-    window.grip.unfocus
-
-Text and button colors are configured through the corresponding resources.
-
-
-Borders and Geometry
-====================
-
-The following resources control the physical dimensions of decorations:
-
-    borderWidth
-    bevelWidth
-    handleWidth
-
-The border color is controlled by:
-
-    borderColor
-
-For example:
-
-    borderColor: green
-    borderWidth: 1
-    bevelWidth: 2
-    handleWidth: 5
-
-
-Window Layout and Justification
-===============================
-
-Text justification can be configured with:
-
-    window.justify
-
-Menu and title components may also provide their own justification
-resources.
-
-Supported values depend on the component and current style parser.
-
-
-Backgrounds
-==========
-
-Hackedbox uses hbsetbg for root background handling.
-
-New styles should use:
-
-    root.background: /path/to/image.jpg
-    root.background.mode: center
-
-For example:
-
-    root.background: /usr/share/hackedbox/backgrounds/default.jpg
-    root.background.mode: center
-
-User backgrounds may also be stored under:
-
-    ~/.hackedbox/backgrounds/
-
-The optional background rotation resources are:
-
-    root.background.folder
-    root.background.timer
-
-A timer value of 0 disables rotation.
-
-The older:
-
-    rootCommand:
-
-resource is retained for compatibility with older styles but is not used by
-the current root background system. New styles should use the
-root.background resources instead.
-
-
-Pointers and Cursors
-====================
-
-Mouse pointer handling is provided by X11 rather than by the Hackedbox
-style texture system.
-
-Cursor themes and sizes can therefore be configured through the X cursor
-resources, for example:
-
-    Xcursor.theme: breeze_cursors
-    Xcursor.size: 26
-
-These settings normally belong in the user's X resource configuration
-rather than in the Hackedbox style.
-
-
-Creating a Style From Scratch
-=============================
-
-The simplest way to create a new style is to start with an empty file and
-add only the resources that need to be changed.
-
-For example:
-
-    ! My Hackedbox style
-
-    root.background: /usr/share/hackedbox/backgrounds/default.jpg
-    root.background.mode: center
-
-    menu.title.font: Hack-14
-    menu.frame.font: Hack-10
-
-    menu.title: raised gradient diagonal
-    menu.title.color: rgb:90/94/98
-    menu.title.colorTo: rgb:20/24/28
-    menu.title.textColor: white
-
-    menu.frame: sunken gradient diagonal
-    menu.frame.color: rgb:10/20/30
-    menu.frame.colorTo: rgb:70/80/90
-    menu.frame.textColor: rgb:90/a0/b0
-
-    menu.hilite: raised gradient diagonal
-    menu.hilite.color: rgb:90/94/98
-    menu.hilite.colorTo: rgb:20/24/28
-    menu.hilite.textColor: green
-
-    borderColor: green
-    bevelWidth: 2
-    borderWidth: 1
-    handleWidth: 5
-
-Resources that are not specified retain their default values.
-
-This makes it possible to build a style incrementally instead of copying
-an existing style and modifying every setting.
-
-
-Installing a User Style
-=======================
-
-Save the style in:
-
-    ~/.hackedbox/styles/
-
-For example:
-
-    ~/.hackedbox/styles/MyStyle
-
-The style can then be selected through the Hackedbox menu.
-
-System-wide styles installed by Hackedbox are normally located in:
-
-    /usr/share/hackedbox/styles/
-
-
-Reconfiguring
-=============
-
-After modifying a style, reload or reconfigure Hackedbox so that the new
-resources are read.
-
-If a resource appears to have no effect, verify the resource name and value
-against the currently supported style resources. Hackedbox ignores resources
-that are not used by the component being configured.
-
-
-Complete Example
-================
-
-The following is a compact example containing the major components of a
-style:
-
-    ! Example Hackedbox style
-
-    root.background: /usr/share/hackedbox/backgrounds/default.jpg
-    root.background.mode: center
-
-    menu.title.font: Hack-14
-    menu.frame.font: Hack-10
-
-    menu.title: raised gradient diagonal
-    menu.title.color: rgb:90/94/98
-    menu.title.colorTo: rgb:20/24/28
-    menu.title.textColor: white
-
-    menu.frame: sunken gradient diagonal
-    menu.frame.color: rgb:10/20/30
-    menu.frame.colorTo: rgb:70/80/90
-    menu.frame.textColor: rgb:90/a0/b0
-
-    menu.hilite: raised gradient diagonal
-    menu.hilite.color: rgb:90/94/98
-    menu.hilite.colorTo: rgb:20/24/28
-    menu.hilite.textColor: green
-
-    window.justify: center
-
-    borderColor: green
-    bevelWidth: 2
-    borderWidth: 1
-    handleWidth: 5
-
-This example is intentionally minimal. A complete style can add focused
-and unfocused window textures, labels, buttons, handles, grips, and other
-component-specific resources as required.
+window.handle.focus.c

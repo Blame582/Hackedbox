@@ -1,91 +1,166 @@
--- INSTALL for Hackedbox - an XLibre Window manager (C) 2026
+-- INSTALL for Hackedbox - an X Window Manager (C) 2026 --
 
-Compilation and Installation:
---------------------------------
-   The `configure' shell script attempts to guess correct values for
-various system-dependent variables used during compilation.  It uses
-those values to create a `Makefile' in each directory in the
-Hackedbox source tree.
+## Compilation and Installation:
 
-Finally, it creates a shell script `config.status' that you can run
-in the future to recreate the current configuration, a file
-`config.cache' that saves the results of its tests to speed up
-reconfiguring, and a file `config.log' containing compiler output
-(useful mainly for debugging `configure').
+Hackedbox uses the GNU Autotools build system.
 
-   If you need to do unusual things to compile Hackedbox, please try
-to figure out how `configure' could check whether to do them, and mail
-diffs or instructions to the Hackedbox mailing list so they can be considered
-for the next release.  If at some point `config.cache' contains
-results you don't want to keep, you may remove or edit it.
+Before compiling from a source checkout, generate the build system with:
 
-   The file `configure.in' is used to create `configure' by a program
-called `autoconf'.  You only need `configure.in' if you want to change
-it or regenerate `configure' using a newer version of `autoconf'.
+./bootstrap
 
-The simplest way to compile this package is:
+Configure Hackedbox with:
 
-  1. `cd' to the directory containing the package's source code and type
-     `./configure --prefix=/usr' to configure the package for your system.
-     If you're using `csh' on an old version of System V, you might need 
-     to type `sh ./configure --prefix=/usr' instead to prevent `csh' from 
-     trying to execute `configure' itself.
+./configure --prefix=/usr
 
-     Running `configure' takes awhile.  While running, it prints some
-     messages telling which features it is checking for.
+The `--prefix=/usr` option installs Hackedbox into the standard system
+directories.
 
-  2. Type `make -j$(nproc)' to compile the package.
+Compile Hackedbox with:
 
-  3. Type `sudo make install' to install the programs and any data files and
-     documentation.
+make -j$(nproc)
 
-  4. You can remove the program binaries and object files from the
-     source code directory by typing `make clean'.  To also remove the
-     files that `configure' created (so you can compile the package for
-     a different kind of computer), type `make distclean'. 
+Install Hackedbox with:
 
+sudo make install
 
-Compilers and Options:
-----------------------
-   Some systems require unusual options for compilation or linking that
-the `configure' script does not know about.  You can give `configure'
-initial values for variables by setting them in the environment.  Using
-a Bourne-compatible shell, you can do that on the command line like
-this:
-     CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+The complete build sequence is:
 
-Or on systems that have the `env' program, you can do it like this:
-     env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+./bootstrap
+./configure --prefix=/usr
+make -j$(nproc)
+sudo make install
 
-This method can also be used to add debugging support to the program:
-    CXXFLAGS="-g -Wall -Winline -W -pedantic" ./configure
+## Configuration:
 
-Optional Features:
-------------------
-Hackedbox supports the XShape extension of X11R6.  This support is enabled by
-default, but may be overridden by specifying `--disable-shape' on the configure
-script's command line.
+Run:
 
-Hackedbox supports a rendering effect called "faked interlacing" which darkens
-every other line in rendered images.  This support works only for gradient
-images.  It is compiled in by default, but may be overridden by specifying
-`--disable-interlace' on the configure script's command line. 
+./configure --help
 
-Hackedbox provides an alternative rendering algorithm for dithering on
-pseudocolor (8 bit) displays. A noticeable pattern is visible when using
-this; it's a matter of taste whether this looks better than the default
-algorithm. It is disabled by default, but may be overridden by specifying
-'--enable-ordered-pseudo' on the configure script's command line.
+to display the available configuration and build options.
 
-Hackedbox uses a timer which allows it to periodically flush its pixmap
-cache. It is enabled by default, but may be overridden by specifying
-'--disable-timed-cache' on the configure script's command line.
+The most commonly used option is:
 
-Also, `configure' can usually find the X include and library files
-automatically, but if it doesn't, you can use the `configure'
-options `--x-includes=DIR' and `--x-libraries=DIR' to specify
-their locations.
+--prefix=DIR
 
+Set the installation prefix.
 
-Please read the README files also.
+For example:
 
+./configure --prefix=/usr
+
+## Build Cleanup:
+
+To remove compiled object files and binaries from the source tree:
+
+make clean
+
+To remove generated configuration files and return the source tree to
+an unconfigured state:
+
+make distclean
+
+If the Autotools files need to be regenerated from the source tree:
+
+./bootstrap
+
+## Dependencies:
+
+Hackedbox requires X11 development libraries and the libraries required
+by its current image, font, and rendering systems.
+
+See the `DEPENDENCIES` file for the current list of required libraries,
+development headers, and build tools.
+
+The dependency list is maintained separately from this file so it can
+be updated as the Hackedbox source tree changes.
+
+## Installation Layout:
+
+When configured with:
+
+./configure --prefix=/usr
+
+Hackedbox installs its executables under:
+
+/usr/bin/
+
+Hackedbox data files are installed under:
+
+/usr/share/hackedbox/
+
+This includes:
+
+/usr/share/hackedbox/styles/
+/usr/share/hackedbox/backgrounds/
+/usr/share/hackedbox/menu
+
+## Documentation:
+
+Additional documentation is available throughout the source tree.
+
+README
+    General project information.
+
+DEPENDENCIES
+    Build dependencies and required libraries.
+
+data/README
+    Information about installed Hackedbox data files.
+
+data/README.menu
+    Menu configuration and syntax.
+
+data/README.style
+    Style configuration and available resources.
+
+doc/README.setup
+    Hackedbox setup and configuration information.
+
+doc/README.hbsetbg
+    Documentation for the hbsetbg background utility.
+
+doc/
+    Additional Hackedbox documentation and manual pages.
+
+## HbTK:
+
+HbTK is developed as an independent toolkit and is no longer built as
+part of the Hackedbox window manager.
+
+The HbTK project has its own source tree and build system.
+
+See the HbTK documentation for its separate compilation and installation
+instructions.
+
+## Development:
+
+Hackedbox is currently developed and tested on:
+
+Linux x86_64
+Xorg
+X11
+
+Hackedbox is designed around the X11 protocol and does not require a
+desktop environment.
+
+The project does not depend on GTK, Qt, or a desktop environment for
+the window manager itself.
+
+## Reporting Build Problems:
+
+When reporting a build problem, include:
+
+- Hackedbox version
+- operating system
+- architecture
+- compiler version
+- configure command
+- relevant error messages
+- relevant build output
+
+This information makes build problems easier to reproduce and diagnose.
+
+## License:
+
+See the `LICENSE` file distributed with the Hackedbox source tree for
+licensing information.

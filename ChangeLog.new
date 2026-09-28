@@ -1,74 +1,148 @@
-# Hackedbox 0.8.8 — Change Log
+# Hackedbox Change Log
 
-2026-09-20
-- Added solid color background support to hbsetbg with -color/--color.
-- Added Imlib2 dependency detection to the build configuration.
-- Renamed the default style file to lowercase default to avoid case-related menu naming issues.
-- Removed the obsolete steelblue style from the styles build list.
+## Hackedbox 0.9.x
 
-## Core / Project Direction
+### 2026-09-28
 
-* Continued the conversion and modernization of Hackedbox from its original Blackbox-derived codebase. now completed
-* Continued replacing legacy Blackbox naming with Hackedbox naming throughout the source. completed.
-* Continued conversion of legacy `.hh` headers to `.hpp`. completed
-* Continued conversion of legacy `.cc` sources to `.cpp`. completed
+* Moved HbTK out of the Hackedbox window manager source tree to continue development as an independent toolkit.
+* Updated Hackedbox documentation to reflect the separation of HbTK from the window manager.
+* Added documentation for `hbsetbg`, including usage, options, background configuration, positioning, and background rotation.
+* Changed `root.background.timer` to use minutes.
+* Continued cleanup and modernization of the source tree and documentation.
+
+### 2026-09-27
+
+* Continued development of Runbox and keyboard input handling.
+* Continued development and integration of KeyManager.
+* Continued restructuring Hackedbox around dedicated managers and components.
+* Continued development of the StyleEngine and classic window/frame styling.
+* Continued development of multi-screen background handling.
+
+### 2026-09-26
+
+* Added the initial StyleEngine as a separate component of the Hackedbox style system.
+* Moved style processing out of `Screen.cpp` into StyleEngine.
+* Began restructuring Hackedbox around dedicated managers rather than keeping functionality inside Screen.
+* Added MenuManager to replace the older RootMenu/BaseMenu responsibilities.
+* Added KeyManager for keyboard shortcut and key binding management.
+* Added Runbox for the Hackedbox run dialog.
+* Added `hbsudo` for privileged Hackedbox operations.
+* Added dialog styling support for `hbsudo`.
+* Continued modernization of the menu and configuration systems.
+
+#### HbTK
+
+* Began development of HbTK as a reusable native C++ GUI toolkit.
+* Added the initial application, window, widget, event, drawing, dialog, and container components.
+* Added Style and StyleEngine components.
+* Added support for building HbTK as a library.
+* Installed HbTK headers under `/usr/include/hbtk/`.
+* Installed the HbTK static library as `/usr/lib/libhbtk.a`.
+* Added an initial HbTK test window.
+* Began moving Hackedbox-style window and frame rendering concepts into HbTK.
+* Established HbTK as a reusable toolkit rather than a collection of application-specific widgets.
+
+### 2026-09-25
+
+* Continued development of `hbsetbg` background handling.
+* Improved background handling for multi-screen X displays.
+* Began automatic detection and handling of multiple monitors and combined desktop backgrounds.
+* Continued modernization of the Hackedbox background system.
+
+### 2026-09-24
+
+* Continued development of the Hackedbox style system and resource handling.
+* Expanded style support for window and menu appearance.
+* Added support for newer menu, window, alpha, and dialog resources.
+* Added `window.dialog.*` resources for Hackedbox dialog styling.
+* Continued correction of style resource loading and fallback behavior.
+* Updated styles while retaining their existing fonts, colors, gradients, and layout.
+
+### 2026-09-23
+
+* Began updating the existing Hackedbox styles for the 0.9.x style system.
+* Began the transition from the legacy style implementation toward the new StyleEngine architecture.
+
+## Hackedbox 0.8.8
+
+### 2026-09-20
+
+* Added solid color background support to `hbsetbg` with `-color`/`--color`.
+* Added Imlib2 dependency detection to the build configuration.
+* Renamed the default style file to lowercase `default` to avoid case-related menu naming issues.
+* Removed the obsolete `steelblue` style from the styles build list.
+
+## Hackedbox 0.8.7
+
+The 0.8.7 development cycle completed the major conversion and modernization of the original Blackbox-derived codebase.
+
+### Core
+
+* Completed the conversion from legacy Blackbox naming to Hackedbox naming throughout the source.
+
+* Completed conversion of legacy `.hh` headers to `.hpp`.
+
+* Completed conversion of legacy `.cc` sources to `.cpp`.
+
 * Updated copyright headers to:
-  `Copyright (c) 2026 Kevin Day <blame582@gmail.com>`
-  
-* Removed obsolete build/source artifacts and legacy files as part of the conversion. completed
 
-* Old Blackbox/Fluxbox styles are now considered incompatible with the current Hackedbox style implementation.
+  Copyright (c) 2026 Kevin Day <blame582@gmail.com>
 
-## Style System
+* Removed obsolete build artifacts and legacy source files.
+
+* Established Hackedbox-specific configuration and behavior rather than maintaining Blackbox compatibility.
+
+* Marked old Blackbox and Fluxbox styles as incompatible with the current style implementation.
+
+### Style System
 
 * Replaced the original style handling with the new Hackedbox style system.
-	this is the start of the New StyleEngine which will have support for the older styles files  
-* Expanded style parsing and resource handling in `Screen`.
-* Added/continued support for the new `.style` configuration format.
-* Added support for `root.background` in style files.
-* Background handling was moved to `hbsetbg`. no more color backgrounds
-* Style resources now control more of the menu/window appearance rather than relying on legacy Blackbox-compatible behavior.
-* Continued work on menu frame, title, text, texture, font, and color resources.
-* Updated the Default style during the style-system conversion.
-* Fixed and continued debugging style fallback behavior caused by resources not being read from the new format correctly.
-* Menu colors and gradients were adjusted as part of the new style implementation.
+* Began development of StyleEngine as the foundation for future style compatibility and resource handling.
+* Expanded style parsing and resource handling.
+* Added the new `.style` configuration format.
+* Added `root.background` support to style files.
+* Moved background handling to `hbsetbg`.
+* Expanded style resources for menu frames, titles, text, textures, fonts, colors, and gradients.
+* Updated the Default style.
+* Fixed style fallback problems caused by resources not being read correctly from the new format.
+* Continued development of menu and window styling resources.
 
-## Background Handling
+### Backgrounds
 
-* Added `hbsetbg` as the Official Hackedbox Background setter. requires imlib2
-* `root.background` is now used by `.style` files to specify the background command/path.
-* `hbsetroot` is no longer being used as the image setter because it does not provide the required image functionality.
-* Continued integration of `hbsetbg` into the Hackedbox configuration/style system.
+* Established `hbsetbg` as the Hackedbox background-setting utility.
+* Added support for image backgrounds through `root.background`.
+* Replaced the old `hbsetroot` image-setting path because it did not provide the required image functionality.
+* Integrated `hbsetbg` with the Hackedbox style system.
 
-## Runbox / Launcher
+### Runbox
 
-* Continued replacement of the old `hbrun` implementation.
+* Began replacing the old `hbrun` implementation.
 * Reworked the launcher GUI and its integration with Hackedbox styling.
-* Fixed the launcher progressing from a broken/white window to an actual empty launcher box when invoked from the menu.
-* Continued debugging launcher focus, cursor, styling, and rendering behavior.
+* Fixed the launcher from displaying a broken or white window to displaying a functional empty launcher box.
+* Continued work on launcher focus, cursor, styling, and rendering.
 
-## Menu System
+### Menu System
 
-* Continued the new `MenuManager` implementation.
-* Reworked menu initialization and menu-file handling in `HbScreen`.
-* Continued migration of menu classes and resources to the Hackedbox naming/API scheme.
-* Added/continued root-menu list management.
-* Continued work on menu style resources including:
+* Began the new MenuManager implementation.
+* Reworked menu initialization and menu-file handling.
+* Continued migration of menu classes and resources to Hackedbox naming and APIs.
+* Added root-menu list management.
+* Added and refined menu resources for:
 
-  * title font
-  * frame texture
+  * title fonts
+  * frame textures
   * frame colors
   * text colors
-  * highlighted/selected menu resources
+  * highlighted menu items
   * justification
-  * bullet configuration
-* Continued debugging menu rendering and style-file resource loading.
+  * bullets
+* Continued debugging menu rendering and style resource loading.
 
-## Screen / Resource Handling
+### Screen and Resources
 
-* Continued modernization of `Screen.hpp` and `Screen.cpp`.
-* Updated `HbScreen` resource structures for the current Hackedbox implementation.
-* Added/continued handling for:
+* Modernized `Screen.hpp` and `Screen.cpp`.
+* Updated HbScreen resource structures.
+* Added and refined handling for:
 
   * window styles
   * menu styles
@@ -77,119 +151,123 @@
   * click raise
   * workspace configuration
   * placement policy
-  * edge snapping threshold
-  * row/column placement direction
+  * edge snapping thresholds
+  * row and column placement direction
   * background configuration
-* Continued cleanup of legacy commented clock/date resource handling.
-* Continued correction of header declarations so `Screen.hpp` matches the current `Screen.cpp` implementation.
+* Removed obsolete commented clock/date resource handling.
+* Corrected header declarations to match the current Screen implementation.
 
-## Configuration
+### Configuration
 
-* Continued migration away from the original Blackbox configuration assumptions.
-* Configuration is increasingly based around Hackedbox-specific resources and behavior rather than maintaining compatibility with the original WM.
-* Greenday was updated to use the current Hackedbox style/background system.
+* Continued migration away from the original Blackbox configuration model.
+* Established Hackedbox-specific resources and behavior.
+* Updated Greenday to use the current Hackedbox style and background system.
 
-## HbTK
+### HbTK
 
-* Continued development of HbTK, the toolkit being built for Hackedbox.
-* Continued development of native X/XLibre-based widgets without depending on GTK, Qt, or FLTK.
-* Continued work on:
+* Continued development of HbTK as the toolkit for Hackedbox applications.
+* Developed native X/XLibre-based widgets without GTK, Qt, or FLTK.
+* Continued development of:
 
-  * `Widget`
-  * `MainWindow`
-  * `Splitter`
-  * `Painter`
+  * Widget
+  * MainWindow
+  * Splitter
+  * Painter
   * terminal widgets
-* Continued cleanup of internal class naming so HbTK is the toolkit name while its internal components do not unnecessarily use an `Hb` prefix.
-* Continued work toward using HbTK for future Hackedbox applications.
+* Cleaned up internal class naming so toolkit components do not unnecessarily use an `Hb` prefix.
 
-## Terminally-Hacked
+### Terminally-Hacked
 
 * Continued development of the native XLibre/X11 terminal.
-* Continued use of Xft and Fontconfig for terminal font handling.
-* Resolved the Fontconfig/Xft linking issue encountered during development.
+* Added Xft and Fontconfig-based font handling.
+* Resolved Fontconfig/Xft linking issues.
 * Continued development without Qt, GTK, or FLTK dependencies.
 
-## Planned / Not Yet Completed
+## Planned Development
 
-The following are **not counted as completed in 0.8.8**:
+The following work was not considered complete during the 0.8.x development cycle:
 
 * Integrated Hackedbox hotkey system.
 * Regional window snapping.
-* 1/4 and 1/2 screen snapping/placement.
+* 1/4 and 1/2 screen window placement.
 * Optional tiling-style placement.
 * Integrated tray support inside the Hackedbox menu.
 * Menu icon support.
 * File manager.
 * Hackedpad editor.
 * Completion of Terminally-Hacked.
-* Final replacement of the remaining external desktop applications.
-* Final redesign of the overall Hackedbox architecture.
+* Replacement of remaining external desktop applications.
+* Further architectural redesign of Hackedbox.
 
-## Compatibility Status
+## Compatibility
 
-Hackedbox 0.8.8 should be considered a substantially diverged descendant of the original Blackbox codebase.
+Hackedbox is now a substantially diverged descendant of the original Blackbox
+codebase.
 
-Compatibility with:
+The following are not maintained as compatibility targets:
 
-* Blackbox styles — **not maintained**
-* Fluxbox styles — **not maintained**
-* Original Hackedbox legacy styles — **not maintained where incompatible with the new style system**
-* crashes caused by window.font 
+* Blackbox styles.
+* Fluxbox styles.
+* Legacy Hackedbox styles that are incompatible with the current style system.
 
-The project is now being developed around Hackedbox's own configuration, style, toolkit, and desktop-component architecture.
+Hackedbox is developed around its own configuration, style, toolkit, and
+desktop-component architecture.
 
-## Version
+## Historical Development
 
-**Hackedbox 0.8.7**
+### 2026-08-23 — Hackedbox 0.8.6
 
-This version represents the current development state of the project after the major style-system, menu, background, launcher, and toolkit changes.
+#### Core
 
-The eventual **1.0** release should represent the point at which the current architecture is considered complete and stable rather than merely another incremental Blackbox-compatible release.
+* Began the major source and toolkit modernization following the 0.8.5 release.
+* Converted remaining Blackbox and `B`-prefixed source to Hackedbox and `Hb` naming.
+* Renamed `.hh` and `.cc` files to `.hpp` and `.cpp`.
+* Updated include paths and copyright headers.
+* Removed obsolete Blackbox and `bbkeys` components.
 
+#### HbTK
 
+* Began the HbTK toolkit.
+* Added Application, Window, Widget, Dialog, Entry, Button, Frame, TitleBar,
+  Splitter, Painter, Style, StyleEngine, Event, and related components.
+* Added `libhbtk.a` to the build.
+* Began integrating HbTK with Hackedbox.
 
-2026-08-23  Kevin Day <blame582@gmail.com>
+#### Runbox
 
-	* Hackedbox 0.8.6:
-	Begin major source and toolkit modernization following the 0.8.5
-	release.
+* Added the initial HbTK-based Runbox.
+* Began integrating Runbox with the root menu.
 
-	* Core:
-	Convert remaining Blackbox/B-prefixed source to Hackedbox/Hb
-	naming. Rename .hh/.cc files to .hpp/.cpp and update includes.
-	Update copyright headers and remove obsolete Blackbox/bbkeys
-	components.
+#### Styles
 
-	* HbTK: started toolkit
-	Add the HbTK toolkit and integrate it into the Hackedbox build.
-	Add Application, Window, Widget, Dialog, Entry, Button, Frame,
-	TitleBar, Splitter, Painter, Style, StyleEngine, Event and related
-	components. Build HbTK as libhbtk.a and link it with Hackedbox.
+* Updated style handling.
+* Introduced `root.background` for desktop background images.
 
-	* Runbox:
-	Add the HbTK-based Runbox and begin integrating it with Rootmenu.
+#### hbsetbg
 
-	* Styles:
-	Update style handling and introduce root.background for desktop
-	background images.
+* Added the Hackedbox `hbsetbg` image-setting utility.
+* Added center, tile, stretch-to-center, and stretch-to-edge modes.
+* Replaced the old `hsetbg` usage.
+* Removed obsolete `hbsetroot` background handling.
 
-	* hbsetbg:
-	Add the Hackedbox hbsetbg image-setting utility with center, tile,
-	stretch-to-center and stretch-to-edge modes. Replace old hsetbg
-	usage and remove obsolete hbsetroot background handling.
+#### Build System
 
-	* Build system:
-	Update Automake/autoconf configuration for HbTK and static-library
-	building. Add RANLIB support and subdir-objects handling.
+* Updated Automake and Autoconf configuration for HbTK and static-library
+  building.
+* Added RANLIB support.
+* Added subdir-objects handling.
 
-	* Documentation:
-	Add hbsetbg documentation and update manual generation.
+#### Documentation
 
-	* Menu:
-	Updated menu execution handling and begin integration of the
-	internal HbTK Runbox.
+* Added initial `hbsetbg` documentation.
+* Updated manual generation.
 
-	* Current status:
-	Hackedbox, HbTK and hbsetbg build successfully. Internal Runbox
-	integration is not yet functional at runtime.
+#### Menu
+
+* Updated menu execution handling.
+* Began integration of the internal HbTK Runbox.
+
+#### Status
+
+* Hackedbox, HbTK, and `hbsetbg` built successfully.
+* Internal Runbox integration was not yet functional at runtime.

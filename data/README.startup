@@ -1,75 +1,126 @@
-Hackedbox Startup Directory
+# Hackedbox Startup Directory
 
-Hackedbox provides a simple startup directory for programs that should be started when the Hackedbox session begins.
+Hackedbox provides a simple startup directory for programs and scripts
+that should be started when the Hackedbox session begins.
 
-The startup system is intentionally simple. There is no special configuration language and no numbered startup files. Everything in the startup directory is a normal shell script.
+The startup system is intentionally simple. There is no special
+configuration language, no numbered startup files, and no dependency
+system. Startup entries are ordinary shell scripts using the `.run`
+extension.
 
-How It Works:
-When Hackedbox starts, hackedbox-session checks:
+## How It Works:
+
+When Hackedbox starts, `hackedbox-session` checks:
+
 ~/.hackedbox/startup/
-Every executable file in that directory is run.
+
+It runs each executable regular file matching:
+
+*.run
+
+Each startup file is run in the background before Hackedbox starts.
+
+## Startup Scripts:
+
 Startup files are ordinary shell scripts.
 
 For example:
-    #!/bin/sh
 
-    volumeicon &
+#!/bin/sh
 
-Save this as:
-~/.hackedbox/startup/sound
+volumeicon &
+
+Save the script as:
+
+~/.hackedbox/startup/sound.run
 
 Then make it executable:
-chmod +x ~/.hackedbox/startup/sound
 
-this will send the volume icon to the icon menu (middle click)
+chmod +x ~/.hackedbox/startup/sound.run
 
-User Programs
-The startup directory is also a convenient place to start programs automatically when Hackedbox starts.
+The `.run` extension is required for `hackedbox-session` to recognize
+the file as a startup entry.
+
+## Starting User Programs:
+
+The startup directory can also be used to start graphical programs
+automatically when the Hackedbox session begins.
 
 For example:
-    #!/bin/sh
 
-    conky &
-    xclock &
-    my-program &
+#!/bin/sh
+
+conky &
+xclock &
+my-program &
+
+Save the script as:
+
+~/.hackedbox/startup/programs.run
+
+Then make it executable:
+
+chmod +x ~/.hackedbox/startup/programs.run
+
+Anything that can normally be started from a terminal can be placed in
+a startup script.
+
+## Starting Session Services:
+
+The startup directory can also be used to start user-session services
+that are needed by the graphical environment.
+
+For example:
+
+#!/bin/sh
+
+/sbin/openrc -U default
 
 Save it as:
-~/.hackedbox/startup/programs
 
-and make it executable:
-chmod +x ~/.hackedbox/startup/programs
+~/.hackedbox/startup/openrc.run
 
-Anything that can normally be started from a terminal can be placed in a startup script.
+Then make it executable:
 
-Startup Programs and System Services:
-The Hackedbox startup directory is not a replacement for the system init system.
-OpenRC, runit, dinit, s6, systemd, or another init system should continue to handle system services. The Hackedbox startup directory is intended for graphical-session programs and user-specific startup tasks.
+chmod +x ~/.hackedbox/startup/openrc.run
 
-For example:
-    volume/tray applications
-    network tray applications
-    desktop utilities
-    notification programs
-    user applications
-    graphical configuration programs
-    scripts needed by the user's desktop session
+This allows user-session services to be started as part of the
+Hackedbox graphical session without making Hackedbox responsible for
+managing those services.
 
-This allows Hackedbox to work with different init systems without requiring Hackedbox to manage those services itself.
+## Startup Programs and System Services:
 
-Keep It Simple:
-The startup system follows one rule:
-If it is an executable shell script in ~/.hackedbox/startup/, Hackedbox will run it when the session starts. There are no startup numbers, no complicated dependency system, and no Hackedbox-specific scripting language. Just normal shell scripts in one directory.
+The Hackedbox startup directory is not a replacement for the system
+init system.
 
+OpenRC, runit, dinit, s6, systemd, or another init system should
+continue to manage system services.
 
+The Hackedbox startup directory is intended for graphical-session
+programs, user-session services, and other user-specific startup tasks.
 
+Typical uses include:
 
+volume and tray applications
+network tray applications
+desktop utilities
+notification programs
+user applications
+graphical configuration programs
+user-session services
+scripts needed by the graphical session
 
+Hackedbox does not manage the services started by these scripts. It
+simply executes the startup entries when the graphical session begins.
 
+## Keep It Simple:
 
+The startup system follows a simple rule:
 
+Executable *.run files in ~/.hackedbox/startup/ are run when the
+Hackedbox session starts.
 
+There are no startup numbers, no complicated dependency system, and no
+Hackedbox-specific scripting language.
 
-
-
-
-
+Just normal shell scripts in one directory.

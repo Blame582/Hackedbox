@@ -1,0 +1,82 @@
+# hbsetbg
+
+`hbsetbg` is the background-setting utility used by Hackedbox.
+
+It loads an image and applies it to the desktop/root window. It is designed to work with the Hackedbox background system while also supporting direct invocation for testing and development.
+
+Usage:
+
+hbsetbg [option] <path to image>
+
+## Options
+
+-center, --center <image>
+    Display the image at its original size, centered on the screen.
+
+## Hackedbox Integration
+
+`hbsetbg` is built alongside Hackedbox and is used by the Hackedbox style and background system.
+
+Users normally do not need to invoke `hbsetbg` directly. Backgrounds are configured through the Hackedbox style configuration, and Hackedbox invokes `hbsetbg` when applying a configured background.
+
+Style properties include:
+
+### `root.background`
+
+Sets a single background image.
+
+Example:
+
+root.background: /path/to/image.jpg
+
+### `root.background.mode`
+
+Controls how the background image is displayed.
+
+The available modes correspond to the background modes supported by `hbsetbg`.
+
+### `root.background.folder`
+
+Specifies a folder containing background images.
+
+It is used together with `root.background.timer` to rotate backgrounds automatically.
+
+Example:
+
+root.background.folder: ~/.hackedbox/backgrounds
+
+### `root.background.timer`
+
+Sets the interval, in minutes, used when rotating backgrounds from `root.background.folder`.
+
+Example:
+
+root.background.timer: 5
+
+`5` = 5 minutes.
+
+## Purpose
+
+`hbsetbg` provides the actual background-setting functionality while keeping background configuration within the Hackedbox style system.
+
+This separates the responsibilities:
+
+Style configuration
+        ↓
+Hackedbox style system
+        ↓
+hbsetbg
+        ↓
+Root window
+
+`hbsetbg` remains a separate executable within the Hackedbox project, while the configuration and management of backgrounds remain part of Hackedbox.
+
+HbTK is an independent toolkit and is not required by `hbsetbg`.
+
+## Status
+
+`hbsetbg` was developed specifically for Hackedbox and provides the background-setting functionality required by its style system.
+
+It removes the need for users to manually manage the root background through external background-setting commands.
+
+Direct invocation is available for development, testing, and debugging, while normal operation is handled automatically by Hackedbox.

@@ -86,12 +86,15 @@ Changes from 0.8.5.1 to 0.8.6:
   - updated installation documentation
   - corrected build and installation instructions in the README
   - documented the ./bootstrap 
+  
 Changes from 0.8.5 to 0.8.5.1:
   - applied patches from Fedora
   - fixed compilation bugs
+  
 Changes from blackbox to hackedbox:
   - added two configure options "--enable-bg-utils and --enable-bloat"
   - Made all the neccesary hacks to make it "hackedbox" :-)
+  
 Changes from 0.62.1 to 0.65.0:
   - added Taiwan Chinese (zh_TW), Hungarian (hu_HU), Korean (ko_KR),
     Norwegian (no_NO), Polish (pl_PL), Romanian (ro_RO) and Ukrainian (uk_UA)
