@@ -50,6 +50,7 @@
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <vector>
 
 #include "Hackedbox.hpp"
 #include "BaseMenu.hpp"
@@ -108,6 +109,50 @@ bool ensureConfigurationDirectory(const fs::path& directory) {
         return fs::is_directory(directory, error);
 
     return fs::create_directories(directory, error);
+}
+
+fs::path findMenuFile() {
+    const fs::path directory = configurationDirectory();
+
+    if (directory.empty())
+        return {};
+
+    std::error_code error;
+
+    if (!fs::is_directory(directory, error))
+        return {};
+
+    std::vector<fs::path> matches;
+
+    for (const auto &entry :
+         fs::directory_iterator(directory, error)) {
+
+        if (error)
+            break;
+
+        if (!entry.is_regular_file(error) || error)
+            continue;
+
+        const std::string filename =
+            entry.path().filename().string();
+
+        if (filename.find("menu.rc") != std::string::npos)
+            matches.push_back(entry.path());
+    }
+
+    if (matches.empty())
+        return {};
+
+    std::sort(
+        matches.begin(),
+        matches.end(),
+        [](const fs::path &left, const fs::path &right) {
+            return left.filename().string() <
+                   right.filename().string();
+        }
+    );
+
+    return matches.front();
 }
 
 std::string makeResourceName(std::string_view prefix,
@@ -202,7 +247,6 @@ void grabReconfigureKey(Display *display) {
 
 } // namespace
 
-
 Hackedbox::Hackedbox(char **m_argv,
                      const char *displayName,
                      const char *configurationFileName)
@@ -219,7 +263,6 @@ Hackedbox::Hackedbox(char **m_argv,
 
     if (configurationFileName) {
         rc_file = expandTilde(configurationFileName);
-
     } else {
         rc_file = configurationFile("hackedbox.rc");
 
@@ -321,7 +364,6 @@ Hackedbox::Hackedbox(char **m_argv,
     if (screenList.empty()) {
         std::cerr
             << "Hackedbox::Hackedbox: no manageable screens found, aborting.\n";
-
         std::exit(EXIT_FAILURE);
     }
 
@@ -358,7 +400,6 @@ Hackedbox::Hackedbox(char **m_argv,
     }
 }
 
-
 Hackedbox::~Hackedbox() {
     if (clock_timer)
         clock_timer->stop();
@@ -376,16 +417,15 @@ Hackedbox::~Hackedbox() {
     delete timer;
 }
 
-
 void Hackedbox::process_event(XEvent *event) {
     switch (event->type) {
 
     case ButtonPress: {
-    	if (RunBox::handles(event->xbutton.window)) {
-        	RunBox::buttonPress(&event->xbutton);
-        	break;
-    	}
-    	
+        if (RunBox::handles(event->xbutton.window)) {
+            RunBox::buttonPress(&event->xbutton);
+            break;
+        }
+
         event->xbutton.state &=
             ~(NumLockMask | ScrollLockMask | LockMask);
 
@@ -418,14 +458,12 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case ButtonRelease: {
         if (RunBox::handles(event->xbutton.window)) {
-        	RunBox::buttonRelease(&event->xbutton);
-        	
-        	break;
-    	}	
-    	
+            RunBox::buttonRelease(&event->xbutton);
+            break;
+        }
+
         event->xbutton.state &=
             ~(NumLockMask | ScrollLockMask | LockMask);
 
@@ -445,7 +483,6 @@ void Hackedbox::process_event(XEvent *event) {
 
         break;
     }
-
 
     case ConfigureRequest: {
         HackedboxWindow *window =
@@ -482,7 +519,6 @@ void Hackedbox::process_event(XEvent *event) {
 
         break;
     }
-
 
     case MapRequest: {
 #ifdef DEBUG
@@ -531,7 +567,6 @@ void Hackedbox::process_event(XEvent *event) {
                 }
 
                 screen = searchScreen(attributes.root);
-
                 assert(screen != nullptr);
             }
 
@@ -541,14 +576,12 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case UnmapNotify: {
         if (auto *window = searchWindow(event->xunmap.window))
             window->unmapNotifyEvent(&event->xunmap);
 
         break;
     }
-
 
     case DestroyNotify: {
         if (auto *window = searchWindow(event->xdestroywindow.window)) {
@@ -562,7 +595,6 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case ReparentNotify: {
         if (auto *window = searchWindow(event->xreparent.window))
             window->reparentNotifyEvent(&event->xreparent);
@@ -570,13 +602,12 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case MotionNotify: {
-    	if (RunBox::handles(event->xmotion.window)) {
-        	RunBox::motionNotify(&event->xmotion);
-        	break;
-    	}
-    	
+        if (RunBox::handles(event->xmotion.window)) {
+            RunBox::motionNotify(&event->xmotion);
+            break;
+        }
+
         XEvent realEvent{};
         unsigned int compressed = 0;
 
@@ -607,7 +638,6 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case PropertyNotify: {
         last_time = event->xproperty.time;
 
@@ -616,7 +646,6 @@ void Hackedbox::process_event(XEvent *event) {
 
         break;
     }
-
 
     case EnterNotify: {
         last_time = event->xcrossing.time;
@@ -645,7 +674,6 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case LeaveNotify: {
         last_time = event->xcrossing.time;
 
@@ -660,13 +688,12 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case Expose: {
-    	if (RunBox::handles(event->xexpose.window)) {
-        	RunBox::expose(&event->xexpose);
-        	break;
-    	}
-    	
+        if (RunBox::handles(event->xexpose.window)) {
+            RunBox::expose(&event->xexpose);
+            break;
+        }
+
         XEvent realEvent{};
         unsigned int compressed = 0;
 
@@ -722,13 +749,12 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case KeyPress: {
-    	
         if (RunBox::handles(event->xbutton.window)) {
-        	RunBox::buttonPress(&event->xbutton);
-        	break;
-    	}	
+            RunBox::buttonPress(&event->xbutton);
+            break;
+        }
+
         const KeySym key =
             XLookupKeysym(&event->xkey, 0);
 
@@ -748,7 +774,6 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case ColormapNotify: {
         if (auto *screen =
                 searchScreen(event->xcolormap.window)) {
@@ -760,7 +785,6 @@ void Hackedbox::process_event(XEvent *event) {
 
         break;
     }
-
 
     case FocusIn: {
         if (event->xfocus.detail != NotifyNonlinear)
@@ -777,7 +801,6 @@ void Hackedbox::process_event(XEvent *event) {
 
         break;
     }
-
 
     case FocusOut: {
         if (event->xfocus.detail != NotifyNonlinear)
@@ -823,13 +846,12 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
-    case ClientMessage: { 
+    case ClientMessage: {
         if (RunBox::handles(event->xclient.window)) {
-        	RunBox::clientMessage(&event->xclient);
-        	break;
-    	}
-        
+            RunBox::clientMessage(&event->xclient);
+            break;
+        }
+
         if (event->xclient.format != 32)
             break;
 
@@ -917,12 +939,10 @@ void Hackedbox::process_event(XEvent *event) {
         break;
     }
 
-
     case NoExpose:
     case ConfigureNotify:
     case MapNotify:
         break;
-
 
     default: {
 #ifdef SHAPE
@@ -932,17 +952,14 @@ void Hackedbox::process_event(XEvent *event) {
 
             if (auto *window =
                     searchWindow(event->xany.window)) {
-
                 window->shapeEvent(shapeEvent);
             }
         }
 #endif
         break;
     }
-
     }
 }
-
 
 bool Hackedbox::handleSignal(int signal) {
     switch (signal) {
@@ -959,7 +976,6 @@ bool Hackedbox::handleSignal(int signal) {
         return false;
     }
 }
-
 
 void Hackedbox::init_icccm() {
     Display *display = getXDisplay();
@@ -1113,7 +1129,6 @@ void Hackedbox::init_icccm() {
 #endif
 }
 
-
 bool Hackedbox::validateWindow(Window window) {
     XEvent event{};
 
@@ -1130,7 +1145,6 @@ bool Hackedbox::validateWindow(Window window) {
     return true;
 }
 
-
 HbScreen *Hackedbox::searchScreen(Window window) {
     for (auto *screen : screenList) {
         if (screen->getRootWindow() == window)
@@ -1139,7 +1153,6 @@ HbScreen *Hackedbox::searchScreen(Window window) {
 
     return nullptr;
 }
-
 
 HackedboxWindow *Hackedbox::searchWindow(Window window) {
     const auto it = windowSearchList.find(window);
@@ -1150,7 +1163,6 @@ HackedboxWindow *Hackedbox::searchWindow(Window window) {
     return nullptr;
 }
 
-
 HbWindowGroup *Hackedbox::searchGroup(Window window) {
     const auto it = groupSearchList.find(window);
 
@@ -1159,7 +1171,6 @@ HbWindowGroup *Hackedbox::searchGroup(Window window) {
 
     return nullptr;
 }
-
 
 HbBasemenu *Hackedbox::searchMenu(Window window) {
     const auto it = menuSearchList.find(window);
@@ -1170,39 +1181,32 @@ HbBasemenu *Hackedbox::searchMenu(Window window) {
     return nullptr;
 }
 
-
 void Hackedbox::saveWindowSearch(Window window,
                                   HackedboxWindow *data) {
     windowSearchList.emplace(window, data);
 }
-
 
 void Hackedbox::saveGroupSearch(Window window,
                                 HbWindowGroup *data) {
     groupSearchList.emplace(window, data);
 }
 
-
 void Hackedbox::saveMenuSearch(Window window,
                                HbBasemenu *data) {
     menuSearchList.emplace(window, data);
 }
 
-
 void Hackedbox::removeWindowSearch(Window window) {
     windowSearchList.erase(window);
 }
-
 
 void Hackedbox::removeGroupSearch(Window window) {
     groupSearchList.erase(window);
 }
 
-
 void Hackedbox::removeMenuSearch(Window window) {
     menuSearchList.erase(window);
 }
-
 
 void Hackedbox::restart(const char *program) {
     shutdown();
@@ -1233,7 +1237,6 @@ void Hackedbox::restart(const char *program) {
         << "Hackedbox: unable to restart process\n";
 }
 
-
 void Hackedbox::shutdown() {
     BaseDisplay::shutdown();
 
@@ -1251,7 +1254,6 @@ void Hackedbox::shutdown() {
 
     save_rc();
 }
-
 
 void Hackedbox::save_rc() {
     XrmDatabase newDatabase = nullptr;
@@ -1500,7 +1502,6 @@ void Hackedbox::save_rc() {
         XrmDestroyDatabase(oldDatabase);
 }
 
-
 void Hackedbox::load_rc() {
     XrmDatabase database =
         XrmGetFileDatabase(rc_file.c_str());
@@ -1522,7 +1523,12 @@ void Hackedbox::load_rc() {
             expandTilde(value.addr);
 
     } else {
-        resource.menu_file = DEFAULTMENU;
+        const fs::path menuFile = findMenuFile();
+
+        if (!menuFile.empty())
+            resource.menu_file = menuFile.string();
+        else
+            resource.menu_file = DEFAULTMENU;
     }
 
     resource.colors_per_channel = 4;
@@ -1738,7 +1744,6 @@ void Hackedbox::load_rc() {
 
     XrmDestroyDatabase(database);
 }
-
 
 void Hackedbox::load_rc(HbScreen *screen) {
     XrmDatabase database =
@@ -2091,7 +2096,6 @@ void Hackedbox::load_rc(HbScreen *screen) {
     XrmDestroyDatabase(database);
 }
 
-
 void Hackedbox::reload_rc() {
     load_rc();
 
@@ -2126,14 +2130,12 @@ void Hackedbox::reload_rc() {
     reconfigure();
 }
 
-
 void Hackedbox::reconfigure() {
     reconfigure_wait = true;
 
     if (!timer->isTiming())
         timer->start();
 }
-
 
 void Hackedbox::real_reconfigure() {
     XrmDatabase newDatabase = nullptr;
@@ -2182,7 +2184,6 @@ void Hackedbox::real_reconfigure() {
     grabReconfigureKey(getXDisplay());
 }
 
-
 void Hackedbox::checkMenu() {
     bool reread = false;
 
@@ -2205,14 +2206,12 @@ void Hackedbox::checkMenu() {
         rereadMenu();
 }
 
-
 void Hackedbox::rereadMenu() {
     reread_menu_wait = true;
 
     if (!timer->isTiming())
         timer->start();
 }
-
 
 void Hackedbox::real_rereadMenu() {
     for (auto *timestamp : menuTimestamps)
@@ -2224,7 +2223,6 @@ void Hackedbox::real_rereadMenu() {
         screen->rereadMenu();
 }
 
-
 void Hackedbox::saveStyleFilename(
     const std::string& filename) {
 
@@ -2233,7 +2231,6 @@ void Hackedbox::saveStyleFilename(
 
     resource.style_file = filename;
 }
-
 
 void Hackedbox::saveMenuFilename(
     const std::string& filename) {
@@ -2272,7 +2269,6 @@ void Hackedbox::saveMenuFilename(
     menuTimestamps.push_back(entry);
 }
 
-
 void Hackedbox::timeout() {
     if (reconfigure_wait)
         real_reconfigure();
@@ -2308,7 +2304,6 @@ void Hackedbox::timeout() {
             menu->redrawClock();
     }
 }
-
 
 void Hackedbox::setFocusedWindow(HackedboxWindow *window) {
     if (focused_window &&

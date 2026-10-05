@@ -46,7 +46,6 @@ menu.icon:                      true
 menu.icon.position:             left
 menu.icon.alpha:                255
 
-window.title.font:              Hack-18
 window.title.focus:             flat solid
 window.title.focus.color:       #666654
 window.title.unfocus:           flat solid

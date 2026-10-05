@@ -49,7 +49,6 @@ menu.icon:                            true
 menu.icon.position:                   right
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-14
 window.title.focus:                  Raised Bevel1 Gradient Vertical
 window.title.focus.color:            #4C4C4C
 window.title.focus.colorTo:          #414141

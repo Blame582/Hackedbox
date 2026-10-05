@@ -1,10 +1,27 @@
 // StyleEngine.cpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 
 #ifdef HAVE_CONFIG_H
 #  include "../config.h"
 #endif
-
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
@@ -12,6 +29,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <locale.h>
 #include <string>
 #include <strings.h>
@@ -23,37 +41,54 @@
 #include "StyleEngine.hpp"
 #include "Util.hpp"
 
-#ifndef FONT_ELEMENT_SIZE
-#define FONT_ELEMENT_SIZE 50
-#endif
+
+static std::string findStyleFile(const std::string &path) {
+  namespace fs = std::filesystem;
+
+  fs::path stylePath(path);
+
+  /*
+   * A style can be loaded directly from a file, or from a
+   * style package directory.
+   *
+   * Example:
+   *
+   *   ~/.hackedbox/styles/USA/
+   *       USA
+   *       background.webp
+   *
+   * The style file has the same name as the style directory.
+   */
+  if (!fs::is_directory(stylePath))
+    return path;
+
+  fs::path styleFile =
+    stylePath / stylePath.filename();
+
+  if (fs::is_regular_file(styleFile))
+    return styleFile.string();
+
+  return std::string();
+}
+
 
 StyleEngine::StyleEngine(Hackedbox *hb, HbImageControl *image, unsigned int screen)
   : hackedbox(hb),
     image_control(image),
     screen_number(screen),
     stylerc(0),
-    backgroundFolder("~/.hackedbox/backgrounds"),
+    backgroundFolder(""),
     backgroundTimer(0),
     handle_width(6),
     bevel_width(3),
     frame_width(3),
     border_width(1) {
 
-  wstyle.fontset = 0;
-  wstyle.fontset_extents = 0;
   wstyle.font = 0;
 
-  mstyle.t_fontset = 0;
-  mstyle.t_fontset_extents = 0;
   mstyle.t_font = 0;
-  mstyle.f_fontset = 0;
-  mstyle.f_fontset_extents = 0;
   mstyle.f_font = 0;
-  mstyle.clock_fontset = 0;
-  mstyle.clock_fontset_extents = 0;
   mstyle.clock_font = 0;
-  mstyle.date_fontset = 0;
-  mstyle.date_fontset_extents = 0;
   mstyle.date_font = 0;
 }
 
@@ -61,21 +96,6 @@ StyleEngine::StyleEngine(Hackedbox *hb, HbImageControl *image, unsigned int scre
 StyleEngine::~StyleEngine() {
   if (stylerc)
     XrmDestroyDatabase(stylerc);
-
-  if (wstyle.fontset)
-    XFreeFontSet(hackedbox->getXDisplay(), wstyle.fontset);
-
-  if (mstyle.f_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(), mstyle.f_fontset);
-
-  if (mstyle.t_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(), mstyle.t_fontset);
-
-  if (mstyle.clock_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(), mstyle.clock_fontset);
-
-  if (mstyle.date_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(), mstyle.date_fontset);
 
   delete wstyle.font;
   delete mstyle.f_font;
@@ -86,58 +106,34 @@ StyleEngine::~StyleEngine() {
 
 
 bool StyleEngine::load(const std::string &filename) {
+  FILE *debug =
+    fopen("/tmp/hackedbox-image.log", "a");
+
+  if (debug) {
+    fprintf(debug,
+            "StyleEngine::load: %s\n",
+            filename.c_str());
+    fclose(debug);
+  }
+
   if (stylerc)
     XrmDestroyDatabase(stylerc);
 
-  stylerc =
-    XrmGetFileDatabase(filename.c_str());
+  std::string styleFile =
+    findStyleFile(filename);
+
+  if (!styleFile.empty())
+    stylerc =
+      XrmGetFileDatabase(styleFile.c_str());
 
   if (!stylerc)
     stylerc =
       XrmGetFileDatabase(DEFAULTSTYLE);
 
-  backgroundFolder =
-    expandTilde("~/.hackedbox/backgrounds");
-
   backgroundTimer = 0;
 
   XrmValue value;
   char *valueType;
-
-  if (wstyle.fontset)
-    XFreeFontSet(hackedbox->getXDisplay(),
-                 wstyle.fontset);
-
-  if (mstyle.f_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(),
-                 mstyle.f_fontset);
-
-  if (mstyle.t_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(),
-                 mstyle.t_fontset);
-
-  if (mstyle.clock_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(),
-                 mstyle.clock_fontset);
-
-  if (mstyle.date_fontset)
-    XFreeFontSet(hackedbox->getXDisplay(),
-                 mstyle.date_fontset);
-
-  wstyle.fontset = 0;
-  wstyle.fontset_extents = 0;
-
-  mstyle.f_fontset = 0;
-  mstyle.f_fontset_extents = 0;
-
-  mstyle.t_fontset = 0;
-  mstyle.t_fontset_extents = 0;
-
-  mstyle.clock_fontset = 0;
-  mstyle.clock_fontset_extents = 0;
-
-  mstyle.date_fontset = 0;
-  mstyle.date_fontset_extents = 0;
 
   delete wstyle.font;
   delete mstyle.f_font;
@@ -170,43 +166,6 @@ bool StyleEngine::load(const std::string &filename) {
   mstyle.date_font =
     readDatabaseFont("menu.date.font",
                      "Menu.Date.Font");
-
-  if (MB_CUR_MAX > 1) {
-    wstyle.fontset =
-      readDatabaseFontSet("window.font",
-                          "Window.Font");
-
-    mstyle.t_fontset =
-      readDatabaseFontSet("menu.title.font",
-                          "Menu.Title.Font");
-
-    mstyle.f_fontset =
-      readDatabaseFontSet("menu.frame.font",
-                          "Menu.Frame.Font");
-
-    mstyle.clock_fontset =
-      readDatabaseFontSet("menu.clock.font",
-                          "Menu.Clock.Font");
-
-    mstyle.date_fontset =
-      readDatabaseFontSet("menu.date.font",
-                          "Menu.Date.Font");
-
-    mstyle.t_fontset_extents =
-      XExtentsOfFontSet(mstyle.t_fontset);
-
-    mstyle.f_fontset_extents =
-      XExtentsOfFontSet(mstyle.f_fontset);
-
-    mstyle.clock_fontset_extents =
-      XExtentsOfFontSet(mstyle.clock_fontset);
-
-    mstyle.date_fontset_extents =
-      XExtentsOfFontSet(mstyle.date_fontset);
-
-    wstyle.fontset_extents =
-      XExtentsOfFontSet(wstyle.fontset);
-  }
 
   wstyle.t_focus =
     readDatabaseTexture("window.title.focus",
@@ -443,9 +402,14 @@ bool StyleEngine::load(const std::string &filename) {
                      &value)) {
 
     if (strstr(value.addr, "right") ||
-        strstr(value.addr, "Right")) {
+               strstr(value.addr, "Right")) {
 
       mstyle.f_justify = RightJustify;
+
+    } else if (strstr(value.addr, "left") ||
+               strstr(value.addr, "Left")) {
+
+      mstyle.f_justify = LeftJustify;
 
     } else if (strstr(value.addr, "center") ||
                strstr(value.addr, "Center")) {
@@ -463,7 +427,7 @@ bool StyleEngine::load(const std::string &filename) {
                      &value)) {
 
     if (strstr(value.addr, "right") ||
-        strstr(value.addr, "Right")) {
+               strstr(value.addr, "Right")) {
 
       mstyle.clock_justify = RightJustify;
 
@@ -488,7 +452,7 @@ bool StyleEngine::load(const std::string &filename) {
                      &value)) {
 
     if (strstr(value.addr, "right") ||
-        strstr(value.addr, "Right")) {
+               strstr(value.addr, "Right")) {
 
       mstyle.date_justify = RightJustify;
 
@@ -766,6 +730,19 @@ HbTexture StyleEngine::readDatabaseTexture(
     texture =
       HbTexture(value.addr);
 
+    FILE *debug =
+      fopen("/tmp/hackedbox-image.log", "a");
+
+    if (debug) {
+      fprintf(debug,
+              "StyleEngine texture: key=%s value=%s texture=%lu description=%s\n",
+              resourceName.c_str(),
+              value.addr,
+              texture.texture(),
+              texture.description().c_str());
+      fclose(debug);
+    }
+
   } else {
 
     texture.setHbTexture(
@@ -825,55 +802,13 @@ HbColor StyleEngine::readDatabaseColor(
 }
 
 
-XFontSet StyleEngine::readDatabaseFontSet(
-  const std::string &resourceName,
-  const std::string &resourceClass) {
-
-  const char *defaultFont = "fixed";
-
-  bool loadDefault = True;
-
-  XrmValue value;
-  char *valueType;
-
-  XFontSet fontSet = 0;
-
-  if (XrmGetResource(stylerc,
-                     resourceName.c_str(),
-                     resourceClass.c_str(),
-                     &valueType,
-                     &value) &&
-      (fontSet = createFontSet(value.addr))) {
-
-    loadDefault = False;
-  }
-
-  if (loadDefault) {
-    fontSet = createFontSet(defaultFont);
-
-    if (!fontSet) {
-      fprintf(stderr,
-              "StyleEngine::readDatabaseFontSet(): "
-              "couldn't load default font.\n");
-
-      exit(2);
-    }
-  }
-
-  return fontSet;
-}
-
-
 HbFont *StyleEngine::readDatabaseFont(
   const std::string &resourceName,
   const std::string &resourceClass) {
 
-  const char *defaultFont = "fixed";
-
+  const char *fontName;
   XrmValue value;
   char *valueType;
-
-  std::string fontName;
 
   if (XrmGetResource(stylerc,
                      resourceName.c_str(),
@@ -885,7 +820,24 @@ HbFont *StyleEngine::readDatabaseFont(
 
   } else {
 
-    fontName = defaultFont;
+    fprintf(stderr,
+            "StyleEngine::readDatabaseFont(): "
+            "no font configured for '%s'\n",
+            resourceName.c_str());
+
+    return nullptr;
+  }
+
+  FILE *log =
+    fopen(expandTilde("~/.hackedbox/font-debug.log").c_str(), "a");
+
+  if (log) {
+    fprintf(log,
+            "StyleEngine: font request '%s' / '%s' -> %s\n",
+            resourceName.c_str(),
+            resourceClass.c_str(),
+            fontName);
+    fclose(log);
   }
 
   HbFont *font = new HbFont();
@@ -897,283 +849,11 @@ HbFont *StyleEngine::readDatabaseFont(
     fprintf(stderr,
             "StyleEngine::readDatabaseFont(): "
             "couldn't load font '%s'\n",
-            fontName.c_str());
+            fontName);
 
     delete font;
-
-    font = new HbFont();
-
-    if (!font->load(hackedbox->getXDisplay(),
-                    screen_number,
-                    defaultFont)) {
-
-      fprintf(stderr,
-              "StyleEngine::readDatabaseFont(): "
-              "couldn't load default font.\n");
-
-      delete font;
-      exit(2);
-    }
+    return nullptr;
   }
 
   return font;
-}
-
-
-const char *StyleEngine::getFontElement(
-  const char *pattern,
-  char *buffer,
-  int bufferSize,
-  ...) {
-
-  const char *position;
-  const char *value;
-
-  char *bufferPosition;
-
-  va_list arguments;
-
-  va_start(arguments, bufferSize);
-
-  buffer[bufferSize - 1] = 0;
-  buffer[bufferSize - 2] = '*';
-
-  while ((value = va_arg(arguments, char *)) != NULL) {
-
-    position = strcasestr(pattern, value);
-
-    if (position) {
-      strncpy(buffer,
-              position + 1,
-              bufferSize - 2);
-
-      buffer[bufferSize - 1] = 0;
-
-      bufferPosition = strchr(buffer, '-');
-
-      if (bufferPosition)
-        *bufferPosition = 0;
-
-      va_end(arguments);
-
-      return position;
-    }
-  }
-
-  va_end(arguments);
-
-  strncpy(buffer, "*", bufferSize - 1);
-  buffer[bufferSize - 1] = 0;
-
-  return NULL;
-}
-
-
-const char *StyleEngine::getFontSize(
-  const char *pattern,
-  int *size) {
-
-  const char *position;
-  const char *previousPosition = nullptr;
-
-  int number = 0;
-
-  for (position = pattern; ; ++position) {
-
-    if (!*position) {
-
-      if (previousPosition &&
-          number > 1 &&
-          number < 72) {
-
-        *size = number;
-        return previousPosition + 1;
-
-      } else {
-
-        *size = 16;
-        return NULL;
-      }
-
-    } else if (*position == '-') {
-
-      if (number > 1 &&
-          number < 72 &&
-          previousPosition) {
-
-        *size = number;
-        return previousPosition + 1;
-      }
-
-      previousPosition = position;
-      number = 0;
-
-    } else if (*position >= '0' &&
-               *position <= '9' &&
-               previousPosition) {
-
-      number *= 10;
-      number += *position - '0';
-
-    } else {
-
-      previousPosition = NULL;
-      number = 0;
-    }
-  }
-}
-
-
-XFontSet StyleEngine::createFontSet(
-  const std::string &fontName) {
-
-  XFontSet fontSet;
-
-  char **missing = 0;
-  char *defaultString = const_cast<char *>("-");
-
-  int missingCount = 0;
-  int pixelSize = 0;
-  int bufferSize = 0;
-
-  char weight[FONT_ELEMENT_SIZE];
-  char slant[FONT_ELEMENT_SIZE];
-
-  fontSet =
-    XCreateFontSet(hackedbox->getXDisplay(),
-                   fontName.c_str(),
-                   &missing,
-                   &missingCount,
-                   &defaultString);
-
-  if (fontSet && !missingCount)
-    return fontSet;
-
-#ifdef HAVE_SETLOCALE
-  if (!fontSet) {
-    if (missingCount)
-      XFreeStringList(missing);
-
-    missing = 0;
-    missingCount = 0;
-
-    setlocale(LC_CTYPE, "C");
-
-    fontSet =
-      XCreateFontSet(hackedbox->getXDisplay(),
-                     fontName.c_str(),
-                     &missing,
-                     &missingCount,
-                     &defaultString);
-
-    setlocale(LC_CTYPE, "");
-
-    if (fontSet && !missingCount)
-      return fontSet;
-  }
-#endif
-
-  const char *nativeFontName =
-    fontName.c_str();
-
-  if (fontSet) {
-    XFontStruct **fontStructs = 0;
-    char **fontNames = 0;
-
-    XFontsOfFontSet(fontSet,
-                    &fontStructs,
-                    &fontNames);
-
-    if (fontNames && fontNames[0])
-      nativeFontName = fontNames[0];
-  }
-
-  getFontElement(
-    nativeFontName,
-    weight,
-    FONT_ELEMENT_SIZE,
-    "-medium-",
-    "-bold-",
-    "-demibold-",
-    "-regular-",
-    NULL);
-
-  getFontElement(
-    nativeFontName,
-    slant,
-    FONT_ELEMENT_SIZE,
-    "-r-",
-    "-i-",
-    "-o-",
-    "-ri-",
-    "-ro-",
-    NULL);
-
-  getFontSize(nativeFontName,
-              &pixelSize);
-
-  if (!strcmp(weight, "*"))
-    strncpy(weight,
-            "medium",
-            FONT_ELEMENT_SIZE - 1);
-
-  weight[FONT_ELEMENT_SIZE - 1] = 0;
-
-  if (!strcmp(slant, "*"))
-    strncpy(slant,
-            "r",
-            FONT_ELEMENT_SIZE - 1);
-
-  slant[FONT_ELEMENT_SIZE - 1] = 0;
-
-  if (pixelSize < 3)
-    pixelSize = 3;
-  else if (pixelSize > 97)
-    pixelSize = 97;
-
-  bufferSize =
-    strlen(nativeFontName) +
-    (FONT_ELEMENT_SIZE * 2) +
-    64;
-
-  char *pattern =
-    new char[bufferSize];
-
-  snprintf(
-    pattern,
-    bufferSize,
-    "%s,"
-    "-*-*-%s-%s-*-*-%d-*-*-*-*-*-*-*,"
-    "-*-*-*-*-*-*-%d-*-*-*-*-*-*-*,*",
-    nativeFontName,
-    weight,
-    slant,
-    pixelSize,
-    pixelSize);
-
-  if (missingCount) {
-    XFreeStringList(missing);
-    missing = 0;
-    missingCount = 0;
-  }
-
-  if (fontSet) {
-    XFreeFontSet(hackedbox->getXDisplay(),
-                 fontSet);
-    fontSet = 0;
-  }
-
-  fontSet =
-    XCreateFontSet(hackedbox->getXDisplay(),
-                   pattern,
-                   &missing,
-                   &missingCount,
-                   &defaultString);
-
-  if (missingCount)
-    XFreeStringList(missing);
-
-  delete [] pattern;
-
-  return fontSet;
 }

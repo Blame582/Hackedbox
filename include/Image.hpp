@@ -86,6 +86,8 @@ private:
   Pixmap render_solid(const HbTexture &texture);
 
   Pixmap render_gradient(const HbTexture &texture);
+  
+  Pixmap render_image(const HbTexture &texture);
 
   XImage *renderXImage(void);
 

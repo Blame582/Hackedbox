@@ -23,7 +23,7 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-
+#include <X11/Xft/Xft.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
@@ -44,6 +44,87 @@
 
 
 #define NIL (0) 
+
+
+static void drawHbFont(Display *display,
+                       int screen,
+                       Visual *visual,
+                       Colormap colormap,
+                       Window window,
+                       HbFont *font,
+                       const HbColor &color,
+                       int x,
+                       int y,
+                       const char *text,
+                       int len)
+{
+    (void)screen;
+
+    if (!display ||
+        !visual ||
+        !font ||
+        !text ||
+        len <= 0 ||
+        window == None)
+        return;
+
+    XftFont *xft_font = font->xftfont();
+
+    if (!xft_font)
+        return;
+
+    XftDraw *draw =
+        XftDrawCreate(display,
+                      window,
+                      visual,
+                      colormap);
+
+    if (!draw)
+        return;
+
+    XRenderColor render_color;
+
+    render_color.red =
+        static_cast<unsigned short>(
+            color.red() * 257U);
+
+    render_color.green =
+        static_cast<unsigned short>(
+            color.green() * 257U);
+
+    render_color.blue =
+        static_cast<unsigned short>(
+            color.blue() * 257U);
+
+    render_color.alpha =
+        static_cast<unsigned short>(
+            color.alpha() * 257U);
+
+    XftColor xft_color;
+
+    if (XftColorAllocValue(display,
+                           visual,
+                           colormap,
+                           &render_color,
+                           &xft_color)) {
+
+        XftDrawStringUtf8(
+            draw,
+            &xft_color,
+            xft_font,
+            x,
+            y,
+            reinterpret_cast<const FcChar8 *>(text),
+            len);
+
+        XftColorFree(display,
+                     visual,
+                     colormap,
+                     &xft_color);
+    }
+
+    XftDrawDestroy(draw);
+}
 
 /*
  * Initializes the class with default values/the window's set initial values.
@@ -2184,63 +2265,102 @@ void HackedboxWindow::restoreGravity(Rect &r) {
   }
 }
 
+
 void HackedboxWindow::redrawLabel() const {
-  if (flags.focused) {
-    if (frame.flabel)
-      XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+    if (flags.focused) {
+        if (frame.flabel)
+            XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                       frame.label,
+                                       frame.flabel);
+        else
+            XSetWindowBackground(hackedbox->getXDisplay(),
                                  frame.label,
-                                 frame.flabel);
-    else
-      XSetWindowBackground(hackedbox->getXDisplay(),
-                           frame.label,
-                           frame.flabel_pixel);
-  } else {
-    if (frame.ulabel)
-      XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                 frame.flabel_pixel);
+    } else {
+        if (frame.ulabel)
+            XSetWindowBackgroundPixmap(hackedbox->getXDisplay(),
+                                       frame.label,
+                                       frame.ulabel);
+        else
+            XSetWindowBackground(hackedbox->getXDisplay(),
                                  frame.label,
-                                 frame.ulabel);
-    else
-      XSetWindowBackground(hackedbox->getXDisplay(),
-                           frame.label,
-                           frame.ulabel_pixel);
-  }
+                                 frame.ulabel_pixel);
+    }
 
-  XClearWindow(hackedbox->getXDisplay(), frame.label);
+    XClearWindow(hackedbox->getXDisplay(), frame.label);
 
-  WindowStyle *style = screen->getWindowStyle();
+    WindowStyle *style = screen->getWindowStyle();
 
-  int pos = frame.bevel_w * 2;
+    if (!style->font || !style->font->xftfont())
+        return;
 
-  int dlen = style->doJustify(client.title.c_str(),
-                              pos,
-                              frame.label_w,
-                              frame.bevel_w * 4,
-                              style->fontset != nullptr);
+    int pos = frame.bevel_w * 2;
 
-  HbPen pen((flags.focused)
-              ? style->l_text_focus
-              : style->l_text_unfocus,
-            style->font);
+    int dlen = style->doJustify(hackedbox->getXDisplay(),
+                                client.title.c_str(),
+                                pos,
+                                frame.label_w,
+                                frame.bevel_w * 4);
 
-  if (style->fontset != nullptr) {
-    XmbDrawString(hackedbox->getXDisplay(),
-                  frame.label,
-                  style->fontset,
-                  pen.gc(),
-                  pos,
-                  (1 - style->fontset_extents->max_ink_extent.y),
-                  client.title.c_str(),
-                  dlen);
-  } else {
-    XDrawString(hackedbox->getXDisplay(),
-                frame.label,
-                pen.gc(),
-                pos,
-                style->font->ascent() + 1,
-                client.title.c_str(),
-                dlen);
-  }
+    const HbColor &text_color =
+        flags.focused ?
+            style->l_text_focus :
+            style->l_text_unfocus;
+
+    XftDraw *draw = XftDrawCreate(
+        hackedbox->getXDisplay(),
+        frame.label,
+        DefaultVisual(hackedbox->getXDisplay(),
+                      screen->getScreenNumber()),
+        DefaultColormap(hackedbox->getXDisplay(),
+                        screen->getScreenNumber()));
+
+    if (!draw)
+        return;
+
+    XRenderColor render_color;
+
+    render_color.red =
+        static_cast<unsigned short>(text_color.red() * 257);
+    render_color.green =
+        static_cast<unsigned short>(text_color.green() * 257);
+    render_color.blue =
+        static_cast<unsigned short>(text_color.blue() * 257);
+    render_color.alpha = 65535;
+
+    XftColor color;
+
+    if (XftColorAllocValue(
+            hackedbox->getXDisplay(),
+            DefaultVisual(hackedbox->getXDisplay(),
+                          screen->getScreenNumber()),
+            DefaultColormap(hackedbox->getXDisplay(),
+                            screen->getScreenNumber()),
+            &render_color,
+            &color)) {
+
+        XftDrawStringUtf8(
+            draw,
+            &color,
+            style->font->xftfont(),
+            pos,
+            style->font->ascent() + 1,
+            reinterpret_cast<const FcChar8 *>(
+                client.title.c_str()),
+            dlen);
+
+        XftColorFree(
+            hackedbox->getXDisplay(),
+            DefaultVisual(hackedbox->getXDisplay(),
+                          screen->getScreenNumber()),
+            DefaultColormap(hackedbox->getXDisplay(),
+                            screen->getScreenNumber()),
+            &color);
+    }
+
+    XftDrawDestroy(draw);
 }
+
 
 void HackedboxWindow::redrawAllButtons(void) const {
   if (frame.iconify_button) redrawIconifyButton(False);
@@ -2317,6 +2437,7 @@ void HackedboxWindow::redrawMaximizeButton(bool pressed) const {
   XDrawLine(hackedbox->getXDisplay(), frame.maximize_button, pen.gc(),
             2, 3, (frame.button_w - 3), 3);
 }
+
 
 void HackedboxWindow::redrawCloseButton(bool pressed) const {
   if (! pressed) {
@@ -3159,15 +3280,14 @@ void HackedboxWindow::upsize(void) {
   }
 
   if (decorations & Decor_Titlebar) {
-    // the height of the titlebar is based upon the height of the font being
-    // used to display the window's title
     WindowStyle *style = screen->getWindowStyle();
-    if (MB_CUR_MAX > 1)
-      frame.title_h = (style->fontset_extents->max_ink_extent.height +
-                       (frame.bevel_w * 2) + 2);
-    else
-      frame.title_h = (style->font->ascent() + style->font->descent() +
-                       (frame.bevel_w * 2) + 2);
+
+    if (style->font) {
+      frame.title_h = style->font->height() +
+                      (frame.bevel_w * 2) + 2;
+    } else {
+      frame.title_h = (frame.bevel_w * 2) + 2;
+    }
 
     frame.label_h = frame.title_h - (frame.bevel_w * 2);
     frame.button_w = (frame.label_h - 2);
@@ -3302,42 +3422,50 @@ void HackedboxWindow::constrain(Corner anchor,
   }
 }
 
-int WindowStyle::doJustify(const char *text,
+
+int WindowStyle::doJustify(Display *display,
+                           const char *text,
                            int &start_pos,
                            unsigned int max_length,
-                           unsigned int modifier,
-                           bool multibyte) const 
-                           {
-  size_t text_len = strlen(text);
-  unsigned int length;
+                           unsigned int modifier) const
+{
+    if (!font || !font->xftfont())
+        return 0;
 
-  do {
-    if (multibyte) {
-      XRectangle ink, logical;
-      XmbTextExtents(fontset, text, text_len, &ink, &logical);
-      length = logical.width;
-    } else {
-      length = XTextWidth(font->xfont(), text, text_len);
+    size_t text_len = strlen(text);
+    unsigned int length = 0;
+
+    do {
+        XGlyphInfo extents;
+
+        XftTextExtentsUtf8(
+            display,
+            font->xftfont(),
+            reinterpret_cast<const FcChar8 *>(text),
+            text_len,
+            &extents);
+
+        length = extents.xOff + modifier;
+
+    } while (length > max_length && text_len-- > 0);
+
+    switch (justify) {
+    case RightJustify:
+        start_pos += max_length - length;
+        break;
+
+    case CenterJustify:
+        start_pos += (max_length - length) / 2;
+        break;
+
+    case LeftJustify:
+    default:
+        break;
     }
-    length += modifier;
-  } while (length > max_length && text_len-- > 0);
 
-  switch (justify) {
-  case RightJustify:
-    start_pos += max_length - length;
-    break;
-
-  case CenterJustify:
-    start_pos += (max_length - length) / 2;
-    break;
-
-  case LeftJustify:
-  default:
-    break;
-  }
-
-  return text_len;
+    return static_cast<int>(text_len);
 }
+
 
 HbWindowGroup::HbWindowGroup(Hackedbox *b, Window _group)
   : hackedbox(b), group(_group) {

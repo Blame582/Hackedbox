@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -23,7 +23,6 @@
 #ifdef HAVE_CONFIG_H
 #  include "../config.h"
 #endif
-
 
 #include <stdlib.h>
 #include <string.h>
@@ -42,9 +41,9 @@
 
 #include "Hackedbox.hpp"
 #include "BaseMenu.hpp"
+#include "GCCache.hpp"
 #include "ImageControl.hpp"
 #include "ImageLoader.hpp"
-#include "GCCache.hpp"
 #include "Screen.hpp"
 
 
@@ -167,95 +166,65 @@ static unsigned long allocateMenuColor(Display *display,
 
 
 /*
- * Return the width of text using either Xft or the old X font system.
- *
- * Xft fonts do not have an XFontStruct, so XTextWidth() must never be
- * called on an HbFont containing an Xft font.
+ * Return the width of text using Xft.
  */
 static unsigned int hfontTextWidth(Display *display,
-                                    int screen,
                                     HbFont *font,
                                     const char *text,
                                     int len)
 {
-  (void)screen;
-
   if (!display ||
       !font ||
       !text ||
       len <= 0)
     return 0;
 
-  if (font->isXft()) {
-    XftFont *xft_font = font->xftfont();
+  XftFont *xft_font =
+    font->xftfont();
 
-    if (!xft_font)
-      return 0;
+  if (!xft_font)
+    return 0;
 
-    XGlyphInfo extents;
+  XGlyphInfo extents;
 
-    XftTextExtentsUtf8(
-      display,
-      xft_font,
-      reinterpret_cast<const FcChar8 *>(text),
-      len,
-      &extents);
+  XftTextExtentsUtf8(
+    display,
+    xft_font,
+    reinterpret_cast<const FcChar8 *>(text),
+    len,
+    &extents);
 
-    return static_cast<unsigned int>(extents.xOff);
-  }
-
-  XFontStruct *xfont = font->xfont();
-
-  if (xfont)
-    return XTextWidth(xfont, text, len);
-
-  return 0;
+  return static_cast<unsigned int>(
+    extents.xOff);
 }
 
 
 /*
- * Return the height of a menu font using either Xft or the old X font
- * system.
+ * Return the height of an Xft font.
  */
-static unsigned int hfontHeight(HbFont *font,
-                                XFontSet fontset,
-                                XFontSetExtents *fontset_extents)
+static unsigned int hfontHeight(HbFont *font)
 {
   if (!font)
     return 0;
-
-  if (font->isXft())
-    return font->height();
-
-  if (MB_CUR_MAX > 1 &&
-      fontset &&
-      fontset_extents)
-    return fontset_extents->max_ink_extent.height;
 
   return font->height();
 }
 
 
 /*
- * Draw text using whichever font backend HbFont selected.
- *
- * Xft fonts are rendered through Xft.
- * Old X fonts continue to use the existing Xlib/Xmb paths.
+ * Draw text using Xft.
  */
 static void drawHbFont(Display *display,
-                       int screen,
-                       Visual *visual,
-                       Colormap colormap,
-                       Window window,
-                       HbFont *font,
-                       const HbColor &color,
-                       int x,
-                       int y,
-                       const char *text,
-                       int len)
+                        Visual *visual,
+                        Colormap colormap,
+                        Window window,
+                        HbFont *font,
+                        const HbColor &color,
+                        int x,
+                        int y,
+                        const char *text,
+                        int len)
 {
-  (void)screen;
-
   if (!display ||
       !visual ||
       !font ||
@@ -264,180 +233,149 @@ static void drawHbFont(Display *display,
       window == None)
     return;
 
-  /*
-   * Xft / TrueType font.
-   */
-  if (font->isXft()) {
-    XftFont *xft_font = font->xftfont();
+  XftFont *xft_font =
+    font->xftfont();
 
-    if (!xft_font)
-      return;
-
-    XftDraw *draw =
-      XftDrawCreate(display,
-                    window,
-                    visual,
-                    colormap);
-
-    if (!draw)
-      return;
-
-    XRenderColor render_color;
-
-    render_color.red =
-      static_cast<unsigned short>(
-        color.red() * 257U);
-
-    render_color.green =
-      static_cast<unsigned short>(
-        color.green() * 257U);
-
-    render_color.blue =
-      static_cast<unsigned short>(
-        color.blue() * 257U);
-
-    render_color.alpha =
-      static_cast<unsigned short>(
-        color.alpha() * 257U);
-
-    XftColor xft_color;
-
-    if (XftColorAllocValue(display,
-                           visual,
-                           colormap,
-                           &render_color,
-                           &xft_color)) {
-
-      XftDrawStringUtf8(
-        draw,
-        &xft_color,
-        xft_font,
-        x,
-        y,
-        reinterpret_cast<const FcChar8 *>(text),
-        len);
-
-      XftColorFree(display,
-                   visual,
-                   colormap,
-                   &xft_color);
-    }
-
-    XftDrawDestroy(draw);
+  if (!xft_font)
     return;
+
+  XftDraw *draw =
+    XftDrawCreate(display,
+                  window,
+                  visual,
+                  colormap);
+
+  if (!draw)
+    return;
+
+  XRenderColor render_color;
+
+  render_color.red =
+    static_cast<unsigned short>(
+      color.red() * 257U);
+
+  render_color.green =
+    static_cast<unsigned short>(
+      color.green() * 257U);
+
+  render_color.blue =
+    static_cast<unsigned short>(
+      color.blue() * 257U);
+
+  render_color.alpha =
+    static_cast<unsigned short>(
+      color.alpha() * 257U);
+
+  XftColor xft_color;
+
+  if (XftColorAllocValue(display,
+                         visual,
+                         colormap,
+                         &render_color,
+                         &xft_color)) {
+
+    XftDrawStringUtf8(
+      draw,
+      &xft_color,
+      xft_font,
+      x,
+      y,
+      reinterpret_cast<const FcChar8 *>(text),
+      len);
+
+    XftColorFree(display,
+                 visual,
+                 colormap,
+                 &xft_color);
   }
 
-
-  /*
-   * Old X core font.
-   */
-  XFontStruct *xfont = font->xfont();
-
-  if (xfont) {
-    HbPen pen(color, xfont);
-
-    XDrawString(display,
-                window,
-                pen.gc(),
-                x,
-                y,
-                text,
-                len);
-  }
+  XftDrawDestroy(draw);
 }
 
-/*
 
-* Draw a menu item icon from a direct image filename.
-*
-* The image is loaded with HbImageLoader and rendered into the menu frame.
-  */
-  static void drawMenuIcon(Display *display,
-  Visual *visual,
-  Colormap colormap,
-  Window window,
-  const char *filename,
-  int x,
-  int y,
-  unsigned int size)
-  {
+/*
+ * Draw a menu item icon from a direct image filename.
+ *
+ * The image is loaded with HbImageLoader and rendered into the menu frame.
+ */
+static void drawMenuIcon(Display *display,
+                         Visual *visual,
+                         Colormap colormap,
+                         Window window,
+                         const char *filename,
+                         int x,
+                         int y,
+                         unsigned int size)
+{
   if (!display ||
-  !visual ||
-  window == None ||
-  !filename ||
-  !*filename ||
-  size == 0)
-  return;
+      !visual ||
+      window == None ||
+      !filename ||
+      !*filename ||
+      size == 0)
+    return;
 
-(void)colormap;
+  (void)colormap;
 
-HbImageData image;
-std::string error;
+  HbImageData image;
+  std::string error;
 
-if (!HbImageLoader::load(
-filename,
-image,
-error) ||
-!image.valid())
-return;
+  if (!HbImageLoader::load(filename,
+                           image,
+                           error) ||
+      !image.valid())
+    return;
 
-if (image.width == 0 ||
-image.height == 0 ||
-image.stride < image.width * 4)
-return;
+  if (image.width == 0 ||
+      image.height == 0 ||
+      image.stride < image.width * 4)
+    return;
 
-/*
-
-* Preserve the original aspect ratio.
-  */
+  /*
+   * Preserve the original aspect ratio.
+   */
   unsigned int draw_width = size;
   unsigned int draw_height = size;
 
-if (image.width > image.height) {
+  if (image.width > image.height) {
 
+    const unsigned long long scaled_height =
+      (static_cast<unsigned long long>(size) *
+       static_cast<unsigned long long>(image.height)) /
+      static_cast<unsigned long long>(image.width);
 
-const unsigned long long scaled_height =
-  (static_cast<unsigned long long>(size) *
-   static_cast<unsigned long long>(image.height)) /
-  static_cast<unsigned long long>(image.width);
+    draw_height =
+      static_cast<unsigned int>(scaled_height);
 
-draw_height =
-  static_cast<unsigned int>(scaled_height);
+    if (draw_height == 0)
+      draw_height = 1;
 
-if (draw_height == 0)
-  draw_height = 1;
+  } else if (image.height > image.width) {
 
+    const unsigned long long scaled_width =
+      (static_cast<unsigned long long>(size) *
+       static_cast<unsigned long long>(image.width)) /
+      static_cast<unsigned long long>(image.height);
 
-} else if (image.height > image.width) {
+    draw_width =
+      static_cast<unsigned int>(scaled_width);
 
+    if (draw_width == 0)
+      draw_width = 1;
+  }
 
-const unsigned long long scaled_width =
-  (static_cast<unsigned long long>(size) *
-   static_cast<unsigned long long>(image.width)) /
-  static_cast<unsigned long long>(image.height);
+  const int draw_x =
+    x + static_cast<int>((size - draw_width) / 2);
 
-draw_width =
-  static_cast<unsigned int>(scaled_width);
+  const int draw_y =
+    y + static_cast<int>((size - draw_height) / 2);
 
-if (draw_width == 0)
-  draw_width = 1;
-
-
-}
-
-const int draw_x =
-x + static_cast<int>((size - draw_width) / 2);
-
-const int draw_y =
-y + static_cast<int>((size - draw_height) / 2);
-
-/*
-
-* Get the actual depth of the menu window.
-*
-* This is important because Hackedbox menus can use a 32-bit
-* ARGB visual while the root screen may use a different depth.
-  */
+  /*
+   * Get the actual depth of the menu window.
+   *
+   * This is important because Hackedbox menus can use a 32-bit
+   * ARGB visual while the root screen may use a different depth.
+   */
   Window root;
   int window_x;
   int window_y;
@@ -446,166 +384,159 @@ y + static_cast<int>((size - draw_height) / 2);
   unsigned int border_width;
   unsigned int depth;
 
-if (!XGetGeometry(
-display,
-window,
-&root,
-&window_x,
-&window_y,
-&window_width,
-&window_height,
-&border_width,
-&depth))
-return;
+  if (!XGetGeometry(display,
+                    window,
+                    &root,
+                    &window_x,
+                    &window_y,
+                    &window_width,
+                    &window_height,
+                    &border_width,
+                    &depth))
+    return;
 
-if (depth == 0)
-return;
+  if (depth == 0)
+    return;
 
-XImage *ximage =
-XCreateImage(
-display,
-visual,
-depth,
-ZPixmap,
-0,
-nullptr,
-draw_width,
-draw_height,
-32,
-0);
+  XImage *ximage =
+    XCreateImage(display,
+                 visual,
+                 depth,
+                 ZPixmap,
+                 0,
+                 nullptr,
+                 draw_width,
+                 draw_height,
+                 32,
+                 0);
 
-if (!ximage)
-return;
+  if (!ximage)
+    return;
 
-const size_t image_bytes =
-static_cast<size_t>(ximage->bytes_per_line) *
-static_cast<size_t>(draw_height);
+  const size_t image_bytes =
+    static_cast<size_t>(ximage->bytes_per_line) *
+    static_cast<size_t>(draw_height);
 
-if (image_bytes == 0) {
-ximage->data = nullptr;
-XDestroyImage(ximage);
-return;
-}
-
-ximage->data =
-static_cast<char *>(calloc(1, image_bytes));
-
-if (!ximage->data) {
-XDestroyImage(ximage);
-return;
-}
-
-/*
-
-* Convert an 8-bit channel value into the bit range used by
-* the X11 Visual.
-  */
-  const auto scaleChannel =
-  [](unsigned int value,
-  unsigned long mask) -> unsigned long {
-
-  if (mask == 0)
-  return 0;
-
-  unsigned int shift = 0;
-  unsigned long shifted = mask;
-
-  while ((shifted & 1UL) == 0) {
-  shifted >>= 1;
-  ++shift;
+  if (image_bytes == 0) {
+    ximage->data = nullptr;
+    XDestroyImage(ximage);
+    return;
   }
 
-  unsigned long max_value = shifted;
+  ximage->data =
+    static_cast<char *>(calloc(1, image_bytes));
 
-  return
-  ((static_cast<unsigned long>(value) *
-  max_value) / 255UL) << shift;
-  };
+  if (!ximage->data) {
+    XDestroyImage(ximage);
+    return;
+  }
 
-const unsigned long red_mask =
-visual->red_mask;
+  /*
+   * Convert an 8-bit channel value into the bit range used by
+   * the X11 Visual.
+   */
+  const auto scaleChannel =
+    [](unsigned int value,
+       unsigned long mask) -> unsigned long {
 
-const unsigned long green_mask =
-visual->green_mask;
+      if (mask == 0)
+        return 0;
 
-const unsigned long blue_mask =
-visual->blue_mask;
+      unsigned int shift = 0;
+      unsigned long shifted = mask;
 
-for (unsigned int py = 0;
-py < draw_height;
-++py) {
+      while ((shifted & 1UL) == 0) {
+        shifted >>= 1;
+        ++shift;
+      }
 
+      unsigned long max_value = shifted;
 
-const unsigned int src_y =
-  static_cast<unsigned int>(
-    (static_cast<unsigned long long>(py) *
-     static_cast<unsigned long long>(image.height)) /
-    static_cast<unsigned long long>(draw_height));
+      return
+        ((static_cast<unsigned long>(value) *
+          max_value) / 255UL) << shift;
+    };
 
-const unsigned char *src_row =
-  image.pixels.data() +
-  static_cast<size_t>(src_y) *
-  static_cast<size_t>(image.stride);
+  const unsigned long red_mask =
+    visual->red_mask;
 
-for (unsigned int px = 0;
-     px < draw_width;
-     ++px) {
+  const unsigned long green_mask =
+    visual->green_mask;
 
-  const unsigned int src_x =
-    static_cast<unsigned int>(
-      (static_cast<unsigned long long>(px) *
-       static_cast<unsigned long long>(image.width)) /
-      static_cast<unsigned long long>(draw_width));
+  const unsigned long blue_mask =
+    visual->blue_mask;
 
-  const unsigned char *pixel =
-    src_row +
-    static_cast<size_t>(src_x) * 4;
+  for (unsigned int py = 0;
+       py < draw_height;
+       ++py) {
 
-  const unsigned long red =
-    scaleChannel(pixel[0], red_mask);
+    const unsigned int src_y =
+      static_cast<unsigned int>(
+        (static_cast<unsigned long long>(py) *
+         static_cast<unsigned long long>(image.height)) /
+        static_cast<unsigned long long>(draw_height));
 
-  const unsigned long green =
-    scaleChannel(pixel[1], green_mask);
+    const unsigned char *src_row =
+      image.pixels.data() +
+      static_cast<size_t>(src_y) *
+      static_cast<size_t>(image.stride);
 
-  const unsigned long blue =
-    scaleChannel(pixel[2], blue_mask);
+    for (unsigned int px = 0;
+         px < draw_width;
+         ++px) {
 
-  XPutPixel(
+      const unsigned int src_x =
+        static_cast<unsigned int>(
+          (static_cast<unsigned long long>(px) *
+           static_cast<unsigned long long>(image.width)) /
+          static_cast<unsigned long long>(draw_width));
+
+      const unsigned char *pixel =
+        src_row +
+        static_cast<size_t>(src_x) * 4;
+
+      const unsigned long red =
+        scaleChannel(pixel[0], red_mask);
+
+      const unsigned long green =
+        scaleChannel(pixel[1], green_mask);
+
+      const unsigned long blue =
+        scaleChannel(pixel[2], blue_mask);
+
+      XPutPixel(
+        ximage,
+        static_cast<int>(px),
+        static_cast<int>(py),
+        red | green | blue);
+    }
+  }
+
+  GC gc =
+    XCreateGC(display,
+              window,
+              0,
+              nullptr);
+
+  if (!gc) {
+    XDestroyImage(ximage);
+    return;
+  }
+
+  XPutImage(
+    display,
+    window,
+    gc,
     ximage,
-    static_cast<int>(px),
-    static_cast<int>(py),
-    red | green | blue);
-}
+    0,
+    0,
+    draw_x,
+    draw_y,
+    draw_width,
+    draw_height);
 
-
-}
-
-GC gc =
-XCreateGC(
-display,
-window,
-0,
-nullptr);
-
-if (!gc) {
-XDestroyImage(ximage);
-return;
-}
-
-XPutImage(
-display,
-window,
-gc,
-ximage,
-0,
-0,
-draw_x,
-draw_y,
-draw_width,
-draw_height);
-
-XFreeGC(display, gc);
-XDestroyImage(ximage);
+  XFreeGC(display, gc);
+  XDestroyImage(ximage);
 }
 
 
@@ -689,45 +620,44 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
 
   menu.bevel_w = screen->getBevelWidth();
 
-  MenuStyle *style = screen->getMenuStyle();
+  MenuStyle *style =
+    screen->getMenuStyle();
 
-  if (MB_CUR_MAX > 1 && !style->t_font->isXft()) {
-    menu.width = menu.title_h = menu.item_w = menu.frame_h =
-      style->t_fontset_extents->max_ink_extent.height +
-      (menu.bevel_w * 2);
-  } else {
-    menu.width = menu.title_h = menu.item_w = menu.frame_h =
+  menu.width =
+    menu.title_h =
+    menu.item_w =
+    menu.frame_h =
       style->t_font->height() +
       (menu.bevel_w * 2);
-  }
 
   menu.item_h =
-    hfontHeight(style->f_font,
-                style->f_fontset,
-                style->f_fontset_extents) +
+    hfontHeight(style->f_font) +
     menu.bevel_w;
 
   const unsigned int clock_h =
-    hfontHeight(style->clock_font,
-                style->clock_fontset,
-                style->clock_fontset_extents) +
+    hfontHeight(style->clock_font) +
     menu.bevel_w;
 
   const unsigned int date_h =
-    hfontHeight(style->date_font,
-                style->date_fontset,
-                style->date_fontset_extents) +
+    hfontHeight(style->date_font) +
     menu.bevel_w;
 
   menu.item_h =
     max(menu.item_h,
         max(clock_h, date_h));
 
-  menu.height = menu.title_h + screen->getBorderWidth() + menu.frame_h;
+  menu.height =
+    menu.title_h +
+    screen->getBorderWidth() +
+    menu.frame_h;
 
   unsigned long attrib_mask =
-    CWBackPixmap | CWBackPixel | CWBorderPixel |
-    CWColormap | CWOverrideRedirect | CWEventMask;
+    CWBackPixmap |
+    CWBackPixel |
+    CWBorderPixel |
+    CWColormap |
+    CWOverrideRedirect |
+    CWEventMask;
 
   XSetWindowAttributes attrib;
 
@@ -760,18 +690,19 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
     ExposureMask;
 
   menu.window =
-    XCreateWindow(display,
-                  screen->getRootWindow(),
-                  menu.x,
-                  menu.y,
-                  menu.width,
-                  menu.height,
-                  screen->getBorderWidth(),
-                  menu_depth,
-                  InputOutput,
-                  menu_visual,
-                  attrib_mask,
-                  &attrib);
+    XCreateWindow(
+      display,
+      screen->getRootWindow(),
+      menu.x,
+      menu.y,
+      menu.width,
+      menu.height,
+      screen->getBorderWidth(),
+      menu_depth,
+      InputOutput,
+      menu_visual,
+      attrib_mask,
+      &attrib);
 
   hackedbox->saveMenuSearch(menu.window, this);
 
@@ -803,36 +734,39 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
     LeaveWindowMask;
 
   menu.title =
-    XCreateWindow(display,
-                  menu.window,
-                  0,
-                  0,
-                  menu.width,
-                  menu.height,
-                  0,
-                  menu_depth,
-                  InputOutput,
-                  menu_visual,
-                  attrib_mask,
-                  &attrib);
+    XCreateWindow(
+      display,
+      menu.window,
+      0,
+      0,
+      menu.width,
+      menu.height,
+      0,
+      menu_depth,
+      InputOutput,
+      menu_visual,
+      attrib_mask,
+      &attrib);
 
   hackedbox->saveMenuSearch(menu.title, this);
 
   attrib.event_mask |= PointerMotionMask;
 
   menu.frame =
-    XCreateWindow(display,
-                  menu.window,
-                  0,
-                  menu.title_h + screen->getBorderWidth(),
-                  menu.width,
-                  menu.frame_h,
-                  0,
-                  menu_depth,
-                  InputOutput,
-                  menu_visual,
-                  attrib_mask,
-                  &attrib);
+    XCreateWindow(
+      display,
+      menu.window,
+      0,
+      menu.title_h +
+        screen->getBorderWidth(),
+      menu.width,
+      menu.frame_h,
+      0,
+      menu_depth,
+      InputOutput,
+      menu_visual,
+      attrib_mask,
+      &attrib);
 
   hackedbox->saveMenuSearch(menu.frame, this);
 }
@@ -841,15 +775,20 @@ HbBasemenu::HbBasemenu(HbScreen *scrn) {
 HbBasemenu::~HbBasemenu(void) {
   XUnmapWindow(display, menu.window);
 
-  if (shown && shown->getWindowID() == getWindowID())
+  if (shown &&
+      shown->getWindowID() == getWindowID())
     shown = (HbBasemenu *) 0;
 
-  MenuItems::const_iterator it = menuitems.begin(),
-    end = menuitems.end();
+  MenuItems::const_iterator it =
+    menuitems.begin();
+
+  MenuItems::const_iterator end =
+    menuitems.end();
 
   for (; it != end; ++it) {
     if (!internal_menu) {
-      HbBasemenu *tmp = (*it)->submenu();
+      HbBasemenu *tmp =
+        (*it)->submenu();
 
       if (tmp) {
         if (!tmp->internal_menu)
@@ -860,9 +799,10 @@ HbBasemenu::~HbBasemenu(void) {
     }
   }
 
-  std::for_each(menuitems.begin(),
-                menuitems.end(),
-                PointerAssassin());
+  std::for_each(
+    menuitems.begin(),
+    menuitems.end(),
+    PointerAssassin());
 
   if (menu.title_pixmap)
     image_ctrl->removeImage(menu.title_pixmap);
@@ -911,12 +851,18 @@ HbBasemenuItem *HbBasemenu::find(int index) {
 }
 
 
-int HbBasemenu::insert(HbBasemenuItem *item, int pos) {
+int HbBasemenu::insert(HbBasemenuItem *item,
+                       int pos) {
   if (pos < 0) {
     menuitems.push_back(item);
   } else {
-    assert(pos < static_cast<signed>(menuitems.size()));
-    menuitems.insert(menuitems.begin() + pos, item);
+    assert(pos <
+           static_cast<signed>(
+             menuitems.size()));
+
+    menuitems.insert(
+      menuitems.begin() + pos,
+      item);
   }
 
   return menuitems.size();
@@ -928,12 +874,14 @@ int HbBasemenu::insert(const string& label,
                        const string& exec,
                        int pos) {
   HbBasemenuItem *item =
-    new HbBasemenuItem(label,
-                       function,
-                       exec);
+    new HbBasemenuItem(
+      label,
+      function,
+      exec);
 
   return insert(item, pos);
 }
+
 
 int HbBasemenu::insert(const string& label,
                        int function,
@@ -941,10 +889,11 @@ int HbBasemenu::insert(const string& label,
                        const string& icon,
                        int pos) {
   HbBasemenuItem *item =
-    new HbBasemenuItem(label,
-                       function,
-                       exec,
-                       icon);
+    new HbBasemenuItem(
+      label,
+      function,
+      exec,
+      icon);
 
   return insert(item, pos);
 }
@@ -954,7 +903,9 @@ int HbBasemenu::insert(const string& label,
                        HbBasemenu *submenu,
                        int pos) {
   HbBasemenuItem *item =
-    new HbBasemenuItem(label, submenu);
+    new HbBasemenuItem(
+      label,
+      submenu);
 
   submenu->parent = this;
 
@@ -967,9 +918,10 @@ int HbBasemenu::insert(const string& label,
                        const string& icon,
                        int pos) {
   HbBasemenuItem *item =
-    new HbBasemenuItem(label,
-                       submenu,
-                       icon);
+    new HbBasemenuItem(
+      label,
+      submenu,
+      icon);
 
   submenu->parent = this;
 
@@ -978,13 +930,15 @@ int HbBasemenu::insert(const string& label,
 
 
 int HbBasemenu::remove(int index) {
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
   if (!item)
     return -1;
 
   if (!internal_menu) {
-    HbBasemenu *tmp = item->submenu();
+    HbBasemenu *tmp =
+      item->submenu();
 
     if (tmp) {
       if (!tmp->internal_menu)
@@ -1011,7 +965,8 @@ int HbBasemenu::remove(int index) {
   else if (date_item > index)
     date_item--;
 
-  menuitems.erase(menuitems.begin() + index);
+  menuitems.erase(
+    menuitems.begin() + index);
 
   return menuitems.size();
 }
@@ -1021,43 +976,19 @@ void HbBasemenu::update(void) {
   const MenuStyle *const style =
     screen->getMenuStyle();
 
-  unsigned int title_font_h;
+  const unsigned int title_font_h =
+    style->t_font->height();
 
-  /*
-   * Xmb fontset is used only when the selected HbFont is
-   * an old X core font. Xft fonts have their own metrics.
-   */
-  if (MB_CUR_MAX > 1 && !style->f_font->isXft()) {
-    menu.item_h =
-      style->f_fontset_extents->max_ink_extent.height +
-      menu.bevel_w;
+  menu.item_h =
+    style->f_font->height() +
+    menu.bevel_w;
 
-    title_font_h =
-      style->t_fontset_extents->max_ink_extent.height;
-  } else {
-    menu.item_h =
-      style->f_font->height() +
-      menu.bevel_w;
-
-    title_font_h =
-      style->t_font->height();
-  }
-
-  /*
-   * Clock and date rows can use fonts different from the normal
-   * menu frame font. Make the common row height large enough for
-   * either of them.
-   */
   const unsigned int clock_h =
-    hfontHeight(style->clock_font,
-                style->clock_fontset,
-                style->clock_fontset_extents) +
+    hfontHeight(style->clock_font) +
     menu.bevel_w;
 
   const unsigned int date_h =
-    hfontHeight(style->date_font,
-                style->date_fontset,
-                style->date_fontset_extents) +
+    hfontHeight(style->date_font) +
     menu.bevel_w;
 
   menu.item_h =
@@ -1072,60 +1003,33 @@ void HbBasemenu::update(void) {
     (menu.bevel_w * 2);
 
   /*
-   * Measure text using the supplied font and fontset.
+   * Measure text using Xft.
    */
   auto textWidth =
     [&](HbFont *font,
-        XFontSet fontset,
         const char *text,
         int len) -> unsigned int {
 
-      if (!font || !text || len <= 0)
-        return 0;
-
-      if (font->isXft()) {
-
-        return hfontTextWidth(
-          display,
-          screen->getScreenNumber(),
-          font,
-          text,
-          len);
-
-      } else if (MB_CUR_MAX > 1) {
-
-        XRectangle ink, logical;
-
-        XmbTextExtents(
-          fontset,
-          text,
-          len,
-          &ink,
-          &logical);
-
-        return logical.width;
-
-      } else {
-
-        return hfontTextWidth(
-          display,
-          screen->getScreenNumber(),
-          font,
-          text,
-          len);
-      }
+      return hfontTextWidth(
+        display,
+        font,
+        text,
+        len);
     };
 
   if (title_vis) {
 
-    const char *s = getLabel();
-    const int l = strlen(s);
+    const char *s =
+      getLabel();
+
+    const int l =
+      strlen(s);
 
     menu.item_w =
-      textWidth(style->t_font,
-                style->t_fontset,
-                s,
-                l);
+      textWidth(
+        style->t_font,
+        s,
+        l);
 
     menu.item_w +=
       menu.bevel_w * 2;
@@ -1137,33 +1041,42 @@ void HbBasemenu::update(void) {
 
   unsigned int ii = 0;
 
-  MenuItems::iterator it = menuitems.begin(),
-    end = menuitems.end();
+  MenuItems::iterator it =
+    menuitems.begin();
+
+  MenuItems::iterator end =
+    menuitems.end();
 
   for (; it != end; ++it) {
 
     const int index =
       it - menuitems.begin();
 
-    const char *s = (*it)->label();
-    const int l = strlen(s);
+    const char *s =
+      (*it)->label();
 
-    HbFont *font = style->f_font;
-    XFontSet fontset = style->f_fontset;
+    const int l =
+      strlen(s);
+
+    HbFont *font =
+      style->f_font;
 
     if (index == clock_item) {
-      font = style->clock_font;
-      fontset = style->clock_fontset;
+
+      font =
+        style->clock_font;
+
     } else if (index == date_item) {
-      font = style->date_font;
-      fontset = style->date_fontset;
+
+      font =
+        style->date_font;
     }
 
     ii =
-      textWidth(font,
-                fontset,
-                s,
-                l);
+      textWidth(
+        font,
+        s,
+        l);
 
     /*
      * Keep the existing two item-height columns of horizontal
@@ -1262,7 +1175,9 @@ void HbBasemenu::update(void) {
             display,
             menu.title,
             menu.title_pixmap);
+
         } else {
+
           XSetWindowBackground(
             display,
             menu.title,
@@ -1302,7 +1217,9 @@ void HbBasemenu::update(void) {
     if (tmp)
       image_ctrl->removeImage(tmp);
 
-    XClearWindow(display, menu.title);
+    XClearWindow(
+      display,
+      menu.title);
   }
 
   tmp = menu.frame_pixmap;
@@ -1404,7 +1321,8 @@ void HbBasemenu::update(void) {
 
   } else {
 
-    const int hw = menu.item_h / 2;
+    const int hw =
+      menu.item_h / 2;
 
     menu.sel_pixmap =
       menu_argb ?
@@ -1444,14 +1362,23 @@ void HbBasemenu::update(void) {
     menu.width,
     menu.frame_h);
 
-  XClearWindow(display, menu.window);
-  XClearWindow(display, menu.title);
-  XClearWindow(display, menu.frame);
+  XClearWindow(
+    display,
+    menu.window);
+
+  XClearWindow(
+    display,
+    menu.title);
+
+  XClearWindow(
+    display,
+    menu.frame);
 
   if (title_vis && visible)
     redrawTitle();
 
-  const int menu_size = menuitems.size();
+  const int menu_size =
+    menuitems.size();
 
   for (int i = 0;
        visible && i < menu_size;
@@ -1468,7 +1395,9 @@ void HbBasemenu::update(void) {
   if (parent && visible)
     parent->drawSubmenu(parent->which_sub);
 
-  XMapSubwindows(display, menu.window);
+  XMapSubwindows(
+    display,
+    menu.window);
 }
 
 
@@ -1485,52 +1414,26 @@ void HbBasemenu::redrawTitle(void) {
     screen->getMenuStyle();
 
   /*
-   * Measure text using the actual rendering backend.
+   * Measure text using Xft.
    */
   auto textWidth =
-    [&](const char *text, int len) -> unsigned int {
+    [&](const char *text,
+        int len) -> unsigned int {
 
-      if (!text || len <= 0)
-        return 0;
-
-      if (style->t_font->isXft()) {
-
-        return hfontTextWidth(
-          display,
-          screen->getScreenNumber(),
-          style->t_font,
-          text,
-          len);
-
-      } else if (MB_CUR_MAX > 1) {
-
-        XRectangle ink, logical;
-
-        XmbTextExtents(
-          style->t_fontset,
-          text,
-          len,
-          &ink,
-          &logical);
-
-        return logical.width;
-
-      } else {
-
-        return hfontTextWidth(
-          display,
-          screen->getScreenNumber(),
-          style->t_font,
-          text,
-          len);
-      }
+      return hfontTextWidth(
+        display,
+        style->t_font,
+        text,
+        len);
     };
 
   /*
    * Draw one centered line.
    */
   auto drawCentered =
-    [&](const char *text, int len, int baseline) {
+    [&](const char *text,
+        int len,
+        int baseline) {
 
       const unsigned int width =
         textWidth(text, len);
@@ -1540,78 +1443,25 @@ void HbBasemenu::redrawTitle(void) {
         (menu.width - width) / 2 :
         0;
 
-      if (style->t_font->isXft()) {
-
-        drawHbFont(
-          display,
-          screen->getScreenNumber(),
-          menu_visual,
-          menu_colormap,
-          menu.title,
-          style->t_font,
-          style->t_text,
-          dx,
-          baseline,
-          text,
-          len);
-
-      } else if (MB_CUR_MAX > 1) {
-
-        HbPen pen(
-          style->t_text,
-          style->t_font->xfont());
-
-        XmbDrawString(
-          display,
-          menu.title,
-          style->t_fontset,
-          pen.gc(),
-          dx,
-          baseline,
-          text,
-          len);
-
-      } else {
-
-        HbPen pen(
-          style->t_text,
-          style->t_font->xfont());
-
-        XDrawString(
-          display,
-          menu.title,
-          pen.gc(),
-          dx,
-          baseline,
-          text,
-          len);
-      }
+      drawHbFont(
+        display,
+        menu_visual,
+        menu_colormap,
+        menu.title,
+        style->t_font,
+        style->t_text,
+        dx,
+        baseline,
+        text,
+        len);
     };
 
   /*
    * One normal menu title line.
    */
-  int baseline;
-
-  if (style->t_font->isXft()) {
-
-    baseline =
-      style->t_font->ascent() +
-      menu.bevel_w;
-
-  } else if (MB_CUR_MAX > 1) {
-
-    baseline =
-      menu.bevel_w -
-      style->t_fontset_extents->
-        max_ink_extent.y;
-
-  } else {
-
-    baseline =
-      style->t_font->ascent() +
-      menu.bevel_w;
-  }
+  const int baseline =
+    style->t_font->ascent() +
+    menu.bevel_w;
 
   drawCentered(
     title,
@@ -1641,11 +1491,13 @@ void HbBasemenu::redrawClock(void) {
    * Keep the global Clock object's formatting independent from
    * the menu clock/date formatting.
    */
-  time_t now = time((time_t *) 0);
+  time_t now =
+    time((time_t *) 0);
 
   struct tm local_time;
 
-  if (!localtime_r(&now, &local_time))
+  if (!localtime_r(&now,
+                   &local_time))
     return;
 
   if (clock_item >= 0 &&
@@ -1654,14 +1506,16 @@ void HbBasemenu::redrawClock(void) {
     char buffer[256];
 
     const size_t len =
-      strftime(buffer,
-               sizeof(buffer),
-               style->clock_format.c_str(),
-               &local_time);
+      strftime(
+        buffer,
+        sizeof(buffer),
+        style->clock_format.c_str(),
+        &local_time);
 
     if (len)
-      changeItemLabel(clock_item,
-                      buffer);
+      changeItemLabel(
+        clock_item,
+        buffer);
   }
 
   if (date_item >= 0 &&
@@ -1670,14 +1524,16 @@ void HbBasemenu::redrawClock(void) {
     char buffer[256];
 
     const size_t len =
-      strftime(buffer,
-               sizeof(buffer),
-               style->date_format.c_str(),
-               &local_time);
+      strftime(
+        buffer,
+        sizeof(buffer),
+        style->date_format.c_str(),
+        &local_time);
 
     if (len)
-      changeItemLabel(date_item,
-                      buffer);
+      changeItemLabel(
+        date_item,
+        buffer);
   }
 }
 
@@ -1685,13 +1541,22 @@ void HbBasemenu::redrawClock(void) {
 void HbBasemenu::show(void) {
   visible = True;
 
-  XMapSubwindows(display, menu.window);
-  XMapWindow(display, menu.window);
+  XMapSubwindows(
+    display,
+    menu.window);
 
-  XRaiseWindow(display, menu.window);
+  XMapWindow(
+    display,
+    menu.window);
+
+  XRaiseWindow(
+    display,
+    menu.window);
 
   if (!parent) {
-    if (shown && (!shown->torn))
+
+    if (shown &&
+        (!shown->torn))
       shown->hide();
 
     shown = this;
@@ -1705,7 +1570,8 @@ void HbBasemenu::hide(void) {
       parent &&
       parent->isVisible()) {
 
-    HbBasemenu *p = parent;
+    HbBasemenu *p =
+      parent;
 
     while (p->isVisible() &&
            !p->torn &&
@@ -1713,26 +1579,33 @@ void HbBasemenu::hide(void) {
       p = p->parent;
 
     p->internal_hide();
+
   } else {
+
     internal_hide();
   }
 }
 
 
 void HbBasemenu::internal_hide(void) {
-  HbBasemenuItem *tmp = find(which_sub);
+  HbBasemenuItem *tmp =
+    find(which_sub);
 
   if (tmp)
     tmp->submenu()->internal_hide();
 
   if (parent && !torn) {
-    parent->drawItem(parent->which_sub,
-                     False,
-                     True);
+
+    parent->drawItem(
+      parent->which_sub,
+      False,
+      True);
 
     parent->which_sub = -1;
+
   } else if (shown &&
              shown->menu.window == menu.window) {
+
     shown = (HbBasemenu *) 0;
   }
 
@@ -1742,18 +1615,22 @@ void HbBasemenu::internal_hide(void) {
   which_press = -1;
   which_sbl = -1;
 
-  XUnmapWindow(display, menu.window);
+  XUnmapWindow(
+    display,
+    menu.window);
 }
 
 
-void HbBasemenu::move(int x, int y) {
+void HbBasemenu::move(int x,
+                      int y) {
   menu.x = x;
   menu.y = y;
 
-  XMoveWindow(display,
-              menu.window,
-              x,
-              y);
+  XMoveWindow(
+    display,
+    menu.window,
+    x,
+    y);
 
   if (which_sub != -1)
     drawSubmenu(which_sub);
@@ -1761,7 +1638,8 @@ void HbBasemenu::move(int x, int y) {
 
 
 void HbBasemenu::drawSubmenu(int index) {
-  HbBasemenuItem *item = find(which_sub);
+  HbBasemenuItem *item =
+    find(which_sub);
 
   if (item &&
       item->submenu() &&
@@ -1769,12 +1647,14 @@ void HbBasemenu::drawSubmenu(int index) {
       which_sub != index)
     item->submenu()->internal_hide();
 
-  item = find(index);
+  item =
+    find(index);
 
   if (!item)
     return;
 
-  HbBasemenu *submenu = item->submenu();
+  HbBasemenu *submenu =
+    item->submenu();
 
   if (submenu &&
       visible &&
@@ -1784,17 +1664,23 @@ void HbBasemenu::drawSubmenu(int index) {
     if (submenu->parent != this)
       submenu->parent = this;
 
-    const int sbl = index / menu.persub;
-    const int i = index - (sbl * menu.persub);
+    const int sbl =
+      index / menu.persub;
+
+    const int i =
+      index -
+      (sbl * menu.persub);
 
     int x =
       menu.x +
-      ((menu.item_w * (sbl + 1)) +
+      ((menu.item_w *
+        (sbl + 1)) +
        screen->getBorderWidth());
 
     int y;
 
     if (alignment == AlignTop) {
+
       y =
         (((shifted) ?
           menu.y_shift :
@@ -1805,7 +1691,9 @@ void HbBasemenu::drawSubmenu(int index) {
          ((submenu->title_vis) ?
           submenu->menu.title_h +
           screen->getBorderWidth() : 0));
+
     } else {
+
       y =
         (((shifted) ?
          menu.y_shift :
@@ -1870,16 +1758,20 @@ void HbBasemenu::drawSubmenu(int index) {
 
     submenu->moving = moving;
     which_sub = index;
+
   } else {
+
     which_sub = -1;
   }
 }
 
 
 bool HbBasemenu::hasSubmenu(int index) {
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
-  if (item && item->submenu())
+  if (item &&
+      item->submenu())
     return True;
 
   return False;
@@ -1893,7 +1785,8 @@ void HbBasemenu::drawItem(int index,
                           int y,
                           unsigned int w,
                           unsigned int h) {
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
   if (!item)
     return;
@@ -1902,13 +1795,15 @@ void HbBasemenu::drawItem(int index,
   bool dohilite = True;
   bool dosel = True;
 
-  const char *text = item->label();
+  const char *text =
+    item->label();
 
   const int sbl =
     index / menu.persub;
 
   const int i =
-    index - (sbl * menu.persub);
+    index -
+    (sbl * menu.persub);
 
   const int item_x =
     sbl * menu.item_w;
@@ -1929,17 +1824,10 @@ void HbBasemenu::drawItem(int index,
     screen->getMenuStyle();
 
   /*
-   * Select the font, fontset, color and justification for this
-   * particular row.
+   * Select the font, color and justification for this particular row.
    */
   HbFont *item_font =
     style->f_font;
-
-  XFontSet item_fontset =
-    style->f_fontset;
-
-  XFontSetExtents *item_fontset_extents =
-    style->f_fontset_extents;
 
   TextJustify item_justify =
     style->f_justify;
@@ -1952,12 +1840,6 @@ void HbBasemenu::drawItem(int index,
     item_font =
       style->clock_font;
 
-    item_fontset =
-      style->clock_fontset;
-
-    item_fontset_extents =
-      style->clock_fontset_extents;
-
     item_justify =
       style->clock_justify;
 
@@ -1968,12 +1850,6 @@ void HbBasemenu::drawItem(int index,
 
     item_font =
       style->date_font;
-
-    item_fontset =
-      style->date_fontset;
-
-    item_fontset_extents =
-      style->date_fontset_extents;
 
     item_justify =
       style->date_justify;
@@ -2004,57 +1880,21 @@ void HbBasemenu::drawItem(int index,
   unsigned int text_h = 0;
 
   /*
-   * Measure text using the selected font backend.
+   * Measure text using Xft.
    */
   if (text) {
 
-    if (item_font->isXft()) {
+    text_w =
+      hfontTextWidth(
+        display,
+        item_font,
+        text,
+        len);
 
-      text_w =
-        hfontTextWidth(display,
-                       screen->getScreenNumber(),
-                       item_font,
-                       text,
-                       len);
-
-      text_y =
-        item_y +
-        item_font->ascent() +
-        (menu.bevel_w / 2);
-
-    } else if (MB_CUR_MAX > 1) {
-
-      XRectangle ink, logical;
-
-      XmbTextExtents(item_fontset,
-                     text,
-                     len,
-                     &ink,
-                     &logical);
-
-      text_w = logical.width;
-
-      text_y =
-        item_y +
-        (menu.bevel_w / 2) -
-          (item_fontset_extents ?
-           item_fontset_extents->max_ink_extent.y :
-           0);
-
-    } else {
-
-      text_w =
-        hfontTextWidth(display,
-                       screen->getScreenNumber(),
-                       item_font,
-                       text,
-                       len);
-
-      text_y =
-        item_y +
-        item_font->ascent() +
-        (menu.bevel_w / 2);
-    }
+    text_y =
+      item_y +
+      item_font->ascent() +
+      (menu.bevel_w / 2);
 
     /*
      * Icon space is only reserved when icons are enabled.
@@ -2146,23 +1986,6 @@ void HbBasemenu::drawItem(int index,
       style->h_text :
       style->f_text);
 
-  /*
-   * HbPen is only given an XFontStruct when using
-   * the old X core font backend.
-   */
-  const HbPen textpen(
-    (index == clock_item ||
-     index == date_item) ?
-      *item_text_color :
-      (highlight) ?
-        style->h_text :
-        item->isEnabled() ?
-          style->f_text :
-          style->d_text,
-    item_font->isXft() ?
-      0 :
-      item_font->xfont());
-
   const HbPen hipen(
     style->hilite.color());
 
@@ -2178,17 +2001,20 @@ void HbBasemenu::drawItem(int index,
       menu.bevel_w;
 
   sel_x += quarter_w;
-  sel_y = item_y + quarter_w;
+  sel_y =
+    item_y +
+    quarter_w;
 
   if (clear) {
 
-    XClearArea(display,
-               menu.frame,
-               item_x,
-               item_y,
-               menu.item_w,
-               menu.item_h,
-               False);
+    XClearArea(
+      display,
+      menu.frame,
+      item_x,
+      item_y,
+      menu.item_w,
+      menu.item_h,
+      False);
 
   } else if (!(x == y &&
                y == -1 &&
@@ -2269,26 +2095,28 @@ void HbBasemenu::drawItem(int index,
 
     if (menu.hilite_pixmap) {
 
-      XCopyArea(display,
-                menu.hilite_pixmap,
-                menu.frame,
-                hipen.gc(),
-                hoff_x,
-                hoff_y,
-                hilite_w,
-                hilite_h,
-                hilite_x,
-                hilite_y);
+      XCopyArea(
+        display,
+        menu.hilite_pixmap,
+        menu.frame,
+        hipen.gc(),
+        hoff_x,
+        hoff_y,
+        hilite_w,
+        hilite_h,
+        hilite_x,
+        hilite_y);
 
     } else {
 
-      XFillRectangle(display,
-                     menu.frame,
-                     hipen.gc(),
-                     hilite_x,
-                     hilite_y,
-                     hilite_w,
-                     hilite_h);
+      XFillRectangle(
+        display,
+        menu.frame,
+        hipen.gc(),
+        hilite_x,
+        hilite_y,
+        hilite_w,
+        hilite_h);
     }
 
   } else if (dosel &&
@@ -2297,26 +2125,28 @@ void HbBasemenu::drawItem(int index,
 
     if (menu.sel_pixmap) {
 
-      XCopyArea(display,
-                menu.sel_pixmap,
-                menu.frame,
-                hipen.gc(),
-                0,
-                0,
-                half_w,
-                half_w,
-                sel_x,
-                sel_y);
+      XCopyArea(
+        display,
+        menu.sel_pixmap,
+        menu.frame,
+        hipen.gc(),
+        0,
+        0,
+        half_w,
+        half_w,
+        sel_x,
+        sel_y);
 
     } else {
 
-      XFillRectangle(display,
-                     menu.frame,
-                     hipen.gc(),
-                     sel_x,
-                     sel_y,
-                     half_w,
-                     half_w);
+      XFillRectangle(
+        display,
+        menu.frame,
+        hipen.gc(),
+        sel_x,
+        sel_y,
+        half_w,
+        half_w);
     }
   }
 
@@ -2334,8 +2164,7 @@ void HbBasemenu::drawItem(int index,
    *
    * The menu still uses the direct filename supplied by the
    * menu entry. No desktop-file or icon-theme lookup is done.
-   */  
-   
+   */
   if (style->icon &&
       item->icon() &&
       *item->icon()) {
@@ -2368,8 +2197,7 @@ void HbBasemenu::drawItem(int index,
   /*
    * TEXT RENDERING
    *
-   * Never call XDrawString/XmbDrawString with an Xft-only
-   * HbFont.
+   * All Hackedbox menu text is rendered through Xft.
    */
   if (dotext && text) {
 
@@ -2383,56 +2211,34 @@ void HbBasemenu::drawItem(int index,
             style->f_text :
             style->d_text;
 
-    if (item_font->isXft()) {
-
-      drawHbFont(display,
-                 screen->getScreenNumber(),
-                 menu_visual,
-                 menu_colormap,
-                 menu.frame,
-                 item_font,
-                 text_color,
-                 text_x,
-                 text_y,
-                 text,
-                 len);
-
-    } else if (MB_CUR_MAX > 1) {
-
-      XmbDrawString(display,
-                    menu.frame,
-                    item_fontset,
-                    textpen.gc(),
-                    text_x,
-                    text_y,
-                    text,
-                    len);
-
-    } else {
-
-      XDrawString(display,
-                  menu.frame,
-                  textpen.gc(),
-                  text_x,
-                  text_y,
-                  text,
-                  len);
-    }
+    drawHbFont(
+      display,
+      menu_visual,
+      menu_colormap,
+      menu.frame,
+      item_font,
+      text_color,
+      text_x,
+      text_y,
+      text,
+      len);
   }
 
-  if (dosel && item->submenu()) {
+  if (dosel &&
+      item->submenu()) {
 
     switch (style->bullet) {
 
     case Square:
 
-      XDrawRectangle(display,
-                     menu.frame,
-                     pen.gc(),
-                     sel_x,
-                     sel_y,
-                     half_w,
-                     half_w);
+      XDrawRectangle(
+        display,
+        menu.frame,
+        pen.gc(),
+        sel_x,
+        sel_y,
+        half_w,
+        half_w);
       break;
 
     case Triangle: {
@@ -2441,10 +2247,12 @@ void HbBasemenu::drawItem(int index,
       if (style->bullet_pos == Right) {
 
         tri[0].x =
-          sel_x + quarter_w - 2;
+          sel_x +
+          quarter_w - 2;
 
         tri[0].y =
-          sel_y + quarter_w - 2;
+          sel_y +
+          quarter_w - 2;
 
         tri[1].x = 4;
         tri[1].y = 2;
@@ -2455,10 +2263,12 @@ void HbBasemenu::drawItem(int index,
       } else {
 
         tri[0].x =
-          sel_x + quarter_w - 2;
+          sel_x +
+          quarter_w - 2;
 
         tri[0].y =
-          item_y + half_w;
+          item_y +
+          half_w;
 
         tri[1].x = 4;
         tri[1].y = 2;
@@ -2467,13 +2277,14 @@ void HbBasemenu::drawItem(int index,
         tri[2].y = -4;
       }
 
-      XFillPolygon(display,
-                   menu.frame,
-                   pen.gc(),
-                   tri,
-                   3,
-                   Convex,
-                   CoordModePrevious);
+      XFillPolygon(
+        display,
+        menu.frame,
+        pen.gc(),
+        tri,
+        3,
+        Convex,
+        CoordModePrevious);
       break;
     }
 
@@ -2481,10 +2292,12 @@ void HbBasemenu::drawItem(int index,
       XPoint dia[4];
 
       dia[0].x =
-        sel_x + quarter_w - 3;
+        sel_x +
+        quarter_w - 3;
 
       dia[0].y =
-        item_y + half_w;
+        item_y +
+        half_w;
 
       dia[1].x = 3;
       dia[1].y = -3;
@@ -2495,13 +2308,14 @@ void HbBasemenu::drawItem(int index,
       dia[3].x = -3;
       dia[3].y = 3;
 
-      XFillPolygon(display,
-                   menu.frame,
-                   pen.gc(),
-                   dia,
-                   4,
-                   Convex,
-                   CoordModePrevious);
+      XFillPolygon(
+        display,
+        menu.frame,
+        pen.gc(),
+        dia,
+        4,
+        Convex,
+        CoordModePrevious);
       break;
     }
     }
@@ -2514,10 +2328,12 @@ void HbBasemenu::setLabel(const string& label) {
 }
 
 
-void HbBasemenu::setItemSelected(int index, bool sel) {
+void HbBasemenu::setItemSelected(int index,
+                                 bool sel) {
   assert(index >= 0);
 
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
   if (!item)
     return;
@@ -2525,16 +2341,18 @@ void HbBasemenu::setItemSelected(int index, bool sel) {
   item->setSelected(sel);
 
   if (visible)
-    drawItem(index,
-             (index == which_sub),
-             True);
+    drawItem(
+      index,
+      (index == which_sub),
+      True);
 }
 
 
 bool HbBasemenu::isItemSelected(int index) {
   assert(index >= 0);
 
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
   if (!item)
     return False;
@@ -2543,10 +2361,12 @@ bool HbBasemenu::isItemSelected(int index) {
 }
 
 
-void HbBasemenu::setItemEnabled(int index, bool enable) {
+void HbBasemenu::setItemEnabled(int index,
+                                bool enable) {
   assert(index >= 0);
 
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
   if (!item)
     return;
@@ -2554,16 +2374,18 @@ void HbBasemenu::setItemEnabled(int index, bool enable) {
   item->setEnabled(enable);
 
   if (visible)
-    drawItem(index,
-             (index == which_sub),
-             True);
+    drawItem(
+      index,
+      (index == which_sub),
+      True);
 }
 
 
 bool HbBasemenu::isItemEnabled(int index) {
   assert(index >= 0);
 
-  HbBasemenuItem *item = find(index);
+  HbBasemenuItem *item =
+    find(index);
 
   if (!item)
     return False;
@@ -2584,7 +2406,8 @@ void HbBasemenu::buttonPressEvent(XButtonEvent *be) {
     const int w =
       (sbl * menu.persub) + i;
 
-    HbBasemenuItem *item = find(w);
+    HbBasemenuItem *item =
+      find(w);
 
     if (item) {
 
@@ -2594,9 +2417,10 @@ void HbBasemenu::buttonPressEvent(XButtonEvent *be) {
       if (item->submenu())
         drawSubmenu(w);
       else
-        drawItem(w,
-                 item->isEnabled(),
-                 True);
+        drawItem(
+          w,
+          item->isEnabled(),
+          True);
     }
 
   } else {
@@ -2614,6 +2438,7 @@ void HbBasemenu::buttonReleaseEvent(XButtonEvent *re) {
   if (re->window == menu.title) {
 
     if (moving) {
+
       moving = False;
 
       if (which_sub != -1)
@@ -2659,11 +2484,13 @@ void HbBasemenu::buttonReleaseEvent(XButtonEvent *re) {
         which_press;
 
       if (w >= 0 &&
-          w < static_cast<signed>(menuitems.size())) {
+          w < static_cast<signed>(
+            menuitems.size())) {
 
-        drawItem(p,
-                 (p == which_sub),
-                 True);
+        drawItem(
+          p,
+          (p == which_sub),
+          True);
 
         if (p == w &&
             isItemEnabled(w)) {
@@ -2675,15 +2502,18 @@ void HbBasemenu::buttonReleaseEvent(XButtonEvent *re) {
               re->y < static_cast<signed>(
                 iy + menu.item_h)) {
 
-            itemSelected(re->button, w);
+            itemSelected(
+              re->button,
+              w);
           }
         }
 
       } else {
 
-        drawItem(p,
-                 False,
-                 True);
+        drawItem(
+          p,
+          False,
+          True);
       }
     }
   }
@@ -2700,9 +2530,10 @@ void HbBasemenu::motionNotifyEvent(XMotionEvent *me) {
 
         if (parent && !torn) {
 
-          parent->drawItem(parent->which_sub,
-                           False,
-                           True);
+          parent->drawItem(
+            parent->which_sub,
+            False,
+            True);
 
           parent->which_sub = -1;
         }
@@ -2720,10 +2551,11 @@ void HbBasemenu::motionNotifyEvent(XMotionEvent *me) {
         menu.y =
           me->y_root - menu.y_move;
 
-        XMoveWindow(display,
-                     menu.window,
-                     menu.x,
-                     menu.y);
+        XMoveWindow(
+          display,
+          menu.window,
+          menu.x,
+          menu.y);
 
         if (which_sub != -1)
           drawSubmenu(which_sub);
@@ -2748,7 +2580,8 @@ void HbBasemenu::motionNotifyEvent(XMotionEvent *me) {
     if ((i != which_press ||
          sbl != which_sbl) &&
         (w >= 0 &&
-         w < static_cast<signed>(menuitems.size()))) {
+         w < static_cast<signed>(
+           menuitems.size()))) {
 
       if (which_press != -1 &&
           which_sbl != -1) {
@@ -2757,14 +2590,16 @@ void HbBasemenu::motionNotifyEvent(XMotionEvent *me) {
           (which_sbl * menu.persub) +
           which_press;
 
-        HbBasemenuItem *item = find(p);
+        HbBasemenuItem *item =
+          find(p);
 
         if (!item)
           return;
 
-        drawItem(p,
-                 False,
-                 True);
+        drawItem(
+          p,
+          False,
+          True);
 
         if (item->submenu() &&
             item->submenu()->isVisible() &&
@@ -2778,7 +2613,8 @@ void HbBasemenu::motionNotifyEvent(XMotionEvent *me) {
       which_press = i;
       which_sbl = sbl;
 
-      HbBasemenuItem *itmp = find(w);
+      HbBasemenuItem *itmp =
+        find(w);
 
       if (!itmp)
         return;
@@ -2786,9 +2622,10 @@ void HbBasemenu::motionNotifyEvent(XMotionEvent *me) {
       if (itmp->submenu())
         drawSubmenu(w);
       else
-        drawItem(w,
-                 itmp->isEnabled(),
-                 True);
+        drawItem(
+          w,
+          itmp->isEnabled(),
+          True);
     }
   }
 }
@@ -2818,8 +2655,9 @@ void HbBasemenu::exposeEvent(XExposeEvent *ee) {
     if (id_d > menu.persub)
       id_d = menu.persub;
 
-    MenuItems::iterator it,
-      end = menuitems.end();
+    MenuItems::iterator it;
+    MenuItems::iterator end =
+      menuitems.end();
 
     for (int i = sbl;
          i <= sbl_d;
@@ -2837,13 +2675,14 @@ void HbBasemenu::exposeEvent(XExposeEvent *ee) {
         const int index =
           ii + (i * menu.persub);
 
-        drawItem(index,
-                 (which_sub == index),
-                 False,
-                 ee->x,
-                 ee->y,
-                 ee->width,
-                 ee->height);
+        drawItem(
+          index,
+          (which_sub == index),
+          False,
+          ee->x,
+          ee->y,
+          ee->width,
+          ee->height);
       }
     }
   }
@@ -2895,10 +2734,11 @@ void HbBasemenu::enterNotifyEvent(XCrossingEvent *ce) {
     }
 
     if (shifted)
-      XMoveWindow(display,
-                  menu.window,
-                  menu.x_shift,
-                  menu.y_shift);
+      XMoveWindow(
+        display,
+        menu.window,
+        menu.x_shift,
+        menu.y_shift);
 
     if (which_sub != -1) {
 
@@ -2921,9 +2761,10 @@ void HbBasemenu::enterNotifyEvent(XCrossingEvent *ce) {
 
           tmp->submenu()->internal_hide();
 
-          drawItem(which_sub,
-                   False,
-                   True);
+          drawItem(
+            which_sub,
+            False,
+            True);
 
           which_sub = -1;
         }
@@ -2944,9 +2785,10 @@ void HbBasemenu::leaveNotifyEvent(XCrossingEvent *ce) {
         (which_sbl * menu.persub) +
         which_press;
 
-      drawItem(p,
-               (p == which_sub),
-               True);
+      drawItem(
+        p,
+        (p == which_sub),
+        True);
 
       which_sbl =
         which_press = -1;
@@ -2954,10 +2796,11 @@ void HbBasemenu::leaveNotifyEvent(XCrossingEvent *ce) {
 
     if (shifted) {
 
-      XMoveWindow(display,
-                  menu.window,
-                  menu.x,
-                  menu.y);
+      XMoveWindow(
+        display,
+        menu.window,
+        menu.x,
+        menu.y);
 
       shifted = False;
 
@@ -3004,16 +2847,22 @@ void HbBasemenu::reconfigure(void) {
 }
 
 
-void HbBasemenu::changeItemLabel(unsigned int index,
-                                  const string& label) {
-  HbBasemenuItem *item = find(index);
+void HbBasemenu::changeItemLabel(
+  unsigned int index,
+  const string& label) {
+
+  HbBasemenuItem *item =
+    find(index);
 
   assert(item);
 
   item->newLabel(label);
 
   if (visible)
-    drawItem(index, false, true);
+    drawItem(
+      index,
+      false,
+      true);
 }
 
 

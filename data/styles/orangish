@@ -51,11 +51,10 @@ menu.icon:                            true
 menu.icon.position:                   left
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-14
+
 window.title.focus:                  flat gradient vertical
 window.title.focus.color:            #D6753D
 window.title.focus.colorTo:          #8B3D10
-
 window.title.unfocus:                flat gradient vertical
 window.title.unfocus.color:          #898989
 window.title.unfocus.colorTo:        #6D6D6D
@@ -66,7 +65,6 @@ window.label.focus.color:            #FFFFFF
 window.label.focus.colorTo:          #FFFFFF
 window.label.focus.textColor:        #000000
 window.label.focus.justify:          center
-
 window.label.unfocus:                parentrelative
 window.label.unfocus.color:          #FFFFFF
 window.label.unfocus.colorTo:        #FFFFFF

@@ -57,7 +57,6 @@ window.title.unfocus:           raised gradient diagonal
 window.title.unfocus.color:     #666666
 window.title.unfocus.colorTo:   #0F1319
 window.title.alpha:             255
-window.title.font:              Hack-14
 
 window.label.focus:             sunken gradient crossdiagonal
 window.label.focus.color:       #151A22

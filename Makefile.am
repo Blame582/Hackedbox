@@ -37,7 +37,7 @@ AM_CPPFLAGS = \
         -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
         -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
 
-bin_PROGRAMS = hackedbox hbsetbg
+bin_PROGRAMS = hackedbox hbsetbg hbsudo
 
 hackedbox_SOURCES = \
 src/BaseDisplay.cpp \
@@ -47,6 +47,7 @@ src/Clock.cpp \
 src/Color.cpp \
 src/ConfigMenu.cpp \
 src/Font.cpp \
+src/FontCache.cpp \
 src/GCCache.cpp \
 src/Hackedbox.cpp \
 src/IconMenu.cpp \
@@ -98,6 +99,14 @@ hbsetbg_LDADD = \
 	-lX11 \
 	-lXft \
 	-lXext
+
+hbsudo_SOURCES = \
+    src/HbSudo.cpp
+
+hbsudo_LDADD = \
+    -lX11 \
+    -lXft \
+    -lXrender
 
 MAINTAINERCLEANFILES = \
 	aclocal.m4 \

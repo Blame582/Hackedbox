@@ -48,10 +48,8 @@ menu.icon:                            true
 menu.icon.position:                   left
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-14
 window.title.focus:                  flat solid
 window.title.focus.color:            #666666
-
 window.title.unfocus:                flat solid
 window.title.unfocus.color:          #444444
 window.title.alpha:                  255

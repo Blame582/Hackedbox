@@ -140,6 +140,24 @@ void HbTexture::setDescription(const std::string &description) {
     return;
   }
 
+    if (!description.empty()) {
+        const std::string &path = description;
+
+        auto hasSuffix = [&](const char *suffix) {
+        	const size_t len = strlen(suffix);
+            return path.size() >= len &&
+                   path.compare(path.size() - len, len, suffix) == 0;
+        };
+
+        if (hasSuffix(".png") ||
+            hasSuffix(".jpg") ||
+            hasSuffix(".jpeg")) {
+            t = Image;
+            descr = path;
+            return;
+        }
+    }
+
   setHbTexture(0);
 
   if (descr.find("gradient") != std::string::npos) {

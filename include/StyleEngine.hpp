@@ -1,6 +1,5 @@
 // StyleEngine.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
-// Look in the Authors file to learn more.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -48,14 +47,17 @@ struct WindowStyle {
   HbTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
     h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
 
-  XFontSet fontset;
-  XFontSetExtents *fontset_extents;
   HbFont *font;
 
   TextJustify justify;
 
-  int doJustify(const char *text, int &start_pos, unsigned int max_length,
-                unsigned int modifier, bool multibyte) const;
+  int doJustify(
+    Display *display,
+    const char *text,
+    int &start_pos,
+    unsigned int max_length,
+    unsigned int modifier
+  ) const;
 };
 
 struct MenuStyle {
@@ -63,12 +65,6 @@ struct MenuStyle {
   HbColor clock_text, date_text;
 
   HbTexture title, frame, hilite, sel;
-
-  XFontSet t_fontset, f_fontset;
-  XFontSet clock_fontset, date_fontset;
-
-  XFontSetExtents *t_fontset_extents, *f_fontset_extents;
-  XFontSetExtents *clock_fontset_extents, *date_fontset_extents;
 
   HbFont *t_font, *f_font;
   HbFont *clock_font, *date_font;
@@ -113,21 +109,8 @@ private:
                            const std::string &rclass,
                            const std::string &default_color);
 
-  XFontSet readDatabaseFontSet(const std::string &rname,
-                               const std::string &rclass);
-
   HbFont *readDatabaseFont(const std::string &rname,
                            const std::string &rclass);
-
-  XFontSet createFontSet(const std::string &fontname);
-
-  static const char *getFontElement(const char *pattern,
-                                    char *buffer,
-                                    int bufferSize,
-                                    ...);
-
-  static const char *getFontSize(const char *pattern,
-                                 int *size);
 
 public:
   StyleEngine(Hackedbox *hb,
@@ -136,6 +119,17 @@ public:
 
   ~StyleEngine();
 
+  /*
+   * Load a style from either a style file or a style package
+   * directory.
+   *
+   * A style package uses the style directory name as the
+   * style file name.
+   *
+   * Example:
+   *
+   *   styles/USA/USA
+   */
   bool load(const std::string &filename);
 
   WindowStyle *getWindowStyle()

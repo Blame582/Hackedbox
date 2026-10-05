@@ -571,6 +571,18 @@ Pixmap HbImageControl::renderImage(
     unsigned int height,
     const HbTexture &texture) {
 
+  FILE *debug = fopen("/tmp/hackedbox-image.log", "a");
+
+  if (debug) {
+    fprintf(debug,
+            "ImageControl::renderImage: texture=%lu description=%s size=%ux%u\n",
+            texture.texture(),
+            texture.description().c_str(),
+            width,
+            height);
+    fclose(debug);
+  }
+
   if (texture.texture() & HbTexture::ParentRelativeTexture)
     return ParentRelative;
 

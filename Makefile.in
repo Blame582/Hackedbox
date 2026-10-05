@@ -109,7 +109,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = hackedbox$(EXEEXT) hbsetbg$(EXEEXT)
+bin_PROGRAMS = hackedbox$(EXEEXT) hbsetbg$(EXEEXT) hbsudo$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -130,16 +130,16 @@ am_hackedbox_OBJECTS = src/BaseDisplay.$(OBJEXT) \
 	src/BaseMenu.$(OBJEXT) src/ClientMenu.$(OBJEXT) \
 	src/Clock.$(OBJEXT) src/Color.$(OBJEXT) \
 	src/ConfigMenu.$(OBJEXT) src/Font.$(OBJEXT) \
-	src/GCCache.$(OBJEXT) src/Hackedbox.$(OBJEXT) \
-	src/IconMenu.$(OBJEXT) src/Image.$(OBJEXT) \
-	src/ImageControl.$(OBJEXT) src/ImageLoader.$(OBJEXT) \
-	src/KeyManager.$(OBJEXT) src/MenuManager.$(OBJEXT) \
-	src/Netizen.$(OBJEXT) src/Runbox.$(OBJEXT) \
-	src/Screen.$(OBJEXT) src/StyleEngine.$(OBJEXT) \
-	src/Texture.$(OBJEXT) src/Timer.$(OBJEXT) src/Util.$(OBJEXT) \
-	src/Window.$(OBJEXT) src/WindowMenu.$(OBJEXT) \
-	src/Workspace.$(OBJEXT) src/WorkspaceMenu.$(OBJEXT) \
-	src/main.$(OBJEXT)
+	src/FontCache.$(OBJEXT) src/GCCache.$(OBJEXT) \
+	src/Hackedbox.$(OBJEXT) src/IconMenu.$(OBJEXT) \
+	src/Image.$(OBJEXT) src/ImageControl.$(OBJEXT) \
+	src/ImageLoader.$(OBJEXT) src/KeyManager.$(OBJEXT) \
+	src/MenuManager.$(OBJEXT) src/Netizen.$(OBJEXT) \
+	src/Runbox.$(OBJEXT) src/Screen.$(OBJEXT) \
+	src/StyleEngine.$(OBJEXT) src/Texture.$(OBJEXT) \
+	src/Timer.$(OBJEXT) src/Util.$(OBJEXT) src/Window.$(OBJEXT) \
+	src/WindowMenu.$(OBJEXT) src/Workspace.$(OBJEXT) \
+	src/WorkspaceMenu.$(OBJEXT) src/main.$(OBJEXT)
 hackedbox_OBJECTS = $(am_hackedbox_OBJECTS)
 am__DEPENDENCIES_1 =
 hackedbox_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -152,6 +152,9 @@ hbsetbg_DEPENDENCIES = $(top_builddir)/src/BaseDisplay.o \
 	$(top_builddir)/src/Timer.o $(top_builddir)/src/Util.o \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_hbsudo_OBJECTS = src/HbSudo.$(OBJEXT)
+hbsudo_OBJECTS = $(am_hbsudo_OBJECTS)
+hbsudo_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -184,8 +187,9 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(hackedbox_SOURCES) $(hbsetbg_SOURCES)
-DIST_SOURCES = $(hackedbox_SOURCES) $(hbsetbg_SOURCES)
+SOURCES = $(hackedbox_SOURCES) $(hbsetbg_SOURCES) $(hbsudo_SOURCES)
+DIST_SOURCES = $(hackedbox_SOURCES) $(hbsetbg_SOURCES) \
+	$(hbsudo_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -413,6 +417,7 @@ src/Clock.cpp \
 src/Color.cpp \
 src/ConfigMenu.cpp \
 src/Font.cpp \
+src/FontCache.cpp \
 src/GCCache.cpp \
 src/Hackedbox.cpp \
 src/IconMenu.cpp \
@@ -464,6 +469,14 @@ hbsetbg_LDADD = \
 	-lX11 \
 	-lXft \
 	-lXext
+
+hbsudo_SOURCES = \
+    src/HbSudo.cpp
+
+hbsudo_LDADD = \
+    -lX11 \
+    -lXft \
+    -lXrender
 
 MAINTAINERCLEANFILES = \
 	aclocal.m4 \
@@ -589,6 +602,7 @@ src/Clock.$(OBJEXT): src/$(am__dirstamp)
 src/Color.$(OBJEXT): src/$(am__dirstamp)
 src/ConfigMenu.$(OBJEXT): src/$(am__dirstamp)
 src/Font.$(OBJEXT): src/$(am__dirstamp)
+src/FontCache.$(OBJEXT): src/$(am__dirstamp)
 src/GCCache.$(OBJEXT): src/$(am__dirstamp)
 src/Hackedbox.$(OBJEXT): src/$(am__dirstamp)
 src/IconMenu.$(OBJEXT): src/$(am__dirstamp)
@@ -619,6 +633,11 @@ src/hbsetbg-ImageLoader.$(OBJEXT): src/$(am__dirstamp)
 hbsetbg$(EXEEXT): $(hbsetbg_OBJECTS) $(hbsetbg_DEPENDENCIES) $(EXTRA_hbsetbg_DEPENDENCIES) 
 	@rm -f hbsetbg$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(hbsetbg_OBJECTS) $(hbsetbg_LDADD) $(LIBS)
+src/HbSudo.$(OBJEXT): src/$(am__dirstamp)
+
+hbsudo$(EXEEXT): $(hbsudo_OBJECTS) $(hbsudo_DEPENDENCIES) $(EXTRA_hbsudo_DEPENDENCIES) 
+	@rm -f hbsudo$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(hbsudo_OBJECTS) $(hbsudo_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

@@ -41,9 +41,8 @@ GCCacheContext::~GCCacheContext()
 
 
 void GCCacheContext::set(const HbColor &_color,
-                           const XFontStruct * const _font,
-                           int _function,
-                           int _subwindow)
+                         int _function,
+                         int _subwindow)
 {
   XGCValues gcv;
 
@@ -51,36 +50,15 @@ void GCCacheContext::set(const HbColor &_color,
   function = gcv.function = _function;
   subwindow = gcv.subwindow_mode = _subwindow;
 
-  unsigned long mask = GCForeground | GCFunction | GCSubwindowMode;
-
-  if (_font) {
-    fontid = gcv.font = _font->fid;
-    mask |= GCFont;
-  } else {
-    fontid = 0;
-  }
-
-  XChangeGC(display->getXDisplay(), gc, mask, &gcv);
-}
-
-
-void GCCacheContext::set(const XFontStruct * const _font)
-{
-  if (!_font) {
-    fontid = 0;
-    return;
-  }
-
-  XGCValues gcv;
-
-  fontid = gcv.font = _font->fid;
-
-  XChangeGC(display->getXDisplay(), gc, GCFont, &gcv);
+  XChangeGC(display->getXDisplay(),
+             gc,
+             GCForeground | GCFunction | GCSubwindowMode,
+             &gcv);
 }
 
 
 GCCache::GCCache(const BaseDisplay * const _display,
-                   unsigned int screen_count)
+                 unsigned int screen_count)
   : display(_display),
     context_count(128u),
     cache_size(16u),
@@ -122,7 +100,10 @@ GCCacheContext *GCCache::nextContext(unsigned int scr)
     GCCacheContext *c = contexts[i];
 
     if (!c->gc) {
-      c->gc = XCreateGC(display->getXDisplay(), hd, 0, nullptr);
+      c->gc = XCreateGC(display->getXDisplay(),
+                        hd,
+                        0,
+                        nullptr);
       c->used = false;
       c->screen = scr;
     }
@@ -145,9 +126,8 @@ void GCCache::release(GCCacheContext *ctx)
 
 
 GCCacheItem *GCCache::find(const HbColor &_color,
-                              const XFontStruct * const _font,
-                              int _function,
-                              int _subwindow)
+                           int _function,
+                           int _subwindow)
 {
   const unsigned long pixel = _color.pixel();
   const unsigned int screen = _color.screen();
@@ -173,7 +153,7 @@ GCCacheItem *GCCache::find(const HbColor &_color,
     }
 
     if (c->count == 0 && c->ctx->screen == screen) {
-      c->ctx->set(_color, _font, _function, _subwindow);
+      c->ctx->set(_color, _function, _subwindow);
       c->ctx->used = true;
       c->count = 1;
       c->hits = 1;
@@ -192,9 +172,6 @@ GCCacheItem *GCCache::find(const HbColor &_color,
   }
 
   if (c->ctx) {
-    if (_font && _font->fid && _font->fid != c->ctx->fontid)
-      c->ctx->set(_font);
-
     ++c->count;
     ++c->hits;
 
@@ -204,7 +181,7 @@ GCCacheItem *GCCache::find(const HbColor &_color,
     }
   } else {
     c->ctx = nextContext(screen);
-    c->ctx->set(_color, _font, _function, _subwindow);
+    c->ctx->set(_color, _function, _subwindow);
     c->ctx->used = true;
     c->count = 1;
     c->hits = 1;

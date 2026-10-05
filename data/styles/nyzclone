@@ -47,10 +47,8 @@ menu.icon:                            true
 menu.icon.position:                   left
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-14
 window.title.focus:                  Raised Bevel1 Solid
 window.title.focus.color:            #506890
-
 window.title.unfocus:                Raised Bevel1 Solid
 window.title.unfocus.color:          #C8C8C8
 window.title.alpha:                  255

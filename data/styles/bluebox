@@ -52,13 +52,10 @@ menu.icon.alpha:                 255
 window.title.focus:               Raised Bevel1 Gradient Vertical
 window.title.focus.color:         #414b57
 window.title.focus.colorTo:       #6a7b8f
-
 window.title.unfocus:             Raised Bevel1 Gradient Vertical
 window.title.unfocus.color:       #414b57
 window.title.unfocus.colorTo:     #6a7b8f
-
 window.title.alpha:               255
-window.title.font:                Hack-10
 
 window.label.focus:               Sunken Bevel1 Gradient Vertical
 window.label.focus.color:         #21354a

@@ -28,17 +28,13 @@
 #include "BaseDisplay.hpp"
 #include "Color.hpp"
 
-class HbFont;
 class GCCacheItem;
 
 class GCCacheContext {
 public:
   void set(const HbColor &_color,
-           const XFontStruct * const _font,
            int _function,
            int _subwindow);
-
-  void set(const XFontStruct * const _font);
 
   ~GCCacheContext();
 
@@ -47,7 +43,6 @@ private:
     : display(_display),
       gc(nullptr),
       pixel(0ul),
-      fontid(0ul),
       function(0),
       subwindow(0),
       used(false),
@@ -56,7 +51,6 @@ private:
   const BaseDisplay *display;
   GC gc;
   unsigned long pixel;
-  unsigned long fontid;
   int function;
   int subwindow;
   bool used;
@@ -98,13 +92,11 @@ public:
   GCCache(const BaseDisplay * const _display, unsigned int screen_count);
   ~GCCache();
 
-  // Clean up the cache.
   void purge();
 
   GCCacheItem *find(const HbColor &_color,
-                     const XFontStruct * const _font = nullptr,
-                     int _function = GXcopy,
-                     int _subwindow = ClipByChildren);
+                    int _function = GXcopy,
+                    int _subwindow = ClipByChildren);
 
   void release(GCCacheItem *_item);
 
@@ -125,29 +117,13 @@ private:
   GCCacheItem **cache;
 };
 
+
 class HbPen {
 public:
-  // Legacy X11 font constructor.
   HbPen(const HbColor &_color,
-        const XFontStruct * const _font = nullptr,
         int _function = GXcopy,
         int _subwindow = ClipByChildren)
     : color(_color),
-      font(_font),
-      hbFont(nullptr),
-      function(_function),
-      subwindow(_subwindow),
-      cache(_color.display()->gcCache()),
-      item(nullptr) {}
-
-  // New HbFont/Xft font constructor.
-  HbPen(const HbColor &_color,
-        const HbFont * const _font,
-        int _function = GXcopy,
-        int _subwindow = ClipByChildren)
-    : color(_color),
-      font(nullptr),
-      hbFont(_font),
       function(_function),
       subwindow(_subwindow),
       cache(_color.display()->gcCache()),
@@ -162,19 +138,13 @@ public:
   const GC &gc() const
   {
     if (!item)
-      item = cache->find(color, font, function, subwindow);
+      item = cache->find(color, function, subwindow);
 
     return item->gc();
   }
 
 private:
   const HbColor &color;
-
-  // Legacy X11 font.
-  const XFontStruct *font;
-
-  // New Xft/HbFont font.
-  const HbFont *hbFont;
 
   int function;
   int subwindow;
@@ -185,4 +155,3 @@ private:
 
 
 #endif // GCCACHE_HPP
-

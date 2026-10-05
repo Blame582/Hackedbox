@@ -1,4 +1,4 @@
-// Font.hpp for Hackedbox - an X Window manager
+// FontCache.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day (blame582@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,34 +19,46 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef HFONT_HH
-#define HFONT_HH
+#ifndef FONTCACHE_HPP
+#define FONTCACHE_HPP
 
-#include <X11/Xft/Xft.h>
-
+#include <map>
 #include <string>
 
-class HbFont {
+#include "Font.hpp"
+
+class BaseDisplay;
+
+class FontCache {
 public:
-  HbFont();
-  ~HbFont();
+    explicit FontCache(const BaseDisplay * const _display);
+    ~FontCache();
 
-  bool load(Display *display, int screen, const std::string &name);
+    HbFont *find(unsigned int _screen, const std::string &_name);
 
-  XftFont *xftfont() const;
+    HbFont *load(unsigned int _screen, const std::string &_name);
 
-  int ascent() const;
-  int descent() const;
-  int height() const;
-
-  HbFont(const HbFont &) = delete;
-  HbFont &operator=(const HbFont &) = delete;
+    void purge();
 
 private:
-  Display *display;
-  int screen;
+    struct FontKey {
+        unsigned int screen;
+        std::string name;
 
-  XftFont *xft_font;
+        bool operator<(const FontKey &_other) const
+        {
+            if (screen != _other.screen)
+                return screen < _other.screen;
+
+            return name < _other.name;
+        }
+    };
+
+    const BaseDisplay *display;
+    std::map<FontKey, HbFont *> fonts;
+
+    FontCache(const FontCache &) = delete;
+    FontCache &operator=(const FontCache &) = delete;
 };
 
-#endif // HFONT_HH
+#endif // FONTCACHE_HPP

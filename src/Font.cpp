@@ -26,7 +26,6 @@
 HbFont::HbFont()
   : display(nullptr),
     screen(0),
-    x_font(nullptr),
     xft_font(nullptr)
 {
 }
@@ -35,9 +34,6 @@ HbFont::~HbFont()
 {
   if (xft_font)
     XftFontClose(display, xft_font);
-
-  if (x_font)
-    XFreeFont(display, x_font);
 }
 
 bool HbFont::load(Display *dpy, int scr, const std::string &name)
@@ -45,44 +41,21 @@ bool HbFont::load(Display *dpy, int scr, const std::string &name)
   display = dpy;
   screen = scr;
 
-  // Release any previously loaded font.
   if (xft_font) {
     XftFontClose(display, xft_font);
     xft_font = nullptr;
   }
 
-  if (x_font) {
-    XFreeFont(display, x_font);
-    x_font = nullptr;
-  }
-
-  // Try X11 core fonts first.
-  x_font = XLoadQueryFont(display, name.c_str());
-
-  if (x_font)
-    return true;
-
-  // Fall back to Xft fonts.
   xft_font = XftFontOpenName(display, screen, name.c_str());
 
   if (xft_font)
     return true;
 
   std::fprintf(stderr,
-               "HbFont: unable to load '%s'\n",
+               "HbFont: unable to load Xft font '%s'\n",
                name.c_str());
 
   return false;
-}
-
-bool HbFont::isXft() const
-{
-  return xft_font != nullptr;
-}
-
-XFontStruct *HbFont::xfont() const
-{
-  return x_font;
 }
 
 XftFont *HbFont::xftfont() const
@@ -95,9 +68,6 @@ int HbFont::ascent() const
   if (xft_font)
     return xft_font->ascent;
 
-  if (x_font)
-    return x_font->ascent;
-
   return 0;
 }
 
@@ -105,9 +75,6 @@ int HbFont::descent() const
 {
   if (xft_font)
     return xft_font->descent;
-
-  if (x_font)
-    return x_font->descent;
 
   return 0;
 }

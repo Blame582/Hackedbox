@@ -10,7 +10,7 @@ root.background.mode:                center
 # Background rotation timer in seconds (0 = disabled)
 #root.background.timer:              0
 
-menu.title.font:                     Hack-10
+menu.title.font:                     Hack-14
 menu.title:                           raised diagonal interlaced gradient bevel1
 menu.title.color:                    #333333
 menu.title.colorTo:                  #778888
@@ -18,7 +18,7 @@ menu.title.textColor:                #D9D9D9
 menu.title.justify:                  center
 menu.title.alpha:                    255
 
-menu.frame.font:                     Hack-10
+menu.frame.font:                     Hack-12
 menu.frame:                           raised diagonal gradient bevel1
 menu.frame.color:                    #778888
 menu.frame.colorTo:                  #1A1A1A
@@ -33,12 +33,12 @@ menu.hilite.colorTo:                 #FFFFFF
 menu.hilite.textColor:               #333333
 menu.hilite.alpha:                   255
 
-menu.clock.font:                     Hack-10
+menu.clock.font:                     Hack-14
 menu.clock.textColor:                #FFFFFF
 menu.clock.format:                   %I:%M:%S %p
 menu.clock.justify:                  center
 
-menu.date.font:                      Hack-10
+menu.date.font:                      Hack-14
 menu.date.textColor:                 #FFFFFF
 menu.date.format:                    %m/%d/%Y
 menu.date.justify:                   center
@@ -50,7 +50,6 @@ menu.icon:                            true
 menu.icon.position:                   left
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-10
 window.title.focus:                  raised diagonal gradient bevel1
 window.title.focus.color:            #778888
 window.title.focus.colorTo:          #333333
@@ -107,10 +106,10 @@ window.frame.focusColor:             #D9D9D9
 window.frame.unfocusColor:           #664444
 window.frame.alpha:                  255
 
-window.font:                         Hack-10
+window.font:                         Hack-14
 window.justify:                      center
 
-window.dialog.font:                  Hack-10
+window.dialog.font:                  Hack-14
 window.dialog.bgcolor:               #778888
 window.dialog.inputColor:            #333333
 window.dialog.inputTextColor:        #FFFFFF
@@ -125,7 +124,6 @@ window.dialog.buttonFocusColor:      #999999
 window.dialog.borderWidth:           1
 window.dialog.alpha:                 255
 
-! misc...
 borderColor:                         #1C0202
 
 borderWidth:                         1

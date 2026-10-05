@@ -49,11 +49,9 @@ menu.icon:                            true
 menu.icon.position:                   left
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-14
 window.title.focus:                  flat crossdiagonal gradient
 window.title.focus.color:            #6699CC
 window.title.focus.colorTo:          #334866
-
 window.title.unfocus:                flat diagonal gradient
 window.title.unfocus.color:          #808080
 window.title.unfocus.colorTo:        #333333
@@ -61,16 +59,13 @@ window.title.alpha:                  255
 
 window.label.focus:                  parentrelative
 window.label.focus.textColor:        #FFFFFF
-
 window.label.unfocus:                parentrelative
 window.label.unfocus.textColor:      #999999
 
 window.button.focus:                 parentrelative
 window.button.focus.picColor:        #D9D9D9
-
 window.button.unfocus:               parentrelative
 window.button.unfocus.picColor:      #999999
-
 window.button.pressed:               flat crossdiagonal gradient
 window.button.pressed.color:         #808080
 window.button.pressed.colorTo:       #CCCCCC
@@ -79,14 +74,12 @@ window.button.alpha:                 255
 window.handle.focus:                 flat crossdiagonal gradient
 window.handle.focus.color:           #6699CC
 window.handle.focus.colorTo:         #334866
-
 window.handle.unfocus:               flat diagonal gradient
 window.handle.unfocus.color:         #808080
 window.handle.unfocus.colorTo:       #333333
 window.handle.alpha:                 255
 
 window.grip.focus:                   parentrelative
-
 window.grip.unfocus:                 parentrelative
 window.grip.alpha:                   255
 

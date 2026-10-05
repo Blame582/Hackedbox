@@ -26,6 +26,7 @@
 
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
+#include <X11/Xft/Xft.h>
 
 #include <algorithm>
 #include <cassert>
@@ -35,7 +36,6 @@
 #include <cstring>
 #include <dirent.h>
 #include <functional>
-#include <locale.h>
 #include <stdarg.h>
 #include <string>
 #include <strings.h>
@@ -57,10 +57,6 @@ using std::string;
 #include "Window.hpp"
 #include "Workspace.hpp"
 #include "WorkspaceMenu.hpp"
-
-#ifndef FONT_ELEMENT_SIZE
-#define FONT_ELEMENT_SIZE 50
-#endif
 
 static bool running = True;
 
@@ -216,30 +212,25 @@ HbScreen::HbScreen(Hackedbox *hb, unsigned int scrn)
                    &gcv);
 
   const char *s = "0: 0000 x 0: 0000";
-  int l = strlen(s);
 
-  if (MB_CUR_MAX > 1) {
-    XRectangle ink;
-    XRectangle logical;
+  HbFont *font =
+    style_engine->getWindowStyle()->font;
 
-    XmbTextExtents(style_engine->getWindowStyle()->fontset,
-                   s,
-                   l,
-                   &ink,
-                   &logical);
+  if (font && font->xftfont()) {
+    XGlyphInfo extents;
 
-    geom_w = logical.width;
-    geom_h =
-      style_engine->getWindowStyle()->fontset_extents->max_ink_extent.height;
+    XftTextExtentsUtf8(
+      hackedbox->getXDisplay(),
+      font->xftfont(),
+      reinterpret_cast<const FcChar8 *>(s),
+      strlen(s),
+      &extents);
+
+    geom_w = extents.xOff;
+    geom_h = font->height();
   } else {
-    geom_h =
-      style_engine->getWindowStyle()->font->ascent() +
-      style_engine->getWindowStyle()->font->descent();
-
-    geom_w =
-      XTextWidth(style_engine->getWindowStyle()->font->xfont(),
-                 s,
-                 l);
+    geom_w = 0;
+    geom_h = 0;
   }
 
   geom_w += style_engine->getBevelWidth() * 2;
@@ -531,31 +522,25 @@ void HbScreen::reconfigure(void) {
             &gcv);
 
   const char *s = "0: 0000 x 0: 0000";
-  int l = strlen(s);
 
-  if (MB_CUR_MAX > 1) {
-    XRectangle ink;
-    XRectangle logical;
+  HbFont *font =
+    style_engine->getWindowStyle()->font;
 
-    XmbTextExtents(style_engine->getWindowStyle()->fontset,
-                   s,
-                   l,
-                   &ink,
-                   &logical);
+  if (font && font->xftfont()) {
+    XGlyphInfo extents;
 
-    geom_w = logical.width;
+    XftTextExtentsUtf8(
+      hackedbox->getXDisplay(),
+      font->xftfont(),
+      reinterpret_cast<const FcChar8 *>(s),
+      strlen(s),
+      &extents);
 
-    geom_h =
-      style_engine->getWindowStyle()->fontset_extents->max_ink_extent.height;
+    geom_w = extents.xOff;
+    geom_h = font->height();
   } else {
-    geom_w =
-      XTextWidth(style_engine->getWindowStyle()->font->xfont(),
-                 s,
-                 l);
-
-    geom_h =
-      style_engine->getWindowStyle()->font->ascent() +
-      style_engine->getWindowStyle()->font->descent();
+    geom_w = 0;
+    geom_h = 0;
   }
 
   geom_w += style_engine->getBevelWidth() * 2;
@@ -1235,32 +1220,63 @@ void HbScreen::showPosition(int x, int y) {
     hackedbox->getXDisplay(),
     geom_window);
 
-  HbPen pen(style_engine->getWindowStyle()->l_text_focus,
-            style_engine->getWindowStyle()->font->xfont());
+  HbFont *font =
+    style_engine->getWindowStyle()->font;
 
-  if (MB_CUR_MAX > 1) {
-    XmbDrawString(
+  if (!font || !font->xftfont())
+    return;
+
+  XftDraw *draw =
+    XftDrawCreate(
       hackedbox->getXDisplay(),
       geom_window,
-      style_engine->getWindowStyle()->fontset,
-      pen.gc(),
+      getVisual(),
+      getColormap());
+
+  if (!draw)
+    return;
+
+  XRenderColor render_color;
+
+  const HbColor &text_color =
+    style_engine->getWindowStyle()->l_text_focus;
+
+  render_color.red =
+    static_cast<unsigned short>(text_color.red() * 257U);
+  render_color.green =
+    static_cast<unsigned short>(text_color.green() * 257U);
+  render_color.blue =
+    static_cast<unsigned short>(text_color.blue() * 257U);
+  render_color.alpha =
+    static_cast<unsigned short>(text_color.alpha() * 257U);
+
+  XftColor color;
+
+  if (XftColorAllocValue(
+        hackedbox->getXDisplay(),
+        getVisual(),
+        getColormap(),
+        &render_color,
+        &color)) {
+
+    XftDrawStringUtf8(
+      draw,
+      &color,
+      font->xftfont(),
       style_engine->getBevelWidth(),
-      style_engine->getBevelWidth() -
-        style_engine->getWindowStyle()->fontset_extents
-          ->max_ink_extent.y,
-      label,
-      strlen(label));
-  } else {
-    XDrawString(
-      hackedbox->getXDisplay(),
-      geom_window,
-      pen.gc(),
-      style_engine->getBevelWidth(),
-      style_engine->getWindowStyle()->font->ascent() +
+      font->ascent() +
         style_engine->getBevelWidth(),
-      label,
+      reinterpret_cast<const FcChar8 *>(label),
       strlen(label));
+
+    XftColorFree(
+      hackedbox->getXDisplay(),
+      getVisual(),
+      getColormap(),
+      &color);
   }
+
+  XftDrawDestroy(draw);
 }
 
 
@@ -1296,32 +1312,63 @@ void HbScreen::showGeometry(unsigned int width,
     hackedbox->getXDisplay(),
     geom_window);
 
-  HbPen pen(style_engine->getWindowStyle()->l_text_focus,
-            style_engine->getWindowStyle()->font->xfont());
+  HbFont *font =
+    style_engine->getWindowStyle()->font;
 
-  if (MB_CUR_MAX > 1) {
-    XmbDrawString(
+  if (!font || !font->xftfont())
+    return;
+
+  XftDraw *draw =
+    XftDrawCreate(
       hackedbox->getXDisplay(),
       geom_window,
-      style_engine->getWindowStyle()->fontset,
-      pen.gc(),
+      getVisual(),
+      getColormap());
+
+  if (!draw)
+    return;
+
+  XRenderColor render_color;
+
+  const HbColor &text_color =
+    style_engine->getWindowStyle()->l_text_focus;
+
+  render_color.red =
+    static_cast<unsigned short>(text_color.red() * 257U);
+  render_color.green =
+    static_cast<unsigned short>(text_color.green() * 257U);
+  render_color.blue =
+    static_cast<unsigned short>(text_color.blue() * 257U);
+  render_color.alpha =
+    static_cast<unsigned short>(text_color.alpha() * 257U);
+
+  XftColor color;
+
+  if (XftColorAllocValue(
+        hackedbox->getXDisplay(),
+        getVisual(),
+        getColormap(),
+        &render_color,
+        &color)) {
+
+    XftDrawStringUtf8(
+      draw,
+      &color,
+      font->xftfont(),
       style_engine->getBevelWidth(),
-      style_engine->getBevelWidth() -
-        style_engine->getWindowStyle()->fontset_extents
-          ->max_ink_extent.y,
-      label,
-      strlen(label));
-  } else {
-    XDrawString(
-      hackedbox->getXDisplay(),
-      geom_window,
-      pen.gc(),
-      style_engine->getBevelWidth(),
-      style_engine->getWindowStyle()->font->ascent() +
+      font->ascent() +
         style_engine->getBevelWidth(),
-      label,
+      reinterpret_cast<const FcChar8 *>(label),
       strlen(label));
+
+    XftColorFree(
+      hackedbox->getXDisplay(),
+      getVisual(),
+      getColormap(),
+      &color);
   }
+
+  XftDrawDestroy(draw);
 }
 
 

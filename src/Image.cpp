@@ -38,6 +38,7 @@ using std::min;
 
 #include "BaseDisplay.hpp"
 #include "ImageControl.hpp"
+#include "ImageLoader.hpp"
 #include "Image.hpp"
 #include "GCCache.hpp"
 #include "Texture.hpp"
@@ -76,10 +77,131 @@ HbImage::~HbImage()
 }
 
 
+Pixmap HbImage::render_image(const HbTexture &texture)
+{
+  fprintf(stderr,
+          "HbImage::render_image: %s (%ux%u)\n",
+          texture.description().c_str(),
+          width,
+          height);
+
+  HbImageData image;
+  std::string error;
+
+  if (!HbImageLoader::load(texture.description(), image, error)) {
+    fprintf(stderr,
+            "HbImage::render_image: %s: %s\n",
+            texture.description().c_str(),
+            error.c_str());
+    return None;
+  }
+
+  if (!image.valid())
+    return None;
+
+  Pixmap pixmap = renderPixmap();
+
+  if (pixmap == None)
+    return None;
+
+  Display *display =
+    control->getBaseDisplay()->getXDisplay();
+
+  XImage *ximage =
+    XCreateImage(display,
+                 control->getVisual(),
+                 control->getDepth(),
+                 ZPixmap,
+                 0,
+                 nullptr,
+                 width,
+                 height,
+                 32,
+                 0);
+
+  if (!ximage) {
+    XFreePixmap(display, pixmap);
+    return None;
+  }
+
+  ximage->data =
+    new char[ximage->bytes_per_line * height];
+
+  const unsigned int red_shift =
+    __builtin_ctzl(control->getVisual()->red_mask);
+
+  const unsigned int green_shift =
+    __builtin_ctzl(control->getVisual()->green_mask);
+
+  const unsigned int blue_shift =
+    __builtin_ctzl(control->getVisual()->blue_mask);
+
+  for (unsigned int y = 0; y < height; ++y) {
+    const unsigned int sy =
+      static_cast<unsigned int>(
+        static_cast<unsigned long long>(y) *
+        image.height / height);
+
+    for (unsigned int x = 0; x < width; ++x) {
+      const unsigned int sx =
+        static_cast<unsigned int>(
+          static_cast<unsigned long long>(x) *
+          image.width / width);
+
+      const size_t offset =
+        static_cast<size_t>(sy) * image.stride +
+        static_cast<size_t>(sx) * 4;
+
+      const unsigned long red =
+        image.pixels[offset + 0];
+
+      const unsigned long green =
+        image.pixels[offset + 1];
+
+      const unsigned long blue =
+        image.pixels[offset + 2];
+
+      const unsigned long pixel =
+        ((red << red_shift) & control->getVisual()->red_mask) |
+        ((green << green_shift) & control->getVisual()->green_mask) |
+        ((blue << blue_shift) & control->getVisual()->blue_mask);
+
+      XPutPixel(ximage, x, y, pixel);
+    }
+  }
+
+  GC gc = XCreateGC(display, pixmap, 0, nullptr);
+
+  if (!gc) {
+    XDestroyImage(ximage);
+    XFreePixmap(display, pixmap);
+    return None;
+  }
+
+  XPutImage(display,
+            pixmap,
+            gc,
+            ximage,
+            0,
+            0,
+            0,
+            0,
+            width,
+            height);
+
+  XFreeGC(display, gc);
+  XDestroyImage(ximage);
+
+  return pixmap;
+}
+
+
 Pixmap HbImage::render(const HbTexture &texture)
 {
   if (texture.texture() & HbTexture::ParentRelativeTexture)
     return ParentRelative;
+  else if (texture.texture() & HbTexture::Image)
+    return render_image(texture);
   else if (texture.texture() & HbTexture::Solid)
     return render_solid(texture);
   else if (texture.texture() & HbTexture::Gradient)
@@ -396,6 +518,9 @@ Pixmap HbImage::render_solid(const HbTexture &texture)
                 1, 1, width - 3, 1);
       XDrawLine(display, pixmap, penshadow.gc(),
                 1, height - 3, 1, 1);
+
+      XDrawLine(display, pixmap, penshadow.gc(),
+                1, height - 3, 1, 1);
     }
   }
 
@@ -464,10 +589,10 @@ static const unsigned char dither4[4][4] = {
 
 
 /*
- * Helper function for TrueColorDither and renderXImage.
+ * Helper for TrueColorDither and renderXImage.
  *
- * This handles the proper setting of the image data based on the image depth
- * and the machine's byte ordering.
+ * This handles the proper setting of the image data based on the image
+ * depth and the machine's byte ordering.
  */
 static inline void assignPixelData(unsigned int bit_depth,
                                    unsigned char **data,
@@ -572,6 +697,7 @@ void HbImage::TrueColorDither(unsigned int bit_depth,
     pixel_data = (ppixel_data += bytes_per_line);
   }
 }
+
 
 void HbImage::PseudoColorDither(int bytes_per_line,
                                 unsigned char *pixel_data)
@@ -1456,7 +1582,7 @@ void HbImage::pgradient()
 
   xr = yr = drx / 2;
   xg = yg = dgx / 2;
-  xb = yb = dbx / 2;
+  xb = yb = dby / 2;
 
   drx /= width;
   dgx /= width;
@@ -1716,7 +1842,7 @@ void HbImage::egradient()
 
   rsign = (drx < 0) ? -1 : 1;
   gsign = (dgx < 0) ? -1 : 1;
-  bsign = (dby < 0) ? -1 : 1;
+  bsign = (dbx < 0) ? -1 : 1;
 
   xr = yr = drx / 2;
   xg = yg = dgx / 2;
@@ -1785,7 +1911,7 @@ void HbImage::egradient()
           *(pg++) = channel2;
 
           channel = static_cast<unsigned char>(
-            tb - (bsign * control->getSqrt(*(xt++) + *(yt + 2))));
+            tb - (rsign * control->getSqrt(*(xt++) + *(yt + 2))));
 
           channel2 = (channel >> 1) + (channel >> 2);
           if (channel2 > channel) channel2 = 0;
@@ -1845,7 +1971,7 @@ void HbImage::pcgradient()
 
   rsign = (drx < 0) ? -2 : 2;
   gsign = (dgx < 0) ? -2 : 2;
-  bsign = (dby < 0) ? -2 : 2;
+  bsign = (dbx < 0) ? -2 : 2;
 
   xr = yr = drx / 2;
   xg = yg = dgx / 2;

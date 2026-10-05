@@ -15,6 +15,12 @@ Font support:
 - Fontconfig
 - FreeType
 
+Image support:
+- libpng
+- libjpeg-turbo
+- libwebp
+- librsvg
+
 Build tools:
 - autoconf
 - automake

@@ -50,7 +50,6 @@ menu.icon:                            true
 menu.icon.position:                   right
 menu.icon.alpha:                      255
 
-window.title.font:                   Hack-14
 window.title.focus:                  raised bevel1 gradient vertical
 window.title.focus.color:            #6E7B8B
 window.title.focus.colorTo:          #555F6B

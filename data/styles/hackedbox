@@ -48,7 +48,6 @@ menu.icon:                      true
 menu.icon.position:             left
 menu.icon.alpha:                255
 
-window.title.font:              Hack-20
 window.title.focus:             raised gradient vertical
 window.title.focus.color:       #505458
 window.title.focus.colorTo:     #1E2226

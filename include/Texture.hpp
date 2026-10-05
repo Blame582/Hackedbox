@@ -64,7 +64,10 @@ public:
     ParentRelativeTexture = (1UL << 16),
 
     // Fake interlaced image
-    Interlaced    = (1UL << 17)
+    Interlaced    = (1UL << 17),
+    
+    //Images such as .png
+    Image         = (1UL << 18)
   };
 
   HbTexture(

@@ -1,20 +1,20 @@
-#Name: Purple Lime
+#Name: Halloween
 #Author: Blame
-#Date: (9/2026)
-#Made for hackedbox-0.9.0
+#Date: 09/2026
+#Version: 0.9.0
 
-root.background:                    ~/.hackedbox/backgrounds/purpleLime.jpg
-root.background.mode:                center
+root.background: ~/.hackedbox/backgrounds/halloween/default1.jpg
+root.background.mode: center
 # Background folder for automatic image rotation
-#root.background.folder:             ~/.hackedbox/backgrounds
-# Background rotation timer in seconds (0 = disabled)
-#root.background.timer:              0
+#root.background.folder: ~/.hackedbox/backgrounds/halloween
+# Background rotation timer in minutes (0 = disabled)
+#root.background.timer: 5
 
 menu.title.font: Hack-14
 menu.title: raised gradient diagonal
 menu.title.color: #4A4A4A
 menu.title.colorTo: #181818
-menu.title.textColor: #8066CC
+menu.title.textColor: #FF8C1A
 menu.title.justify: center
 menu.title.alpha: 255
 
@@ -22,23 +22,23 @@ menu.frame.font: Hack-13
 menu.frame: sunken gradient diagonal
 menu.frame.color: #181818
 menu.frame.colorTo: #333333
-menu.frame.textColor: #8066CC
+menu.frame.textColor: #FF8C1A
 menu.frame.justify: center
 menu.frame.alpha: 255
 
 menu.hilite: raised gradient diagonal
-menu.hilite.color: #7755AA
-menu.hilite.colorTo: #443366
+menu.hilite.color: #CC5500
+menu.hilite.colorTo: #663300
 menu.hilite.textColor: #FFFFFF
 menu.hilite.alpha: 255
 
 menu.clock.font: Hack-13
-menu.clock.textColor: #7755AA
+menu.clock.textColor: #CC5500
 menu.clock.format: %I:%M:%S %p
 menu.clock.justify: center
 
 menu.date.font: Hack-13
-menu.date.textColor: #7755AA
+menu.date.textColor: #CC5500
 menu.date.format: %m/%d/%Y
 menu.date.justify: center
 
@@ -51,10 +51,9 @@ menu.icon.alpha: 255
 
 window.justify: center
 
-
 window.title.focus: raised gradient vertical
-window.title.focus.color: #7755AA
-window.title.focus.colorTo: #443366
+window.title.focus.color: #CC5500
+window.title.focus.colorTo: #663300
 window.title.unfocus: raised vertical gradient
 window.title.unfocus.color: #333333
 window.title.unfocus.colorTo: #0F0F0F
@@ -71,25 +70,25 @@ window.label.unfocus.textColor: #777777
 window.label.alpha: 255
 
 window.button.focus: raised gradient diagonal
-window.button.focus.color: #7755AA
-window.button.focus.colorTo: #443366
+window.button.focus.color: #CC5500
+window.button.focus.colorTo: #663300
 window.button.focus.picColor: #FFFFFF
 window.button.unfocus: raised gradient diagonal
 window.button.unfocus.color: #333333
 window.button.unfocus.colorTo: #0F0F0F
 window.button.unfocus.picColor: #777777
 window.button.pressed: sunken gradient diagonal
-window.button.pressed.color: #554477
-window.button.pressed.colorTo: #443366
+window.button.pressed.color: #8B3D00
+window.button.pressed.colorTo: #4A2200
 window.button.alpha: 255
 
-window.frame.focusColor: #7755AA
+window.frame.focusColor: #CC5500
 window.frame.unfocusColor: #181818
 window.frame.alpha: 255
 
 window.handle.focus: raised gradient diagonal
-window.handle.focus.color: #7755AA
-window.handle.focus.colorTo: #443366
+window.handle.focus.color: #CC5500
+window.handle.focus.colorTo: #663300
 window.handle.unfocus: raised gradient diagonal
 window.handle.unfocus.color: #333333
 window.handle.unfocus.colorTo: #0F0F0F
@@ -98,7 +97,7 @@ window.handle.alpha: 255
 window.grip.focus: sunken diagonal gradient
 window.grip.focus.color: #4A4A4A
 window.grip.unfocus: sunken diagonal gradient
-window.grip.unfocus.colorTo: #0F0F0F
+window.grip.unfocus.color: #0F0F0F
 window.grip.unfocus.colorTo: #242424
 window.grip.alpha: 255
 
@@ -107,17 +106,17 @@ window.dialog.bgcolor: #181818
 window.dialog.inputColor: #242424
 window.dialog.inputTextColor: #FFFFFF
 window.dialog.textColor: #D9D9D9
-window.dialog.accentColor: #8066CC
+window.dialog.accentColor: #FF8C1A
 window.dialog.borderColor: #4A4A4A
-window.dialog.borderColor.focus: #7755AA
+window.dialog.borderColor.focus: #CC5500
 window.dialog.buttonColor: #333333
 window.dialog.buttonColorTo: #181818
 window.dialog.buttonTextColor: #FFFFFF
-window.dialog.buttonFocusColor: #8066CC
+window.dialog.buttonFocusColor: #FF8C1A
 window.dialog.borderWidth: 1
 window.dialog.alpha: 255
 
-borderColor: #7755AA
+borderColor: #CC5500
 borderColor.alpha: 255
 
 bevelWidth: 2
