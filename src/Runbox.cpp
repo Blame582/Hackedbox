@@ -55,7 +55,13 @@ constexpr int BUTTON_H = 30;
 
 constexpr int CANCEL_X = 116;
 
-constexpr int HISTORY_HEIGHT = 180;
+constexpr int HISTORY_ROWS = 10;
+constexpr int HISTORY_ROW_HEIGHT = 22;
+constexpr int HISTORY_HEIGHT =
+    HISTORY_ROWS * HISTORY_ROW_HEIGHT;
+
+constexpr int DROPDOWN_HEIGHT =
+    HEIGHT + HISTORY_HEIGHT;
 
 
 struct DialogStyle {
@@ -88,9 +94,7 @@ struct DialogStyle {
     }
 };
 
-
 DialogStyle style;
-
 
 std::string trim(const std::string &value) {
     std::size_t first = 0;
@@ -111,7 +115,6 @@ std::string trim(const std::string &value) {
 
     return value.substr(first, last - first);
 }
-
 
 unsigned long parseColor(
     const std::string &value,
@@ -139,7 +142,6 @@ unsigned long parseColor(
 
     return color;
 }
-
 
 std::string getStyleFile() {
     const char *home =
@@ -182,7 +184,6 @@ std::string getStyleFile() {
 
     return {};
 }
-
 
 void loadStyle() {
     style = DialogStyle();
@@ -293,7 +294,6 @@ void loadStyle() {
     }
 }
 
-
 std::string historyFile() {
     const char *home =
         std::getenv("HOME");
@@ -302,9 +302,8 @@ std::string historyFile() {
         return {};
 
     return std::string(home) +
-           "/.hackedbox/runboxHistory.txt";
+           "/.hackedbox/rbHistory.txt";
 }
-
 
 void allocateColor(
     Display *display,
@@ -344,7 +343,6 @@ void allocateColor(
 }
 
 } // namespace
-
 
 HbScreen *RunBox::screen = nullptr;
 Display *RunBox::display = nullptr;
@@ -387,50 +385,27 @@ unsigned long RunBox::borderColor = 0;
 unsigned long RunBox::buttonColor = 0;
 unsigned long RunBox::buttonFocusColor = 0;
 
-
 bool RunBox::isOpen() {
     return window != None;
 }
-
 
 bool RunBox::handles(Window candidate) {
     return isOpen() &&
            candidate == window;
 }
 
-
 void RunBox::show(HbScreen *newScreen) {
     if (!newScreen)
         return;
 
     if (isOpen()) {
-        XMapRaised(
-            display,
-            window
-        );
-
-        XSetInputFocus(
-            display,
-            window,
-            RevertToPointerRoot,
-            CurrentTime
-        );
-        
-        XGrabKeyboard(
-    		display,
-    		window,
-    		False,
-    		GrabModeAsync,
-    		GrabModeAsync,
-    		CurrentTime
-		);
-
+        XMapRaised(display, window);
+        XSetInputFocus(display, window, RevertToPointerRoot, CurrentTime);
+        XGrabKeyboard(display, window, False, GrabModeAsync, GrabModeAsync, CurrentTime);
         inputFocus = true;
         cursorVisible = true;
         cursorPosition = command.size();
-
         draw();
-
         XFlush(display);
         return;
     }
@@ -543,7 +518,7 @@ void RunBox::show(HbScreen *newScreen) {
     sizeHints.min_width = WIDTH;
     sizeHints.max_width = WIDTH;
     sizeHints.min_height = HEIGHT;
-    sizeHints.max_height = HEIGHT;
+    sizeHints.max_height = DROPDOWN_HEIGHT;
 
     XSetWMNormalHints(
         display,
@@ -655,50 +630,22 @@ void RunBox::show(HbScreen *newScreen) {
      */
     screen->manageWindow(window);
 
-    /*
-     * manageWindow() changes the window's X11 state and event
-     * handling. Re-select the events needed by RunBox afterward.
-     */
-    XSelectInput(
-        display,
-        window,
-        ExposureMask |
-        KeyPressMask |
-        ButtonPressMask |
-        ButtonReleaseMask |
-        PointerMotionMask |
-        StructureNotifyMask
-    );
-
-    /*
-     * RunBox is an actual managed client, so explicitly give the
-     * client input focus after Hackedbox has finished managing it.
-     */
-    XSetInputFocus(
-        display,
-        window,
-        RevertToPointerRoot,
-        CurrentTime
-    );
-
+    XSelectInput(display, window, ExposureMask | KeyPressMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask);
+    XSetInputFocus(display, window, RevertToPointerRoot, CurrentTime);
+    XGrabKeyboard(display, window, False, GrabModeAsync, GrabModeAsync, CurrentTime);
     inputFocus = true;
     cursorVisible = true;
     cursorPosition = command.size();
-
     draw();
-
     XFlush(display);
 }
-
 
 void RunBox::draw() {
     if (!isOpen() || !gc)
         return;
 
     XSetForeground(
-        display,
-        gc,
-        backgroundColor
+        display, gc, backgroundColor
     );
 
     XFillRectangle(
@@ -719,7 +666,6 @@ void RunBox::draw() {
 
     XFlush(display);
 }
-
 
 void RunBox::drawInput() {
     XSetForeground(
@@ -775,7 +721,6 @@ void RunBox::drawInput() {
 
     drawCursor();
 }
-
 
 void RunBox::drawCursor() {
     if (!isOpen() ||
@@ -843,7 +788,6 @@ void RunBox::drawCursor() {
     );
 }
 
-
 void RunBox::drawButtons() {
     XSetForeground(
         display,
@@ -905,7 +849,6 @@ void RunBox::drawButtons() {
     );
 }
 
-
 void RunBox::drawHistory() {
     if (!historyOpen ||
         !xftDraw ||
@@ -917,7 +860,7 @@ void RunBox::drawHistory() {
     const int visible =
         std::min(
             static_cast<int>(history.size()),
-            HISTORY_HEIGHT / 22
+            HISTORY_ROWS
         );
 
     const int start =
@@ -1002,7 +945,6 @@ void RunBox::drawHistory() {
     }
 }
 
-
 void RunBox::expose(XExposeEvent *event) {
     if (!event ||
         !handles(event->window)) {
@@ -1011,7 +953,6 @@ void RunBox::expose(XExposeEvent *event) {
 
     draw();
 }
-
 
 void RunBox::keyPress(XKeyEvent *event) {
     if (!event ||
@@ -1152,7 +1093,6 @@ void RunBox::keyPress(XKeyEvent *event) {
     resetCursor();
 }
 
-
 void RunBox::buttonPress(XButtonEvent *event) {
     if (!event ||
         !isOpen()) {
@@ -1242,11 +1182,9 @@ void RunBox::buttonPress(XButtonEvent *event) {
     draw();
 }
 
-
 void RunBox::buttonRelease(XButtonEvent *event) {
     (void)event;
 }
-
 
 void RunBox::motionNotify(XMotionEvent *event) {
     if (!event ||
@@ -1312,7 +1250,6 @@ void RunBox::motionNotify(XMotionEvent *event) {
     }
 }
 
-
 void RunBox::clientMessage(
     XClientMessageEvent *event) {
 
@@ -1334,7 +1271,6 @@ void RunBox::clientMessage(
         close();
     }
 }
-
 
 void RunBox::execute() {
     const std::string value =
@@ -1364,16 +1300,10 @@ void RunBox::execute() {
     inputFocus = true;
     cursorVisible = true;
 
-    XSetInputFocus(
-        display,
-        window,
-        RevertToPointerRoot,
-        CurrentTime
-    );
-
+    XSetInputFocus(display, window, RevertToPointerRoot, CurrentTime);
+    XGrabKeyboard(display, window, False, GrabModeAsync, GrabModeAsync, CurrentTime);
     draw();
 }
-
 
 void RunBox::loadHistory() {
     history.clear();
@@ -1401,18 +1331,18 @@ void RunBox::loadHistory() {
     historyIndex = -1;
 }
 
-
 void RunBox::saveHistory(
     const std::string &value) {
 
     if (value.empty())
         return;
 
-    if (history.empty() ||
-        history.back() != value) {
-
-        history.push_back(value);
+    if (!history.empty() &&
+        history.back() == value) {
+        return;
     }
+
+    history.push_back(value);
 
     const std::string filename =
         historyFile();
@@ -1428,7 +1358,6 @@ void RunBox::saveHistory(
     if (output)
         output << value << '\n';
 }
-
 
 void RunBox::historyPrevious() {
     if (history.empty())
@@ -1452,7 +1381,6 @@ void RunBox::historyPrevious() {
 
     resetCursor();
 }
-
 
 void RunBox::historyNext() {
     if (history.empty())
@@ -1480,7 +1408,6 @@ void RunBox::historyNext() {
     resetCursor();
 }
 
-
 void RunBox::showHistory() {
     if (history.empty())
         return;
@@ -1488,15 +1415,29 @@ void RunBox::showHistory() {
     historyOpen = true;
     historyHover = -1;
 
+    XResizeWindow(
+        display,
+        window,
+        WIDTH,
+        DROPDOWN_HEIGHT
+    );
+
     draw();
 }
-
 
 void RunBox::hideHistory() {
     historyOpen = false;
     historyHover = -1;
-}
 
+    XResizeWindow(
+        display,
+        window,
+        WIDTH,
+        HEIGHT
+    );
+
+    draw();
+}
 
 void RunBox::selectHistory(int index) {
     if (index < 0 ||
@@ -1527,24 +1468,16 @@ void RunBox::selectHistory(int index) {
     resetCursor();
 }
 
-
 void RunBox::resetCursor() {
     if (!isOpen())
         return;
 
     inputFocus = true;
     cursorVisible = true;
-
-    XSetInputFocus(
-        display,
-        window,
-        RevertToPointerRoot,
-        CurrentTime
-    );
-
+    XSetInputFocus(display, window, RevertToPointerRoot, CurrentTime);
+    XGrabKeyboard(display, window, False, GrabModeAsync, GrabModeAsync, CurrentTime);
     draw();
 }
-
 
 void RunBox::close() {
     if (!display)

@@ -46,6 +46,9 @@ src/ClientMenu.cpp \
 src/Clock.cpp \
 src/Color.cpp \
 src/ConfigMenu.cpp \
+src/Dock.cpp \
+src/DockObject.cpp \
+src/DockButton.cpp \
 src/Font.cpp \
 src/FontCache.cpp \
 src/GCCache.cpp \

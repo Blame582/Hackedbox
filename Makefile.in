@@ -129,17 +129,19 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am_hackedbox_OBJECTS = src/BaseDisplay.$(OBJEXT) \
 	src/BaseMenu.$(OBJEXT) src/ClientMenu.$(OBJEXT) \
 	src/Clock.$(OBJEXT) src/Color.$(OBJEXT) \
-	src/ConfigMenu.$(OBJEXT) src/Font.$(OBJEXT) \
-	src/FontCache.$(OBJEXT) src/GCCache.$(OBJEXT) \
-	src/Hackedbox.$(OBJEXT) src/IconMenu.$(OBJEXT) \
-	src/Image.$(OBJEXT) src/ImageControl.$(OBJEXT) \
-	src/ImageLoader.$(OBJEXT) src/KeyManager.$(OBJEXT) \
-	src/MenuManager.$(OBJEXT) src/Netizen.$(OBJEXT) \
-	src/Runbox.$(OBJEXT) src/Screen.$(OBJEXT) \
-	src/StyleEngine.$(OBJEXT) src/Texture.$(OBJEXT) \
-	src/Timer.$(OBJEXT) src/Util.$(OBJEXT) src/Window.$(OBJEXT) \
-	src/WindowMenu.$(OBJEXT) src/Workspace.$(OBJEXT) \
-	src/WorkspaceMenu.$(OBJEXT) src/main.$(OBJEXT)
+	src/ConfigMenu.$(OBJEXT) src/Dock.$(OBJEXT) \
+	src/DockObject.$(OBJEXT) src/DockButton.$(OBJEXT) \
+	src/Font.$(OBJEXT) src/FontCache.$(OBJEXT) \
+	src/GCCache.$(OBJEXT) src/Hackedbox.$(OBJEXT) \
+	src/IconMenu.$(OBJEXT) src/Image.$(OBJEXT) \
+	src/ImageControl.$(OBJEXT) src/ImageLoader.$(OBJEXT) \
+	src/KeyManager.$(OBJEXT) src/MenuManager.$(OBJEXT) \
+	src/Netizen.$(OBJEXT) src/Runbox.$(OBJEXT) \
+	src/Screen.$(OBJEXT) src/StyleEngine.$(OBJEXT) \
+	src/Texture.$(OBJEXT) src/Timer.$(OBJEXT) src/Util.$(OBJEXT) \
+	src/Window.$(OBJEXT) src/WindowMenu.$(OBJEXT) \
+	src/Workspace.$(OBJEXT) src/WorkspaceMenu.$(OBJEXT) \
+	src/main.$(OBJEXT)
 hackedbox_OBJECTS = $(am_hackedbox_OBJECTS)
 am__DEPENDENCIES_1 =
 hackedbox_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -168,8 +170,27 @@ am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp =
-am__maybe_remake_depfiles =
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__maybe_remake_depfiles = depfiles
+am__depfiles_remade = src/$(DEPDIR)/BaseDisplay.Po \
+	src/$(DEPDIR)/BaseMenu.Po src/$(DEPDIR)/ClientMenu.Po \
+	src/$(DEPDIR)/Clock.Po src/$(DEPDIR)/Color.Po \
+	src/$(DEPDIR)/ConfigMenu.Po src/$(DEPDIR)/Dock.Po \
+	src/$(DEPDIR)/DockButton.Po src/$(DEPDIR)/DockObject.Po \
+	src/$(DEPDIR)/Font.Po src/$(DEPDIR)/FontCache.Po \
+	src/$(DEPDIR)/GCCache.Po src/$(DEPDIR)/Hackedbox.Po \
+	src/$(DEPDIR)/HbSudo.Po src/$(DEPDIR)/IconMenu.Po \
+	src/$(DEPDIR)/Image.Po src/$(DEPDIR)/ImageControl.Po \
+	src/$(DEPDIR)/ImageLoader.Po src/$(DEPDIR)/KeyManager.Po \
+	src/$(DEPDIR)/MenuManager.Po src/$(DEPDIR)/Netizen.Po \
+	src/$(DEPDIR)/Runbox.Po src/$(DEPDIR)/Screen.Po \
+	src/$(DEPDIR)/StyleEngine.Po src/$(DEPDIR)/Texture.Po \
+	src/$(DEPDIR)/Timer.Po src/$(DEPDIR)/Util.Po \
+	src/$(DEPDIR)/Window.Po src/$(DEPDIR)/WindowMenu.Po \
+	src/$(DEPDIR)/Workspace.Po src/$(DEPDIR)/WorkspaceMenu.Po \
+	src/$(DEPDIR)/hbsetbg-HbSetBg.Po \
+	src/$(DEPDIR)/hbsetbg-ImageLoader.Po src/$(DEPDIR)/main.Po
+am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -416,6 +437,9 @@ src/ClientMenu.cpp \
 src/Clock.cpp \
 src/Color.cpp \
 src/ConfigMenu.cpp \
+src/Dock.cpp \
+src/DockObject.cpp \
+src/DockButton.cpp \
 src/Font.cpp \
 src/FontCache.cpp \
 src/GCCache.cpp \
@@ -506,15 +530,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign --ignore-deps'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign --ignore-deps \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign --ignore-deps Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign --ignore-deps Makefile
+	  $(AUTOMAKE) --foreign Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -595,45 +619,77 @@ clean-binPROGRAMS:
 src/$(am__dirstamp):
 	@$(MKDIR_P) src
 	@: >>src/$(am__dirstamp)
-src/BaseDisplay.$(OBJEXT): src/$(am__dirstamp)
-src/BaseMenu.$(OBJEXT): src/$(am__dirstamp)
-src/ClientMenu.$(OBJEXT): src/$(am__dirstamp)
-src/Clock.$(OBJEXT): src/$(am__dirstamp)
-src/Color.$(OBJEXT): src/$(am__dirstamp)
-src/ConfigMenu.$(OBJEXT): src/$(am__dirstamp)
-src/Font.$(OBJEXT): src/$(am__dirstamp)
-src/FontCache.$(OBJEXT): src/$(am__dirstamp)
-src/GCCache.$(OBJEXT): src/$(am__dirstamp)
-src/Hackedbox.$(OBJEXT): src/$(am__dirstamp)
-src/IconMenu.$(OBJEXT): src/$(am__dirstamp)
-src/Image.$(OBJEXT): src/$(am__dirstamp)
-src/ImageControl.$(OBJEXT): src/$(am__dirstamp)
-src/ImageLoader.$(OBJEXT): src/$(am__dirstamp)
-src/KeyManager.$(OBJEXT): src/$(am__dirstamp)
-src/MenuManager.$(OBJEXT): src/$(am__dirstamp)
-src/Netizen.$(OBJEXT): src/$(am__dirstamp)
-src/Runbox.$(OBJEXT): src/$(am__dirstamp)
-src/Screen.$(OBJEXT): src/$(am__dirstamp)
-src/StyleEngine.$(OBJEXT): src/$(am__dirstamp)
-src/Texture.$(OBJEXT): src/$(am__dirstamp)
-src/Timer.$(OBJEXT): src/$(am__dirstamp)
-src/Util.$(OBJEXT): src/$(am__dirstamp)
-src/Window.$(OBJEXT): src/$(am__dirstamp)
-src/WindowMenu.$(OBJEXT): src/$(am__dirstamp)
-src/Workspace.$(OBJEXT): src/$(am__dirstamp)
-src/WorkspaceMenu.$(OBJEXT): src/$(am__dirstamp)
-src/main.$(OBJEXT): src/$(am__dirstamp)
+src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) src/$(DEPDIR)
+	@: >>src/$(DEPDIR)/$(am__dirstamp)
+src/BaseDisplay.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/BaseMenu.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/ClientMenu.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Clock.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Color.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/ConfigMenu.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Dock.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/DockObject.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/DockButton.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Font.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/FontCache.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/GCCache.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Hackedbox.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/IconMenu.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Image.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/ImageControl.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/ImageLoader.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/KeyManager.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/MenuManager.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Netizen.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Runbox.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Screen.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/StyleEngine.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Texture.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Timer.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Util.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Window.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/WindowMenu.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Workspace.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/WorkspaceMenu.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/main.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 
 hackedbox$(EXEEXT): $(hackedbox_OBJECTS) $(hackedbox_DEPENDENCIES) $(EXTRA_hackedbox_DEPENDENCIES) 
 	@rm -f hackedbox$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(hackedbox_OBJECTS) $(hackedbox_LDADD) $(LIBS)
-src/hbsetbg-HbSetBg.$(OBJEXT): src/$(am__dirstamp)
-src/hbsetbg-ImageLoader.$(OBJEXT): src/$(am__dirstamp)
+src/hbsetbg-HbSetBg.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/hbsetbg-ImageLoader.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 
 hbsetbg$(EXEEXT): $(hbsetbg_OBJECTS) $(hbsetbg_DEPENDENCIES) $(EXTRA_hbsetbg_DEPENDENCIES) 
 	@rm -f hbsetbg$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(hbsetbg_OBJECTS) $(hbsetbg_LDADD) $(LIBS)
-src/HbSudo.$(OBJEXT): src/$(am__dirstamp)
+src/HbSudo.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 
 hbsudo$(EXEEXT): $(hbsudo_OBJECTS) $(hbsudo_DEPENDENCIES) $(EXTRA_hbsudo_DEPENDENCIES) 
 	@rm -f hbsudo$(EXEEXT)
@@ -646,23 +702,90 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/BaseDisplay.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/BaseMenu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ClientMenu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Clock.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Color.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ConfigMenu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dock.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/DockButton.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/DockObject.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Font.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/FontCache.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GCCache.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Hackedbox.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/HbSudo.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/IconMenu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Image.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ImageControl.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ImageLoader.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/KeyManager.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/MenuManager.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Netizen.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Runbox.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Screen.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/StyleEngine.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Texture.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Timer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Util.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Window.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/WindowMenu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Workspace.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/WorkspaceMenu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hbsetbg-HbSetBg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hbsetbg-ImageLoader.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main.Po@am__quote@ # am--include-marker
+
+$(am__depfiles_remade):
+	@$(MKDIR_P) $(@D)
+	@: >>$@
+
+am--depfiles: $(am__depfiles_remade)
+
 .cpp.o:
-	$(AM_V_CXX)$(CXXCOMPILE) -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .cpp.obj:
-	$(AM_V_CXX)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 src/hbsetbg-HbSetBg.o: src/HbSetBg.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-HbSetBg.o `test -f 'src/HbSetBg.cpp' || echo '$(srcdir)/'`src/HbSetBg.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/hbsetbg-HbSetBg.o -MD -MP -MF src/$(DEPDIR)/hbsetbg-HbSetBg.Tpo -c -o src/hbsetbg-HbSetBg.o `test -f 'src/HbSetBg.cpp' || echo '$(srcdir)/'`src/HbSetBg.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/hbsetbg-HbSetBg.Tpo src/$(DEPDIR)/hbsetbg-HbSetBg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/HbSetBg.cpp' object='src/hbsetbg-HbSetBg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-HbSetBg.o `test -f 'src/HbSetBg.cpp' || echo '$(srcdir)/'`src/HbSetBg.cpp
 
 src/hbsetbg-HbSetBg.obj: src/HbSetBg.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-HbSetBg.obj `if test -f 'src/HbSetBg.cpp'; then $(CYGPATH_W) 'src/HbSetBg.cpp'; else $(CYGPATH_W) '$(srcdir)/src/HbSetBg.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/hbsetbg-HbSetBg.obj -MD -MP -MF src/$(DEPDIR)/hbsetbg-HbSetBg.Tpo -c -o src/hbsetbg-HbSetBg.obj `if test -f 'src/HbSetBg.cpp'; then $(CYGPATH_W) 'src/HbSetBg.cpp'; else $(CYGPATH_W) '$(srcdir)/src/HbSetBg.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/hbsetbg-HbSetBg.Tpo src/$(DEPDIR)/hbsetbg-HbSetBg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/HbSetBg.cpp' object='src/hbsetbg-HbSetBg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-HbSetBg.obj `if test -f 'src/HbSetBg.cpp'; then $(CYGPATH_W) 'src/HbSetBg.cpp'; else $(CYGPATH_W) '$(srcdir)/src/HbSetBg.cpp'; fi`
 
 src/hbsetbg-ImageLoader.o: src/ImageLoader.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-ImageLoader.o `test -f 'src/ImageLoader.cpp' || echo '$(srcdir)/'`src/ImageLoader.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/hbsetbg-ImageLoader.o -MD -MP -MF src/$(DEPDIR)/hbsetbg-ImageLoader.Tpo -c -o src/hbsetbg-ImageLoader.o `test -f 'src/ImageLoader.cpp' || echo '$(srcdir)/'`src/ImageLoader.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/hbsetbg-ImageLoader.Tpo src/$(DEPDIR)/hbsetbg-ImageLoader.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ImageLoader.cpp' object='src/hbsetbg-ImageLoader.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-ImageLoader.o `test -f 'src/ImageLoader.cpp' || echo '$(srcdir)/'`src/ImageLoader.cpp
 
 src/hbsetbg-ImageLoader.obj: src/ImageLoader.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-ImageLoader.obj `if test -f 'src/ImageLoader.cpp'; then $(CYGPATH_W) 'src/ImageLoader.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ImageLoader.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/hbsetbg-ImageLoader.obj -MD -MP -MF src/$(DEPDIR)/hbsetbg-ImageLoader.Tpo -c -o src/hbsetbg-ImageLoader.obj `if test -f 'src/ImageLoader.cpp'; then $(CYGPATH_W) 'src/ImageLoader.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ImageLoader.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/hbsetbg-ImageLoader.Tpo src/$(DEPDIR)/hbsetbg-ImageLoader.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ImageLoader.cpp' object='src/hbsetbg-ImageLoader.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hbsetbg_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/hbsetbg-ImageLoader.obj `if test -f 'src/ImageLoader.cpp'; then $(CYGPATH_W) 'src/ImageLoader.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ImageLoader.cpp'; fi`
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -1007,6 +1130,7 @@ clean-generic:
 distclean-generic:
 	-$(am__rm_f) $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || $(am__rm_f) $(CONFIG_CLEAN_VPATH_FILES)
+	-$(am__rm_f) src/$(DEPDIR)/$(am__dirstamp)
 	-$(am__rm_f) src/$(am__dirstamp)
 
 maintainer-clean-generic:
@@ -1019,6 +1143,40 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+	-rm -f src/$(DEPDIR)/BaseDisplay.Po
+	-rm -f src/$(DEPDIR)/BaseMenu.Po
+	-rm -f src/$(DEPDIR)/ClientMenu.Po
+	-rm -f src/$(DEPDIR)/Clock.Po
+	-rm -f src/$(DEPDIR)/Color.Po
+	-rm -f src/$(DEPDIR)/ConfigMenu.Po
+	-rm -f src/$(DEPDIR)/Dock.Po
+	-rm -f src/$(DEPDIR)/DockButton.Po
+	-rm -f src/$(DEPDIR)/DockObject.Po
+	-rm -f src/$(DEPDIR)/Font.Po
+	-rm -f src/$(DEPDIR)/FontCache.Po
+	-rm -f src/$(DEPDIR)/GCCache.Po
+	-rm -f src/$(DEPDIR)/Hackedbox.Po
+	-rm -f src/$(DEPDIR)/HbSudo.Po
+	-rm -f src/$(DEPDIR)/IconMenu.Po
+	-rm -f src/$(DEPDIR)/Image.Po
+	-rm -f src/$(DEPDIR)/ImageControl.Po
+	-rm -f src/$(DEPDIR)/ImageLoader.Po
+	-rm -f src/$(DEPDIR)/KeyManager.Po
+	-rm -f src/$(DEPDIR)/MenuManager.Po
+	-rm -f src/$(DEPDIR)/Netizen.Po
+	-rm -f src/$(DEPDIR)/Runbox.Po
+	-rm -f src/$(DEPDIR)/Screen.Po
+	-rm -f src/$(DEPDIR)/StyleEngine.Po
+	-rm -f src/$(DEPDIR)/Texture.Po
+	-rm -f src/$(DEPDIR)/Timer.Po
+	-rm -f src/$(DEPDIR)/Util.Po
+	-rm -f src/$(DEPDIR)/Window.Po
+	-rm -f src/$(DEPDIR)/WindowMenu.Po
+	-rm -f src/$(DEPDIR)/Workspace.Po
+	-rm -f src/$(DEPDIR)/WorkspaceMenu.Po
+	-rm -f src/$(DEPDIR)/hbsetbg-HbSetBg.Po
+	-rm -f src/$(DEPDIR)/hbsetbg-ImageLoader.Po
+	-rm -f src/$(DEPDIR)/main.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -1066,6 +1224,40 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
+	-rm -f src/$(DEPDIR)/BaseDisplay.Po
+	-rm -f src/$(DEPDIR)/BaseMenu.Po
+	-rm -f src/$(DEPDIR)/ClientMenu.Po
+	-rm -f src/$(DEPDIR)/Clock.Po
+	-rm -f src/$(DEPDIR)/Color.Po
+	-rm -f src/$(DEPDIR)/ConfigMenu.Po
+	-rm -f src/$(DEPDIR)/Dock.Po
+	-rm -f src/$(DEPDIR)/DockButton.Po
+	-rm -f src/$(DEPDIR)/DockObject.Po
+	-rm -f src/$(DEPDIR)/Font.Po
+	-rm -f src/$(DEPDIR)/FontCache.Po
+	-rm -f src/$(DEPDIR)/GCCache.Po
+	-rm -f src/$(DEPDIR)/Hackedbox.Po
+	-rm -f src/$(DEPDIR)/HbSudo.Po
+	-rm -f src/$(DEPDIR)/IconMenu.Po
+	-rm -f src/$(DEPDIR)/Image.Po
+	-rm -f src/$(DEPDIR)/ImageControl.Po
+	-rm -f src/$(DEPDIR)/ImageLoader.Po
+	-rm -f src/$(DEPDIR)/KeyManager.Po
+	-rm -f src/$(DEPDIR)/MenuManager.Po
+	-rm -f src/$(DEPDIR)/Netizen.Po
+	-rm -f src/$(DEPDIR)/Runbox.Po
+	-rm -f src/$(DEPDIR)/Screen.Po
+	-rm -f src/$(DEPDIR)/StyleEngine.Po
+	-rm -f src/$(DEPDIR)/Texture.Po
+	-rm -f src/$(DEPDIR)/Timer.Po
+	-rm -f src/$(DEPDIR)/Util.Po
+	-rm -f src/$(DEPDIR)/Window.Po
+	-rm -f src/$(DEPDIR)/WindowMenu.Po
+	-rm -f src/$(DEPDIR)/Workspace.Po
+	-rm -f src/$(DEPDIR)/WorkspaceMenu.Po
+	-rm -f src/$(DEPDIR)/hbsetbg-HbSetBg.Po
+	-rm -f src/$(DEPDIR)/hbsetbg-ImageLoader.Po
+	-rm -f src/$(DEPDIR)/main.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1086,22 +1278,23 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local
 .MAKE: $(am__recursive_targets) all install-am install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
-	am--refresh check check-am clean clean-binPROGRAMS \
-	clean-cscope clean-generic cscope cscopelist-am ctags ctags-am \
-	dist dist-all dist-bzip2 dist-bzip3 dist-gzip dist-lzip \
-	dist-shar dist-tarZ dist-xz dist-zip dist-zstd distcheck \
-	distclean distclean-compile distclean-generic distclean-hdr \
-	distclean-local distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-local
+	am--depfiles am--refresh check check-am clean \
+	clean-binPROGRAMS clean-cscope clean-generic cscope \
+	cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
+	dist-bzip3 dist-gzip dist-lzip dist-shar dist-tarZ dist-xz \
+	dist-zip dist-zstd distcheck distclean distclean-compile \
+	distclean-generic distclean-hdr distclean-local distclean-tags \
+	distcleancheck distdir distuninstallcheck dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-local
 
 .PRECIOUS: Makefile
 

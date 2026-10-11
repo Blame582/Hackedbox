@@ -31,13 +31,21 @@
 class KeyManager
 {
 public:
-    KeyManager(Display *display, Window root);
+    typedef void (*CommandExecutor)(const std::string &command, void *data);
+
+    KeyManager(Display *display,
+               Window root);
 
     void load(const std::string &filename);
     void reconfigure();
     void clear();
 
     bool handleEvent(const XKeyEvent &event);
+
+    void setCommandExecutor(
+        CommandExecutor executor,
+        void *data
+    );
 
 private:
     struct KeyBinding {
@@ -51,25 +59,35 @@ private:
     Window root;
 
     std::string filename;
+
     std::vector<KeyBinding> bindings;
+
+    CommandExecutor commandExecutor;
+    void *commandData;
 
     void parseLine(const std::string &line);
 
-    void addBinding(const std::string &keyString,
-                    const std::string &command);
+    void addBinding(
+        const std::string &keyString,
+        const std::string &command
+    );
 
-    bool parseBinding(const std::string &keyString,
-                      KeyBinding &binding);
+    bool parseBinding(
+        const std::string &keyString,
+        KeyBinding &binding
+    );
 
-    bool parseModifier(const std::string &name,
-                       unsigned int &modifiers);
+    bool parseModifier(
+        const std::string &name,
+        unsigned int &modifiers
+    );
 
     KeySym parseKey(const std::string &name);
 
     void grabBinding(const KeyBinding &binding);
     void ungrabAll();
 
-    void execute(const std::string &command);
+    void execute(const KeyBinding &binding);
 };
 
 #endif

@@ -292,11 +292,12 @@ static void drawHbFont(Display *display,
   XftDrawDestroy(draw);
 }
 
-
 /*
- * Draw a menu item icon from a direct image filename.
+ * Draw a menu item icon with its original RGBA alpha preserved.
  *
- * The image is loaded with HbImageLoader and rendered into the menu frame.
+ * The icon is uploaded into an ARGB32 pixmap and composited onto
+ * the existing ARGB menu frame with XRender. Transparent pixels
+ * therefore remain transparent instead of becoming black.
  */
 static void drawMenuIcon(Display *display,
                          Visual *visual,
@@ -305,240 +306,280 @@ static void drawMenuIcon(Display *display,
                          const char *filename,
                          int x,
                          int y,
-                         unsigned int size)
-{
-  if (!display ||
-      !visual ||
-      window == None ||
-      !filename ||
-      !*filename ||
-      size == 0)
-    return;
+                         unsigned int size) {
+    if (!display ||
+        !visual ||
+        window == None ||
+        !filename ||
+        !*filename ||
+        size == 0)
+        return;
 
-  (void)colormap;
+#ifdef HAVE_XRENDER
+    (void)colormap;
 
-  HbImageData image;
-  std::string error;
+    HbImageData image;
+    std::string error;
 
-  if (!HbImageLoader::load(filename,
-                           image,
-                           error) ||
-      !image.valid())
-    return;
+    if (!HbImageLoader::load(filename, image, error) ||
+        !image.valid())
+        return;
 
-  if (image.width == 0 ||
-      image.height == 0 ||
-      image.stride < image.width * 4)
-    return;
+    if (image.width == 0 ||
+        image.height == 0 ||
+        image.stride < image.width * 4)
+        return;
 
-  /*
-   * Preserve the original aspect ratio.
-   */
-  unsigned int draw_width = size;
-  unsigned int draw_height = size;
+    unsigned int draw_width = size;
+    unsigned int draw_height = size;
 
-  if (image.width > image.height) {
+    if (image.width > image.height) {
+        const unsigned long long scaled_height =
+            (static_cast<unsigned long long>(size) *
+             static_cast<unsigned long long>(image.height)) /
+            static_cast<unsigned long long>(image.width);
 
-    const unsigned long long scaled_height =
-      (static_cast<unsigned long long>(size) *
-       static_cast<unsigned long long>(image.height)) /
-      static_cast<unsigned long long>(image.width);
+        draw_height =
+            static_cast<unsigned int>(scaled_height);
 
-    draw_height =
-      static_cast<unsigned int>(scaled_height);
+        if (draw_height == 0)
+            draw_height = 1;
 
-    if (draw_height == 0)
-      draw_height = 1;
+    } else if (image.height > image.width) {
+        const unsigned long long scaled_width =
+            (static_cast<unsigned long long>(size) *
+             static_cast<unsigned long long>(image.width)) /
+            static_cast<unsigned long long>(image.height);
 
-  } else if (image.height > image.width) {
+        draw_width =
+            static_cast<unsigned int>(scaled_width);
 
-    const unsigned long long scaled_width =
-      (static_cast<unsigned long long>(size) *
-       static_cast<unsigned long long>(image.width)) /
-      static_cast<unsigned long long>(image.height);
-
-    draw_width =
-      static_cast<unsigned int>(scaled_width);
-
-    if (draw_width == 0)
-      draw_width = 1;
-  }
-
-  const int draw_x =
-    x + static_cast<int>((size - draw_width) / 2);
-
-  const int draw_y =
-    y + static_cast<int>((size - draw_height) / 2);
-
-  /*
-   * Get the actual depth of the menu window.
-   *
-   * This is important because Hackedbox menus can use a 32-bit
-   * ARGB visual while the root screen may use a different depth.
-   */
-  Window root;
-  int window_x;
-  int window_y;
-  unsigned int window_width;
-  unsigned int window_height;
-  unsigned int border_width;
-  unsigned int depth;
-
-  if (!XGetGeometry(display,
-                    window,
-                    &root,
-                    &window_x,
-                    &window_y,
-                    &window_width,
-                    &window_height,
-                    &border_width,
-                    &depth))
-    return;
-
-  if (depth == 0)
-    return;
-
-  XImage *ximage =
-    XCreateImage(display,
-                 visual,
-                 depth,
-                 ZPixmap,
-                 0,
-                 nullptr,
-                 draw_width,
-                 draw_height,
-                 32,
-                 0);
-
-  if (!ximage)
-    return;
-
-  const size_t image_bytes =
-    static_cast<size_t>(ximage->bytes_per_line) *
-    static_cast<size_t>(draw_height);
-
-  if (image_bytes == 0) {
-    ximage->data = nullptr;
-    XDestroyImage(ximage);
-    return;
-  }
-
-  ximage->data =
-    static_cast<char *>(calloc(1, image_bytes));
-
-  if (!ximage->data) {
-    XDestroyImage(ximage);
-    return;
-  }
-
-  /*
-   * Convert an 8-bit channel value into the bit range used by
-   * the X11 Visual.
-   */
-  const auto scaleChannel =
-    [](unsigned int value,
-       unsigned long mask) -> unsigned long {
-
-      if (mask == 0)
-        return 0;
-
-      unsigned int shift = 0;
-      unsigned long shifted = mask;
-
-      while ((shifted & 1UL) == 0) {
-        shifted >>= 1;
-        ++shift;
-      }
-
-      unsigned long max_value = shifted;
-
-      return
-        ((static_cast<unsigned long>(value) *
-          max_value) / 255UL) << shift;
-    };
-
-  const unsigned long red_mask =
-    visual->red_mask;
-
-  const unsigned long green_mask =
-    visual->green_mask;
-
-  const unsigned long blue_mask =
-    visual->blue_mask;
-
-  for (unsigned int py = 0;
-       py < draw_height;
-       ++py) {
-
-    const unsigned int src_y =
-      static_cast<unsigned int>(
-        (static_cast<unsigned long long>(py) *
-         static_cast<unsigned long long>(image.height)) /
-        static_cast<unsigned long long>(draw_height));
-
-    const unsigned char *src_row =
-      image.pixels.data() +
-      static_cast<size_t>(src_y) *
-      static_cast<size_t>(image.stride);
-
-    for (unsigned int px = 0;
-         px < draw_width;
-         ++px) {
-
-      const unsigned int src_x =
-        static_cast<unsigned int>(
-          (static_cast<unsigned long long>(px) *
-           static_cast<unsigned long long>(image.width)) /
-          static_cast<unsigned long long>(draw_width));
-
-      const unsigned char *pixel =
-        src_row +
-        static_cast<size_t>(src_x) * 4;
-
-      const unsigned long red =
-        scaleChannel(pixel[0], red_mask);
-
-      const unsigned long green =
-        scaleChannel(pixel[1], green_mask);
-
-      const unsigned long blue =
-        scaleChannel(pixel[2], blue_mask);
-
-      XPutPixel(
-        ximage,
-        static_cast<int>(px),
-        static_cast<int>(py),
-        red | green | blue);
+        if (draw_width == 0)
+            draw_width = 1;
     }
-  }
 
-  GC gc =
-    XCreateGC(display,
-              window,
-              0,
-              nullptr);
+    /*
+     * The icon pixmap is always ARGB32 regardless of the screen
+     * depth. XRender handles the alpha channel during compositing.
+     */
+    XRenderPictFormat *argb_format =
+        XRenderFindStandardFormat(
+            display,
+            PictStandardARGB32);
 
-  if (!gc) {
+    if (!argb_format)
+        return;
+
+    Pixmap icon_pixmap =
+        XCreatePixmap(
+            display,
+            window,
+            draw_width,
+            draw_height,
+            32);
+
+    if (icon_pixmap == None)
+        return;
+
+    /*
+     * Build a native 32-bit XImage containing ARGB32 pixels.
+     */
+    XImage *ximage =
+        XCreateImage(
+            display,
+            visual,
+            32,
+            ZPixmap,
+            0,
+            nullptr,
+            draw_width,
+            draw_height,
+            32,
+            0);
+
+    if (!ximage) {
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    const size_t image_bytes =
+        static_cast<size_t>(ximage->bytes_per_line) *
+        static_cast<size_t>(draw_height);
+
+    if (image_bytes == 0) {
+        ximage->data = nullptr;
+        XDestroyImage(ximage);
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    ximage->data =
+        static_cast<char *>(calloc(1, image_bytes));
+
+    if (!ximage->data) {
+        XDestroyImage(ximage);
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    for (unsigned int py = 0;
+         py < draw_height;
+         ++py) {
+
+        const unsigned int src_y =
+            static_cast<unsigned int>(
+                (static_cast<unsigned long long>(py) *
+                 static_cast<unsigned long long>(image.height)) /
+                static_cast<unsigned long long>(draw_height));
+
+        const unsigned char *src_row =
+            image.pixels.data() +
+            static_cast<size_t>(src_y) *
+            static_cast<size_t>(image.stride);
+
+        for (unsigned int px = 0;
+             px < draw_width;
+             ++px) {
+
+            const unsigned int src_x =
+                static_cast<unsigned int>(
+                    (static_cast<unsigned long long>(px) *
+                     static_cast<unsigned long long>(image.width)) /
+                    static_cast<unsigned long long>(draw_width));
+
+            const unsigned char *pixel =
+                src_row +
+                static_cast<size_t>(src_x) * 4;
+
+            const unsigned long argb =
+                (static_cast<unsigned long>(pixel[3]) << 24) |
+                (static_cast<unsigned long>(pixel[0]) << 16) |
+                (static_cast<unsigned long>(pixel[1]) << 8) |
+                static_cast<unsigned long>(pixel[2]);
+
+            XPutPixel(
+                ximage,
+                static_cast<int>(px),
+                static_cast<int>(py),
+                argb);
+        }
+    }
+
+    /*
+     * Upload the ARGB32 image into the icon pixmap.
+     */
+    GC gc =
+        XCreateGC(
+            display,
+            icon_pixmap,
+            0,
+            nullptr);
+
+    if (!gc) {
+        XDestroyImage(ximage);
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    XPutImage(
+        display,
+        icon_pixmap,
+        gc,
+        ximage,
+        0,
+        0,
+        0,
+        0,
+        draw_width,
+        draw_height);
+
+    XFreeGC(display, gc);
     XDestroyImage(ximage);
-    return;
-  }
 
-  XPutImage(
-    display,
-    window,
-    gc,
-    ximage,
-    0,
-    0,
-    draw_x,
-    draw_y,
-    draw_width,
-    draw_height);
+    /*
+     * Create the source picture from the ARGB32 icon.
+     */
+    Picture source_picture =
+        XRenderCreatePicture(
+            display,
+            icon_pixmap,
+            argb_format,
+            0,
+            nullptr);
 
-  XFreeGC(display, gc);
-  XDestroyImage(ximage);
+    if (source_picture == None) {
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    /*
+     * The menu window is already using the ARGB visual selected by
+     * HbBasemenu. Create the destination picture from that visual.
+     */
+    XRenderPictFormat *destination_format =
+        XRenderFindVisualFormat(
+            display,
+            visual);
+
+    if (!destination_format) {
+        XRenderFreePicture(display, source_picture);
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    Picture destination_picture =
+        XRenderCreatePicture(
+            display,
+            window,
+            destination_format,
+            0,
+            nullptr);
+
+    if (destination_picture == None) {
+        XRenderFreePicture(display, source_picture);
+        XFreePixmap(display, icon_pixmap);
+        return;
+    }
+
+    /*
+     * Composite the icon over the menu. The source alpha channel
+     * controls the result; nothing is made opaque here.
+     */
+    XRenderComposite(
+        display,
+        PictOpOver,
+        source_picture,
+        None,
+        destination_picture,
+        0,
+        0,
+        0,
+        0,
+        x,
+        y,
+        draw_width,
+        draw_height);
+
+    XRenderFreePicture(
+        display,
+        destination_picture);
+
+    XRenderFreePicture(
+        display,
+        source_picture);
+
+    XFreePixmap(
+        display,
+        icon_pixmap);
+#else
+    (void)colormap;
+    (void)window;
+    (void)filename;
+    (void)x;
+    (void)y;
+    (void)size;
+#endif
 }
-
 
 HbBasemenu::HbBasemenu(HbScreen *scrn) {
   screen = scrn;

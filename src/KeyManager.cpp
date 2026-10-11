@@ -19,42 +19,57 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-
 #include "KeyManager.hpp"
-#include "Util.hpp"
 
 #include <fstream>
 #include <sstream>
-
 #include <cctype>
+#include <cstdio>
 
 
 KeyManager::KeyManager(Display *display,
                        Window root)
     : display(display),
-      root(root)
+      root(root),
+      commandExecutor(nullptr),
+      commandData(nullptr)
 {
 }
 
-
 void KeyManager::load(const std::string &filename)
 {
+    std::ofstream log("/tmp/hackedbox-keymanager.log", std::ios::app);
+
+    if (log)
+        log << "LOAD: " << filename << '\n';
+
     this->filename = filename;
 
     clear();
 
     std::ifstream file(filename);
 
-    if (!file)
+    if (!file) {
+        if (log)
+            log << "OPEN FAILED\n";
         return;
+    }
 
     std::string line;
 
-    while (std::getline(file, line))
+    while (std::getline(file, line)) {
+        if (log)
+            log << "LINE: [" << line << "]\n";
+
         parseLine(line);
+    }
+
+    if (log)
+        log << "RECONFIGURE bindings=" << bindings.size() << '\n';
 
     reconfigure();
 }
+
 
 
 void KeyManager::clear()
@@ -84,12 +99,23 @@ void KeyManager::parseLine(const std::string &line)
     if (comment != std::string::npos)
         text.erase(comment);
 
-    size_t exec = text.find("[exec]");
+    size_t actionBegin = text.find('[');
+    size_t actionEnd = text.find(']', actionBegin);
 
-    if (exec == std::string::npos)
+    if (actionBegin == std::string::npos ||
+        actionEnd == std::string::npos ||
+        actionEnd <= actionBegin)
         return;
 
-    size_t keyBegin = text.find('(', exec + 6);
+    std::string action = text.substr(
+        actionBegin + 1,
+        actionEnd - actionBegin - 1
+    );
+
+    if (action != "exec")
+        return;
+
+    size_t keyBegin = text.find('(', actionEnd);
     size_t keyEnd = text.find(')', keyBegin);
 
     if (keyBegin == std::string::npos ||
@@ -131,31 +157,55 @@ void KeyManager::parseLine(const std::string &line)
     trim(keyString);
     trim(command);
 
-    if (keyString.empty() || command.empty())
+    if (keyString.empty() ||
+        command.empty())
         return;
 
-    addBinding(keyString, command);
+    addBinding(
+        keyString,
+        command
+    );
 }
 
-
-void KeyManager::addBinding(const std::string &keyString,
-                            const std::string &command)
+void KeyManager::addBinding(
+    const std::string &keyString,
+    const std::string &command)
 {
+    std::ofstream log("/tmp/hackedbox-keymanager.log", std::ios::app);
+
     KeyBinding binding;
 
-    if (!parseBinding(keyString, binding))
+    if (!parseBinding(keyString, binding)) {
+        if (log)
+            log << "BIND FAILED: [" << keyString << "]\n";
         return;
+    }
 
     binding.command = command;
 
     bindings.push_back(binding);
+
+    if (log) {
+        log << "BIND: key=[" << keyString
+            << "] keycode=" << binding.keycode
+            << " keysym=0x" << std::hex << binding.keysym
+            << std::dec
+            << " command=[" << command << "]\n";
+    }
 }
 
-
-bool KeyManager::parseBinding(const std::string &keyString,
-                              KeyBinding &binding)
+bool KeyManager::parseBinding(
+    const std::string &keyString,
+    KeyBinding &binding)
 {
-    std::istringstream stream(keyString);
+    std::string text = keyString;
+
+    for (char &c : text) {
+        if (c == '+')
+            c = ' ';
+    }
+
+    std::istringstream stream(text);
 
     std::string token;
     std::string keyName;
@@ -189,9 +239,9 @@ bool KeyManager::parseBinding(const std::string &keyString,
     return true;
 }
 
-
-bool KeyManager::parseModifier(const std::string &name,
-                               unsigned int &modifiers)
+bool KeyManager::parseModifier(
+    const std::string &name,
+    unsigned int &modifiers)
 {
     if (name == "Shift") {
         modifiers |= ShiftMask;
@@ -240,21 +290,21 @@ KeySym KeyManager::parseKey(const std::string &name)
     return XStringToKeysym(name.c_str());
 }
 
-
 void KeyManager::grabBinding(const KeyBinding &binding)
 {
-    /*
-     * X11 modifier state can contain NumLock and CapsLock.
-     * Grab all four relevant combinations so the binding remains
-     * active regardless of those states.
-     */
-
     const unsigned int states[] = {
         binding.modifiers,
         binding.modifiers | LockMask,
         binding.modifiers | Mod2Mask,
         binding.modifiers | LockMask | Mod2Mask
     };
+
+    std::ofstream log("/tmp/hackedbox-keymanager.log", std::ios::app);
+
+    if (log)
+        log << "GRAB: keycode=" << binding.keycode
+            << " keysym=0x" << std::hex << binding.keysym
+            << std::dec << '\n';
 
     for (unsigned int state : states) {
         XGrabKey(
@@ -266,6 +316,10 @@ void KeyManager::grabBinding(const KeyBinding &binding)
             GrabModeAsync,
             GrabModeAsync
         );
+
+        if (log)
+            log << "  state=0x" << std::hex << state
+                << std::dec << '\n';
     }
 }
 
@@ -280,11 +334,17 @@ void KeyManager::ungrabAll()
     );
 }
 
-
 bool KeyManager::handleEvent(const XKeyEvent &event)
 {
+    std::ofstream log("/tmp/hackedbox-keymanager.log", std::ios::app);
+
     unsigned int state =
         event.state & ~(LockMask | Mod2Mask);
+
+    if (log)
+        log << "EVENT: keycode=" << event.keycode
+            << " state=0x" << std::hex << state
+            << std::dec << '\n';
 
     for (const auto &binding : bindings) {
         if (event.keycode != binding.keycode)
@@ -293,18 +353,36 @@ bool KeyManager::handleEvent(const XKeyEvent &event)
         if (state != binding.modifiers)
             continue;
 
-        execute(binding.command);
+        if (log)
+            log << "MATCH: command=[" << binding.command << "]\n";
+
+        execute(binding);
+
         return true;
     }
+
+    if (log)
+        log << "NO MATCH\n";
 
     return false;
 }
 
-
-void KeyManager::execute(const std::string &command)
+void KeyManager::execute(const KeyBinding &binding)
 {
-    hbexec(
-        command,
-        DisplayString(display)
+    if (!commandExecutor)
+        return;
+
+    commandExecutor(
+        binding.command,
+        commandData
     );
+}
+
+
+void KeyManager::setCommandExecutor(
+    CommandExecutor executor,
+    void *data)
+{
+    commandExecutor = executor;
+    commandData = data;
 }
