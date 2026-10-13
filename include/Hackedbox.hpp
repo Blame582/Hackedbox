@@ -84,6 +84,7 @@ class HackedboxWindow;
 class HbWindowGroup;
 class HbBasemenu;
 class KeyManager;
+class HbCompositor;
 
 class Hackedbox : public BaseDisplay, public TimeoutHandler {
 private:
@@ -132,6 +133,7 @@ private:
     using MenuLookup = std::map<Window, HbBasemenu *>;
     using MenuTimestampList = std::list<MenuTimestamp *>;
     using ScreenList = std::list<HbScreen *>;
+    using CompositorList = std::list<HbCompositor *>;
 
     WindowLookup windowSearchList;
     GroupLookup groupSearchList;
@@ -143,6 +145,7 @@ private:
     HbScreen *active_screen;
     HackedboxWindow *focused_window;
     HbTimer *timer;
+    CompositorList compositorList;
     Clock *clock;
     HbTimer *clock_timer;
 

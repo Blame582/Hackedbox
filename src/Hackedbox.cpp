@@ -55,6 +55,7 @@
 #include "Hackedbox.hpp"
 #include "BaseMenu.hpp"
 #include "ClientMenu.hpp"
+#include "Compositor.hpp"
 #include "Dock.hpp"
 #include "ImageControl.hpp"
 #include "GCCache.hpp"
@@ -304,6 +305,20 @@ Hackedbox::Hackedbox(char **m_argv, const char *displayName,
             continue;
         }
 
+		auto *compositor = new HbCompositor(
+		    display, screen->getRootWindow(), screen->getScreenNumber());
+
+		if (!compositor->initialize()) {
+		    std::cerr << "Hackedbox: unable to initialize compositor for screen "
+		              << screen->getScreenNumber() << '\n';
+		    delete compositor;
+		    delete screen;
+		    std::exit(EXIT_FAILURE);
+		}
+
+		compositorList.push_back(compositor);
+		screenList.push_back(screen);
+
         screenList.push_back(screen);
     }
 
@@ -344,6 +359,11 @@ Hackedbox::~Hackedbox() {
     delete key_manager;
     delete clock_timer;
     delete clock;
+    
+    for (auto *compositor : compositorList)
+    	delete compositor;
+
+	compositorList.clear();
 
     for (auto *screen : screenList)
         delete screen;
@@ -1033,6 +1053,10 @@ void Hackedbox::restart(const char *program) {
 
 void Hackedbox::shutdown() {
     BaseDisplay::shutdown();
+    
+    
+    for (auto *compositor : compositorList)
+        compositor->shutdown();
 
     XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
 
