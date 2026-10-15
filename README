@@ -5,8 +5,7 @@ Blackbox window manager. The 0.9.x series continues development of the
 original codebase while retaining its lightweight design, traditional
 resource-based configuration, and minimal desktop dependencies.
 
-HackedBox is developed for Unix-like systems using the X11 protocol and is
-currently developed and tested with Xorg on Linux.
+HackedBox is developed for the X11 protocol on linux.
 
 ## Source Tree:
 
