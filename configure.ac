@@ -1,3 +1,4 @@
+
 dnl configure.ac for Hackedbox
 dnl Initialize autoconf and automake
 
@@ -17,7 +18,7 @@ AC_PROG_INSTALL
 
 AC_CHECK_PROGS([regex_cmd], [sed])
 if test x$regex_cmd = "x"; then
-AC_MSG_ERROR([sed is required to build the default menu file.])
+    AC_MSG_ERROR([sed is required to build the default menu file.])
 fi
 
 dnl Check for system header files
@@ -163,47 +164,33 @@ AC_MSG_CHECKING([for GCC])
 
 if test x$GCC = "xyes"; then
 
-AC_MSG_RESULT([yes])
-
-CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
-
-else
-
-AC_MSG_RESULT([no, trying other compilers])
-
-AC_MSG_CHECKING([for MIPSpro])
-
-mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
-
-if test "x$mips_pro_ver" = "x"; then
-
-
-AC_MSG_RESULT([no])
-
+    AC_MSG_RESULT([yes])
+    CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
 
 else
 
+    AC_MSG_RESULT([no, trying other compilers])
 
-AC_MSG_RESULT([yes, version $mips_pro_ver.])
+    AC_MSG_CHECKING([for MIPSpro])
 
-AC_MSG_CHECKING([for -LANG:std in CXXFLAGS])
+    mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
 
-lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
+    if test "x$mips_pro_ver" = "x"; then
+        AC_MSG_RESULT([no])
+    else
+        AC_MSG_RESULT([yes, version $mips_pro_ver.])
 
-if test "x$lang_std_not_set" = "x"; then
+        AC_MSG_CHECKING([for -LANG:std in CXXFLAGS])
 
-  AC_MSG_RESULT([not set, setting.])
+        lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
 
-  CXXFLAGS="${CXXFLAGS} -LANG:std"
-
-else
-
-  AC_MSG_RESULT([already set.])
-
-fi
-
-
-fi
+        if test "x$lang_std_not_set" = "x"; then
+            AC_MSG_RESULT([not set, setting.])
+            CXXFLAGS="${CXXFLAGS} -LANG:std"
+        else
+            AC_MSG_RESULT([already set.])
+        fi
+    fi
 fi
 
 dnl Check for required functions in -lX11
@@ -228,9 +215,7 @@ dnl ------------------------------------------------------------
 
 XRENDER_LIB=""
 
-AC_MSG_CHECKING(
-[whether XRender support is available]
-)
+AC_MSG_CHECKING([whether XRender support is available])
 
 AC_CHECK_HEADERS(
 [X11/extensions/Xrender.h],
@@ -240,11 +225,7 @@ AC_CHECK_LIB(
 [XRenderFindVisualFormat],
 [
 AC_MSG_RESULT([yes])
-AC_DEFINE(
-[HAVE_XRENDER],
-[1],
-[Define if XRender is available.]
-)
+AC_DEFINE([HAVE_XRENDER], [1], [Define if XRender is available.])
 XRENDER_LIB="-lXrender"
 ],
 [
@@ -262,15 +243,65 @@ AC_SUBST([XRENDER_LIB])
 LIBS="$LIBS $X_EXTRA_LIBS $XRENDER_LIB"
 
 dnl ------------------------------------------------------------
+dnl Built-in compositor extensions
+dnl ------------------------------------------------------------
+
+AC_CHECK_HEADERS(
+[
+X11/extensions/Xcomposite.h
+X11/extensions/Xdamage.h
+X11/extensions/Xfixes.h
+X11/extensions/Xrender.h
+],
+[],
+[AC_MSG_ERROR([Hackedbox requires XComposite, XDamage, XFixes and XRender headers.])]
+)
+
+AC_CHECK_LIB(
+[Xcomposite],
+[XCompositeQueryExtension],
+[],
+[AC_MSG_ERROR([Hackedbox requires libXcomposite.])]
+)
+
+AC_CHECK_LIB(
+[Xdamage],
+[XDamageQueryExtension],
+[],
+[AC_MSG_ERROR([Hackedbox requires libXdamage.])]
+)
+
+AC_CHECK_LIB(
+[Xfixes],
+[XFixesQueryExtension],
+[],
+[AC_MSG_ERROR([Hackedbox requires libXfixes.])]
+)
+
+if test "x$XRENDER_LIB" = "x"; then
+    AC_MSG_ERROR([Hackedbox requires XRender support for its built-in compositor.])
+fi
+
+AC_DEFINE(
+[HAVE_COMPOSITOR],
+[1],
+[Define if the built-in compositor is available.]
+)
+
+COMPOSITOR_LIBS="-lXcomposite -lXdamage -lXfixes"
+
+AC_SUBST([COMPOSITOR_LIBS])
+
+AC_MSG_NOTICE([Built-in compositor enabled])
+
+dnl ------------------------------------------------------------
 dnl XShape extension
 dnl ------------------------------------------------------------
 
 Xext_lib=""
 SHAPE=""
 
-AC_MSG_CHECKING(
-[whether to build support for the XShape extension]
-)
+AC_MSG_CHECKING([whether to build support for the XShape extension])
 
 AC_ARG_ENABLE(
 [shape],
@@ -282,47 +313,42 @@ AC_ARG_ENABLE(
 
 if test x$enableval = "xyes"; then
 
-AC_MSG_RESULT([yes])
+    AC_MSG_RESULT([yes])
 
-AC_CHECK_LIB(
-[Xext],
-[XShapeCombineShape],
+    AC_CHECK_LIB(
+    [Xext],
+    [XShapeCombineShape],
 
+    AC_MSG_CHECKING([for X11/extensions/shape.h])
 
-AC_MSG_CHECKING(
-  [for X11/extensions/shape.h]
-)
-
-AC_LINK_IFELSE(
-  [
-    AC_LANG_PROGRAM(
-      [[
-
-
+    AC_LINK_IFELSE(
+    [
+        AC_LANG_PROGRAM(
+        [[
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
-]],
-[[
+        ]],
+        [[
 long foo = ShapeSet;
 (void) foo;
-]]
-)
-],
-[
-AC_MSG_RESULT([yes])
-SHAPE="-DSHAPE"
-Xext_lib="-lXext"
-],
-[
-AC_MSG_RESULT([no])
-]
-)
-)
+        ]]
+        )
+    ],
+    [
+        AC_MSG_RESULT([yes])
+        SHAPE="-DSHAPE"
+        Xext_lib="-lXext"
+    ],
+    [
+        AC_MSG_RESULT([no])
+    ]
+    )
+    )
 
 else
 
-AC_MSG_RESULT([no])
+    AC_MSG_RESULT([no])
 
 fi
 
@@ -336,38 +362,27 @@ dnl ------------------------------------------------------------
 
 DEBUG=""
 
-AC_MSG_CHECKING(
-[whether to include verbose debugging code]
-)
+AC_MSG_CHECKING([whether to include verbose debugging code])
 
 AC_ARG_ENABLE(
 [debug],
-
 [AS_HELP_STRING([--enable-debug],
 [include verbose debugging code @<:@default=no@:>@])],
 
 if test x$enableval = "xyes"; then
 
+    AC_MSG_RESULT([yes])
 
-AC_MSG_RESULT([yes])
-
-if test x$GCC = "xyes"; then
-
-  DEBUG="-DDEBUG -fno-inline -g"
-
-else
-
-  DEBUG="-DDEBUG"
-
-fi
-
+    if test x$GCC = "xyes"; then
+        DEBUG="-DDEBUG -fno-inline -g"
+    else
+        DEBUG="-DDEBUG"
+    fi
 
 else
 
-
-AC_MSG_RESULT([no])
-DEBUG="-DNDEBUG"
-
+    AC_MSG_RESULT([no])
+    DEBUG="-DNDEBUG"
 
 fi,
 
@@ -383,28 +398,21 @@ dnl ------------------------------------------------------------
 
 TIMEDCACHE=""
 
-AC_MSG_CHECKING(
-[whether to use the new timed pixmap cache]
-)
+AC_MSG_CHECKING([whether to use the new timed pixmap cache])
 
 AC_ARG_ENABLE(
 [timed-cache],
-
 [AS_HELP_STRING([--enable-timed-cache],
 [use new timed pixmap cache @<:@default=yes@:>@])],
 
 if test x$enableval = "xyes"; then
 
-
-AC_MSG_RESULT([yes])
-TIMEDCACHE="-DTIMEDCACHE"
-
+    AC_MSG_RESULT([yes])
+    TIMEDCACHE="-DTIMEDCACHE"
 
 else
 
-
-AC_MSG_RESULT([no])
-
+    AC_MSG_RESULT([no])
 
 fi,
 

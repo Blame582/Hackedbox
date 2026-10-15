@@ -1,6 +1,5 @@
-// Compositor.hpp for Hackedbox - an X Window Manager
+// Compositor.hpp for Hackedbox - an X Window manager
 // Copyright (c) 2026 Kevin Day <blame582@gmail.com>
-// Look in the Authors file for credits and copyrights.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -24,32 +23,13 @@
 #define HACKEDBOX_COMPOSITOR_HPP
 
 #include <X11/Xlib.h>
+#include <X11/extensions/Xrender.h>
+#include <X11/extensions/Xdamage.h>
+
+#include <unordered_map>
+#include <unordered_set>
 
 class HbCompositor {
-private:
-    Display *display;
-    Window root;
-    int screen;
-
-    bool available;
-    bool initialized;
-
-    int composite_event_base;
-    int composite_error_base;
-    int damage_event_base;
-    int damage_error_base;
-    int fixes_event_base;
-    int fixes_error_base;
-    int render_event_base;
-    int render_error_base;
-
-    int composite_major;
-    int composite_minor;
-    int damage_major;
-    int damage_minor;
-    int fixes_major;
-    int fixes_minor;
-
 public:
     HbCompositor(Display *display, int screen);
     ~HbCompositor();
@@ -59,16 +39,37 @@ public:
 
     bool initialize();
     void shutdown();
+    bool handleEvent(XEvent *event);
+    void repaint();
 
     bool isAvailable() const;
     bool isInitialized() const;
-
     Window rootWindow() const;
 
-    int compositeEventBase() const;
-    int damageEventBase() const;
-    int fixesEventBase() const;
-    int renderEventBase() const;
+private:
+    void trackWindow(Window window);
+    void paintWindow(Window window, int x, int y);
+    void repaintRegion(int x, int y,
+                       unsigned int width, unsigned int height);
+    void clearTracking();
+
+    Display *display;
+    Window root;
+    Window overlay;
+    Window selection_owner;
+    int screen;
+    int damage_event_base;
+    int damage_error_base;
+    bool available;
+    bool initialized;
+    bool owns_selection;
+
+    Picture root_picture;
+    Picture overlay_picture;
+    Atom selection_atom;
+
+    std::unordered_set<Window> redirected;
+    std::unordered_map<Window, Damage> damages;
 };
 
-#endif // HACKEDBOX_COMPOSITOR_HPP
+#endif

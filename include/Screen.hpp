@@ -364,6 +364,9 @@ public:
 
     inline MenuStyle *getMenuStyle(void)
     { return style_engine->getMenuStyle(); }
+    
+    inline const std::string &getIconSet() const
+	{ return style_engine->getIconSet(); }
 
     HackedboxWindow *getIcon(unsigned int index);
 

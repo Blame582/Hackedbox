@@ -40,7 +40,7 @@ static void showHelp(int exitval)
 {
   printf(
     "Hackedbox %s : (c) 2026 Kevin Day\n"
-    "\t\t\t See the AUTHORS file for original Blackbox contributors.\n\n"
+    "\t\t\t See the AUTHORS file for original contributors.\n\n"
     "  -display <string>\t\tuse display connection.\n"
     "  -rc <string>\t\t\tuse alternate resource file.\n"
     "  -version\t\t\tdisplay version and exit.\n"
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
     } else if (!strcmp(argv[i], "-version")) {
       printf(
         "Hackedbox %s : (c) 2026 Kevin Day\n"
-        "\t\t\t See the AUTHORS file for original Blackbox contributors.\n",
+        "\t\t\t See the AUTHORS file for original contributors.\n",
         __hackedbox_version);
 
       ::exit(0);

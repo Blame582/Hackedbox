@@ -297,6 +297,19 @@ Hackedbox::Hackedbox(char **m_argv, const char *displayName,
                    resource.clock_target == "both");
     clock->update();
 
+	for (unsigned int i = 0; i < getNumberOfScreens(); ++i) {
+	    auto *screen = new HbScreen(this, i);
+
+	    if (!screen->isScreenManaged()) {
+	        delete screen;
+	        continue;
+	    }
+
+	    screenList.push_back(screen);
+	}
+
+  /* this block starts the broken compositor after a recompile
+  
     for (unsigned int i = 0; i < getNumberOfScreens(); ++i) {
         auto *screen = new HbScreen(this, i);
 
@@ -305,9 +318,8 @@ Hackedbox::Hackedbox(char **m_argv, const char *displayName,
             continue;
         }
 
-		auto *compositor = new HbCompositor(
-		    display, screen->getRootWindow(), screen->getScreenNumber());
-
+		auto *compositor = new HbCompositor(display, screen->getScreenNumber());
+		
 		if (!compositor->initialize()) {
 		    std::cerr << "Hackedbox: unable to initialize compositor for screen "
 		              << screen->getScreenNumber() << '\n';
@@ -318,9 +330,8 @@ Hackedbox::Hackedbox(char **m_argv, const char *displayName,
 
 		compositorList.push_back(compositor);
 		screenList.push_back(screen);
-
-        screenList.push_back(screen);
     }
+    */
 
     if (screenList.empty()) {
         std::cerr << "Hackedbox::Hackedbox: no manageable screens found, aborting.\n";
@@ -375,6 +386,11 @@ Hackedbox::~Hackedbox() {
 }
 
 void Hackedbox::process_event(XEvent *event) {
+	for (auto *compositor : compositorList) {
+	    if (compositor->handleEvent(event))
+	        return;
+	}
+	
     switch (event->type) {
     case ButtonPress: {
         for (auto *screen : screenList) {

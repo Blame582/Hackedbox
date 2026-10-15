@@ -93,6 +93,7 @@ private:
 
   HbColor border_color;
 
+  std::string iconSet;
   std::string backgroundFolder;
   int backgroundTimer;
 
@@ -152,6 +153,9 @@ public:
 
   unsigned int getBorderWidth() const
   { return border_width; }
+  
+  const std::string &getIconSet() const
+  { return iconSet; }
 
   const std::string &getBackgroundFolder() const
   { return backgroundFolder; }
@@ -161,6 +165,7 @@ public:
 
   XrmDatabase getDatabase() const
   { return stylerc; }
+  
 };
 
 #endif // __StyleEngine_hpp

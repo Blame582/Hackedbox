@@ -10,6 +10,9 @@ X11:
 - libXext
 - libXrender
 - libXft
+- libXcomposite
+- libXdamage
+- libXfixes
 
 Font support:
 - Fontconfig

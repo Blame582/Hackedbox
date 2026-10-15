@@ -2224,12 +2224,21 @@ void HbBasemenu::drawItem(int index,
         menu.bevel_w -
         icon_size;
 
+    std::string icon_path = item->icon();
+
+    if (!icon_path.empty() && icon_path[0] != '/') {
+        const std::string &icon_set = screen->getIconSet();
+
+        if (!icon_set.empty())
+            icon_path = icon_set + icon_path;
+    }
+
     drawMenuIcon(
       display,
       menu_visual,
       menu_colormap,
       menu.frame,
-      item->icon(),
+      icon_path.c_str(),
       icon_x,
       item_y,
       icon_size);

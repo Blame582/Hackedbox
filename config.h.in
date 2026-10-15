@@ -12,6 +12,9 @@
 /* Define to 1 if you have the 'catopen' function. */
 #undef HAVE_CATOPEN
 
+/* Define if the built-in compositor is available. */
+#undef HAVE_COMPOSITOR
+
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 
@@ -32,6 +35,15 @@
 
 /* Define to 1 if you have the <libgen.h> header file. */
 #undef HAVE_LIBGEN_H
+
+/* Define to 1 if you have the 'Xcomposite' library (-lXcomposite). */
+#undef HAVE_LIBXCOMPOSITE
+
+/* Define to 1 if you have the 'Xdamage' library (-lXdamage). */
+#undef HAVE_LIBXDAMAGE
+
+/* Define to 1 if you have the 'Xfixes' library (-lXfixes). */
+#undef HAVE_LIBXFIXES
 
 /* Define to 1 if you have the <locale.h> header file. */
 #undef HAVE_LOCALE_H
@@ -113,6 +125,15 @@
 
 /* Define to 1 if you have the <webp/decode.h> header file. */
 #undef HAVE_WEBP_DECODE_H
+
+/* Define to 1 if you have the <X11/extensions/Xcomposite.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XCOMPOSITE_H
+
+/* Define to 1 if you have the <X11/extensions/Xdamage.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XDAMAGE_H
+
+/* Define to 1 if you have the <X11/extensions/Xfixes.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XFIXES_H
 
 /* Define to 1 if you have the <X11/extensions/Xrender.h> header file. */
 #undef HAVE_X11_EXTENSIONS_XRENDER_H

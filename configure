@@ -632,6 +632,7 @@ MAINTAINER_MODE_TRUE
 TIMEDCACHE
 DEBUG
 SHAPE
+COMPOSITOR_LIBS
 XRENDER_LIB
 RSVG_LIBS
 RSVG_CFLAGS
@@ -680,6 +681,7 @@ AM_V
 CSCOPE
 ETAGS
 CTAGS
+am__tar_ignore_stderr
 am__untar
 am__tar
 AMTAR
@@ -2718,7 +2720,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-am__api_version='1.18'
+am__api_version='1.19'
 
 
 
@@ -3449,10 +3451,15 @@ mkdir_p='$(MKDIR_P)'
 
 # We need awk for the "check" target (and possibly the TAP driver).  The
 # system "awk" is bad on some platforms.
-# Always define AMTAR for backward compatibility.  Yes, it's still used
-# in the wild :-(  We should find a proper way to deprecate it ...
+# Always define AMTAR for backward compatibility.  It's still used
+# in the wild, let's not break things.
 AMTAR='$${TAR-tar}'
 
+
+# The dist rules treat anything $(am__tar) writes to standard error as
+# a failure (automake bug#19614).  Set this to "yes" for archivers that
+# write there when all is well; cpio reports a block count.
+am__tar_ignore_stderr=no
 
 # We'll loop over all known methods to create a tar archive until one works.
 _am_tools='gnutar plaintar pax cpio none'
@@ -3504,11 +3511,12 @@ printf %s "checking how to create a ustar tar archive... " >&6; }
   _am_tools=${am_cv_prog_tar_ustar-$_am_tools}
 
   for _am_tool in $_am_tools; do
+    am__tar_ignore_stderr=no
     case $_am_tool in
     gnutar)
       for _am_tar in tar gnutar gtar; do
-        { echo "$as_me:$LINENO: $_am_tar --version" >&5
-   ($_am_tar --version) >&5 2>&5
+        { echo "$as_me:$LINENO: $_am_tar --version | grep GNU >/dev/null" >&5
+   ($_am_tar --version | grep GNU >/dev/null) >&5 2>&5
    ac_status=$?
    echo "$as_me:$LINENO: \$? = $ac_status" >&5
    (exit $ac_status); } && break
@@ -3520,7 +3528,7 @@ printf %s "checking how to create a ustar tar archive... " >&6; }
     plaintar)
       # Must skip GNU tar: if it does not support --format= it doesn't create
       # ustar tarball either.
-      (tar --version) >/dev/null 2>&1 && continue
+      (tar --version | grep GNU) >/dev/null 2>&1 && continue
       am__tar='tar chf - "$$tardir"'
       am__tar_='tar chf - "$tardir"'
       am__untar='tar xf -'
@@ -3534,6 +3542,7 @@ printf %s "checking how to create a ustar tar archive... " >&6; }
       am__tar='find "$$tardir" -print | cpio -o -H ustar -L'
       am__tar_='find "$tardir" -print | cpio -o -H ustar -L'
       am__untar='cpio -i -H ustar -d'
+      am__tar_ignore_stderr=yes
       ;;
     none)
       am__tar=false
@@ -3582,6 +3591,7 @@ fi
 
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $am_cv_prog_tar_ustar" >&5
 printf '%s\n' "$am_cv_prog_tar_ustar" >&6; }
+
 
 
 
@@ -5512,7 +5522,7 @@ fi
 done
 
 if test x$regex_cmd = "x"; then
-as_fn_error $? "sed is required to build the default menu file." "$LINENO" 5
+    as_fn_error $? "sed is required to build the default menu file." "$LINENO" 5
 fi
 
 
@@ -7234,9 +7244,6 @@ printf '%s\n' "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
-if test -z "$PKG_CONFIG"; then
-	as_fn_error $? "pkg-config not found" "$LINENO" 5
-fi
 
 pkg_failed=no
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for librsvg-2.0" >&5
@@ -7324,55 +7331,41 @@ printf %s "checking for GCC... " >&6; }
 
 if test x$GCC = "xyes"; then
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-
-CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
+    CXXFLAGS="${CXXFLAGS} -Wall -W -pedantic"
 
 else
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no, trying other compilers" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no, trying other compilers" >&5
 printf '%s\n' "no, trying other compilers" >&6; }
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for MIPSpro" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for MIPSpro" >&5
 printf %s "checking for MIPSpro... " >&6; }
 
-mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
+    mips_pro_ver=`$CC -version 2>&1 | grep -i mipspro | cut -f4 -d ' '`
 
-if test "x$mips_pro_ver" = "x"; then
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+    if test "x$mips_pro_ver" = "x"; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
-
-
-else
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes, version $mips_pro_ver." >&5
+    else
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes, version $mips_pro_ver." >&5
 printf '%s\n' "yes, version $mips_pro_ver." >&6; }
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for -LANG:std in CXXFLAGS" >&5
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for -LANG:std in CXXFLAGS" >&5
 printf %s "checking for -LANG:std in CXXFLAGS... " >&6; }
 
-lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
+        lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
 
-if test "x$lang_std_not_set" = "x"; then
-
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: not set, setting." >&5
+        if test "x$lang_std_not_set" = "x"; then
+            { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: not set, setting." >&5
 printf '%s\n' "not set, setting." >&6; }
-
-  CXXFLAGS="${CXXFLAGS} -LANG:std"
-
-else
-
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: already set." >&5
+            CXXFLAGS="${CXXFLAGS} -LANG:std"
+        else
+            { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: already set." >&5
 printf '%s\n' "already set." >&6; }
-
-fi
-
-
-fi
+        fi
+    fi
 fi
 
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
@@ -7484,10 +7477,8 @@ fi
 
 XRENDER_LIB=""
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether XRender support is available
-" >&5
-printf %s "checking whether XRender support is available
-... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether XRender support is available" >&5
+printf %s "checking whether XRender support is available... " >&6; }
 
        for ac_header in X11/extensions/Xrender.h
 do :
@@ -7575,13 +7566,213 @@ done
 LIBS="$LIBS $X_EXTRA_LIBS $XRENDER_LIB"
 
 
+       for ac_header in X11/extensions/Xcomposite.h X11/extensions/Xdamage.h X11/extensions/Xfixes.h X11/extensions/Xrender.h
+do :
+  as_ac_Header=`printf '%s\n' "ac_cv_header_$ac_header" | sed "$as_sed_sh"`
+ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"
+then :
+  cat >>confdefs.h <<_ACEOF
+#define `printf '%s\n' "HAVE_$ac_header" | sed "$as_sed_cpp"` 1
+_ACEOF
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires XComposite, XDamage, XFixes and XRender headers." "$LINENO" 5
+ ;;
+esac
+fi
+
+done
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XCompositeQueryExtension in -lXcomposite" >&5
+printf %s "checking for XCompositeQueryExtension in -lXcomposite... " >&6; }
+if test ${ac_cv_lib_Xcomposite_XCompositeQueryExtension+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lXcomposite  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XCompositeQueryExtension (void);
+int
+main (void)
+{
+return XCompositeQueryExtension ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_Xcomposite_XCompositeQueryExtension=yes
+else case e in #(
+  e) ac_cv_lib_Xcomposite_XCompositeQueryExtension=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xcomposite_XCompositeQueryExtension" >&5
+printf '%s\n' "$ac_cv_lib_Xcomposite_XCompositeQueryExtension" >&6; }
+if test "x$ac_cv_lib_Xcomposite_XCompositeQueryExtension" = xyes
+then :
+  printf '%s\n' "#define HAVE_LIBXCOMPOSITE 1" >>confdefs.h
+
+  LIBS="-lXcomposite $LIBS"
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libXcomposite." "$LINENO" 5
+ ;;
+esac
+fi
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XDamageQueryExtension in -lXdamage" >&5
+printf %s "checking for XDamageQueryExtension in -lXdamage... " >&6; }
+if test ${ac_cv_lib_Xdamage_XDamageQueryExtension+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lXdamage  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XDamageQueryExtension (void);
+int
+main (void)
+{
+return XDamageQueryExtension ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_Xdamage_XDamageQueryExtension=yes
+else case e in #(
+  e) ac_cv_lib_Xdamage_XDamageQueryExtension=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xdamage_XDamageQueryExtension" >&5
+printf '%s\n' "$ac_cv_lib_Xdamage_XDamageQueryExtension" >&6; }
+if test "x$ac_cv_lib_Xdamage_XDamageQueryExtension" = xyes
+then :
+  printf '%s\n' "#define HAVE_LIBXDAMAGE 1" >>confdefs.h
+
+  LIBS="-lXdamage $LIBS"
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libXdamage." "$LINENO" 5
+ ;;
+esac
+fi
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XFixesQueryExtension in -lXfixes" >&5
+printf %s "checking for XFixesQueryExtension in -lXfixes... " >&6; }
+if test ${ac_cv_lib_Xfixes_XFixesQueryExtension+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lXfixes  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XFixesQueryExtension (void);
+int
+main (void)
+{
+return XFixesQueryExtension ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_Xfixes_XFixesQueryExtension=yes
+else case e in #(
+  e) ac_cv_lib_Xfixes_XFixesQueryExtension=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xfixes_XFixesQueryExtension" >&5
+printf '%s\n' "$ac_cv_lib_Xfixes_XFixesQueryExtension" >&6; }
+if test "x$ac_cv_lib_Xfixes_XFixesQueryExtension" = xyes
+then :
+  printf '%s\n' "#define HAVE_LIBXFIXES 1" >>confdefs.h
+
+  LIBS="-lXfixes $LIBS"
+
+else case e in #(
+  e) as_fn_error $? "Hackedbox requires libXfixes." "$LINENO" 5
+ ;;
+esac
+fi
+
+
+if test "x$XRENDER_LIB" = "x"; then
+    as_fn_error $? "Hackedbox requires XRender support for its built-in compositor." "$LINENO" 5
+fi
+
+
+printf '%s\n' "#define HAVE_COMPOSITOR 1" >>confdefs.h
+
+
+COMPOSITOR_LIBS="-lXcomposite -lXdamage -lXfixes"
+
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: Built-in compositor enabled" >&5
+printf '%s\n' "$as_me: Built-in compositor enabled" >&6;}
+
+
 Xext_lib=""
 SHAPE=""
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to build support for the XShape extension
-" >&5
-printf %s "checking whether to build support for the XShape extension
-... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to build support for the XShape extension" >&5
+printf %s "checking whether to build support for the XShape extension... " >&6; }
 
 # Check whether --enable-shape was given.
 if test ${enable_shape+y}
@@ -7594,10 +7785,10 @@ fi
 
 if test x$enableval = "xyes"; then
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XShapeCombineShape in -lXext" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for XShapeCombineShape in -lXext" >&5
 printf %s "checking for XShapeCombineShape in -lXext... " >&6; }
 if test ${ac_cv_lib_Xext_XShapeCombineShape+y}
 then :
@@ -7642,15 +7833,11 @@ fi
 printf '%s\n' "$ac_cv_lib_Xext_XShapeCombineShape" >&6; }
 if test "x$ac_cv_lib_Xext_XShapeCombineShape" = xyes
 then :
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for X11/extensions/shape.h
-" >&5
-printf %s "checking for X11/extensions/shape.h
-... " >&6; }
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for X11/extensions/shape.h" >&5
+printf %s "checking for X11/extensions/shape.h... " >&6; }
 
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-
 
 
 #include <X11/Xlib.h>
@@ -7673,17 +7860,17 @@ _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-SHAPE="-DSHAPE"
-Xext_lib="-lXext"
+        SHAPE="-DSHAPE"
+        Xext_lib="-lXext"
 
 else case e in #(
   e)
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
- ;;
+     ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -7694,7 +7881,7 @@ fi
 
 else
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
 
 fi
@@ -7706,38 +7893,28 @@ LIBS="$LIBS $Xext_lib"
 
 DEBUG=""
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to include verbose debugging code
-" >&5
-printf %s "checking whether to include verbose debugging code
-... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to include verbose debugging code" >&5
+printf %s "checking whether to include verbose debugging code... " >&6; }
 
 # Check whether --enable-debug was given.
 if test ${enable_debug+y}
 then :
   enableval=$enable_debug; if test x$enableval = "xyes"; then
 
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
 
-if test x$GCC = "xyes"; then
-
-  DEBUG="-DDEBUG -fno-inline -g"
-
-else
-
-  DEBUG="-DDEBUG"
-
-fi
-
+    if test x$GCC = "xyes"; then
+        DEBUG="-DDEBUG -fno-inline -g"
+    else
+        DEBUG="-DDEBUG"
+    fi
 
 else
 
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
-DEBUG="-DNDEBUG"
-
+    DEBUG="-DNDEBUG"
 
 fi
 else case e in #(
@@ -7754,28 +7931,22 @@ fi
 
 TIMEDCACHE=""
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to use the new timed pixmap cache
-" >&5
-printf %s "checking whether to use the new timed pixmap cache
-... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to use the new timed pixmap cache" >&5
+printf %s "checking whether to use the new timed pixmap cache... " >&6; }
 
 # Check whether --enable-timed-cache was given.
 if test ${enable_timed_cache+y}
 then :
   enableval=$enable_timed_cache; if test x$enableval = "xyes"; then
 
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-TIMEDCACHE="-DTIMEDCACHE"
-
+    TIMEDCACHE="-DTIMEDCACHE"
 
 else
 
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }
-
 
 fi
 else case e in #(

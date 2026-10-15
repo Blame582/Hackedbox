@@ -40,68 +40,72 @@ AM_CPPFLAGS = \
 bin_PROGRAMS = hackedbox hbsetbg hbsudo
 
 hackedbox_SOURCES = \
-src/BaseDisplay.cpp \
-src/BaseMenu.cpp \
-src/ClientMenu.cpp \
-src/Clock.cpp \
-src/Color.cpp \
-src/ConfigMenu.cpp \
-src/Dock.cpp \
-src/DockObject.cpp \
-src/DockButton.cpp \
-src/Font.cpp \
-src/FontCache.cpp \
-src/GCCache.cpp \
-src/Hackedbox.cpp \
-src/IconMenu.cpp \
-src/Image.cpp \
-src/ImageControl.cpp \
-src/ImageLoader.cpp \
-src/KeyManager.cpp \
-src/MenuManager.cpp \
-src/Netizen.cpp \
-src/Runbox.cpp \
-src/Screen.cpp \
-src/StyleEngine.cpp \
-src/Texture.cpp \
-src/Timer.cpp \
-src/Util.cpp \
-src/Window.cpp \
-src/WindowMenu.cpp \
-src/Workspace.cpp \
-src/WorkspaceMenu.cpp \
-src/main.cpp
+    src/BaseDisplay.cpp \
+    src/BaseMenu.cpp \
+    src/ClientMenu.cpp \
+    src/Clock.cpp \
+    src/Color.cpp \
+    src/ConfigMenu.cpp \
+    src/Compositor.cpp \
+    src/Dock.cpp \
+    src/DockObject.cpp \
+    src/DockButton.cpp \
+    src/Font.cpp \
+    src/FontCache.cpp \
+    src/GCCache.cpp \
+    src/Hackedbox.cpp \
+    src/IconMenu.cpp \
+    src/Image.cpp \
+    src/ImageControl.cpp \
+    src/ImageLoader.cpp \
+    src/KeyManager.cpp \
+    src/MenuManager.cpp \
+    src/Netizen.cpp \
+    src/Runbox.cpp \
+    src/Screen.cpp \
+    src/StyleEngine.cpp \
+    src/Texture.cpp \
+    src/Timer.cpp \
+    src/Util.cpp \
+    src/Window.cpp \
+    src/WindowMenu.cpp \
+    src/Workspace.cpp \
+    src/WorkspaceMenu.cpp \
+    src/main.cpp
 
 hackedbox_LDADD = \
-	$(PNG_LIBS) \
-	$(JPEG_LIBS) \
-	$(WEBP_LIBS) \
-	$(RSVG_LIBS) \
-	-lX11 \
-	-lXft \
-	-lXext \
-	-lXrender
+    $(PNG_LIBS) \
+    $(JPEG_LIBS) \
+    $(WEBP_LIBS) \
+    $(RSVG_LIBS) \
+    -lXcomposite \
+    -lXdamage \
+    -lXfixes \
+    -lXrender \
+    -lX11 \
+    -lXft \
+    -lXext
 
 hbsetbg_SOURCES = \
-	src/HbSetBg.cpp \
-	src/ImageLoader.cpp
+    src/HbSetBg.cpp \
+    src/ImageLoader.cpp
 
 hbsetbg_CPPFLAGS = \
-	$(AM_CPPFLAGS)
+    $(AM_CPPFLAGS)
 
 hbsetbg_LDADD = \
-	$(top_builddir)/src/BaseDisplay.o \
-	$(top_builddir)/src/Color.o \
-	$(top_builddir)/src/GCCache.o \
-	$(top_builddir)/src/Timer.o \
-	$(top_builddir)/src/Util.o \
-	$(PNG_LIBS) \
-	$(JPEG_LIBS) \
-	$(WEBP_LIBS) \
-	$(RSVG_LIBS) \
-	-lX11 \
-	-lXft \
-	-lXext
+    $(top_builddir)/src/BaseDisplay.o \
+    $(top_builddir)/src/Color.o \
+    $(top_builddir)/src/GCCache.o \
+    $(top_builddir)/src/Timer.o \
+    $(top_builddir)/src/Util.o \
+    $(PNG_LIBS) \
+    $(JPEG_LIBS) \
+    $(WEBP_LIBS) \
+    $(RSVG_LIBS) \
+    -lX11 \
+    -lXft \
+    -lXext
 
 hbsudo_SOURCES = \
     src/HbSudo.cpp
@@ -112,21 +116,21 @@ hbsudo_LDADD = \
     -lXrender
 
 MAINTAINERCLEANFILES = \
-	aclocal.m4 \
-	config.h.in \
-	configure \
-	Makefile.in
+    aclocal.m4 \
+    config.h.in \
+    configure \
+    Makefile.in
 
 EXTRA_DIST = \
-	bootstrap \
-	DEPENDENCIES \
-	README \
-	COPYING \
-	ChangeLog \
-	ChangeLog.new \
-	LICENSE \
-	doc \
-	include/*.hpp
+    bootstrap \
+    DEPENDENCIES \
+    README \
+    COPYING \
+    ChangeLog \
+    ChangeLog.new \
+    LICENSE \
+    doc \
+    include/*.hpp
 
 uninstall-local:
 	-rmdir $(pkgdatadir)

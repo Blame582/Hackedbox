@@ -531,32 +531,42 @@ bool MenuManager::parseFile(FILE *file,
              entries.begin();
            iterator != entries.end();
            ++iterator) {
-
-        const std::string &fileName =
-          *iterator;
-
-        if (fileName.empty())
-          continue;
-
-        if (fileName == "." ||
-            fileName == "..")
-          continue;
-
-        if (fileName[fileName.size() - 1] == '~')
+        const std::string &fileName = *iterator;
+        if (fileName.empty() ||
+            fileName == "." ||
+            fileName == ".." ||
+            fileName[fileName.size() - 1] == '~')
           continue;
 
         std::string style =
           stylesDirectory + "/" + fileName;
 
-        if (!stat(style.c_str(),
-                  &statBuffer) &&
-            S_ISREG(statBuffer.st_mode)) {
+        if (stat(style.c_str(), &statBuffer) == -1)
+          continue;
 
+        if (S_ISREG(statBuffer.st_mode)) {
+          stylesMenu->insert(fileName,
+                             HbScreen::SetStyle,
+                             style);
+          continue;
+        }
+
+        if (!S_ISDIR(statBuffer.st_mode))
+          continue;
+
+        std::string styleFile =
+          style + "/" + fileName;
+
+        struct stat styleStat;
+
+        if (stat(styleFile.c_str(), &styleStat) == 0 &&
+            S_ISREG(styleStat.st_mode)) {
           stylesMenu->insert(fileName,
                              HbScreen::SetStyle,
                              style);
         }
       }
+
 
       stylesMenu->update();
 
